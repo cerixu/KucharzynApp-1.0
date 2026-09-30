@@ -1383,10 +1383,17 @@ const _k3RecipeImage=recipeImage;
 recipeImage=function(r){
   const direct=_k3RecipeImage(r); if(direct && direct!=='./photo-generic.webp') return direct;
   const c=String(r?.category||'').toLowerCase(), n=String(r?.name||'').toLowerCase();
-  if(/deser|ciasto|słod/.test(c+' '+n)) return './photo-generic.webp';
-  if(/mięso|woł|wieprz|kurcz|drób/.test(c+' '+n)) return './photo-tomato.webp';
-  if(/ryb|owoc.*morza|krewet/.test(c+' '+n)) return './photo-generic.webp';
-  if(/sałat/.test(c+' '+n)) return './photo-tomato.webp';
+  if(/koktaj|cocktail|drink/.test(c+' '+n)) return 'https://upload.wikimedia.org/wikipedia/commons/5/59/Bacardi_Mojito.jpg';
+  if(/deser|ciasto|słod/.test(c+' '+n)) return './photo-cr-me-br-l-e.webp';
+  if(/mięso|woł|wieprz|kurcz|drób|baran|kacz/.test(c+' '+n)) return './photo-coq-au-vin.webp';
+  if(/ryb/.test(c+' '+n)) return './photo-fish-and-chips.webp';
+  if(/owoc.*morza|krewet|mule|ośmior/.test(c+' '+n)) return './photo-moqueca.webp';
+  if(/sałat|surów/.test(c+' '+n)) return './photo-panzanella.webp';
+  if(/warzyw/.test(c+' '+n)) return './photo-ratatouille.webp';
+  if(/zup/.test(c+' '+n)) return './photo-harira.webp';
+  if(/sos/.test(c+' '+n)) return './photo-tomato.webp';
+  if(/pieczyw|naan|focaccia/.test(c+' '+n)) return './photo-naan.webp';
+  if(/pasta|makaron/.test(c+' '+n)) return './photo-carbonara.webp';
   return direct;
 };
 
@@ -1708,7 +1715,26 @@ function k34CategoryRecipes(category){
   const c=String(category||'').trim();
   return state.recipes.filter(r=>String(r.category||'').trim()===c);
 }
+const K34_CATEGORY_IMAGES={
+  'Pizza':'./photo-pizza.webp',
+  'Pasta':'./photo-carbonara.webp',
+  'Sosy':'./photo-tomato.webp',
+  'Sosy bazowe':'./photo-tomato.webp',
+  'Mięso':'./photo-coq-au-vin.webp',
+  'Ryby':'./photo-fish-and-chips.webp',
+  'Owoce morza':'./photo-moqueca.webp',
+  'Warzywa':'./photo-ratatouille.webp',
+  'Desery':'./photo-cr-me-br-l-e.webp',
+  'Pieczywo':'./photo-naan.webp',
+  'Zupy':'./photo-harira.webp',
+  'Sałatki':'./photo-panzanella.webp',
+  'Cocktaile':'https://upload.wikimedia.org/wikipedia/commons/5/59/Bacardi_Mojito.jpg',
+  'Prep':'./photo-generic.webp',
+  'Inne':'./photo-generic.webp'
+};
 function k34CategoryImage(category){
+  const mapped=K34_CATEGORY_IMAGES[String(category||'').trim()];
+  if(mapped)return mapped;
   const r=k34CategoryRecipes(category)[0];
   return r?recipeImage(r):'./photo-generic.webp';
 }
@@ -1970,7 +1996,7 @@ async function k33EnsurePolishRecipes(){
       {name:'Placki ziemniaczane',category:'Mączne',cuisine:'Polska',description:'Chrupiące placki z tartych ziemniaków z cebulą, smażone na złoty kolor.',yield:12,yieldUnit:'szt.',servings:4,prep:20,cook:20,tags:['polskie','ziemniaki','mączne','smażone'],image:'https://upload.wikimedia.org/wikipedia/commons/8/86/Polish_potato_pancakes.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — Kavyass',sourceUrl:'https://commons.wikimedia.org/wiki/File:Polish_potato_pancakes.jpg',license:'CC BY-SA 4.0',imageSource:'external',imageCredit:'Kavyass / Wikimedia Commons (CC BY-SA 4.0)',ingredients:[['Ziemniaki',1000,'g'],['Cebula',120,'g'],['Jajko',1,'szt.'],['Mąka pszenna',40,'g'],['Sól',8,'g'],['Pieprz czarny',2,'g'],['Olej',100,'ml']],steps:['Zetrzyj ziemniaki i cebulę na drobnych oczkach. Odstaw na chwilę i odlej nadmiar płynu.','Dodaj jajko, mąkę, sól i pieprz. Wymieszaj.','Smaż cienkie porcje na dobrze rozgrzanym oleju z obu stron na złoto.','Podawaj od razu ze śmietaną, cukrem lub wytrawnymi dodatkami.']},
       {name:'Gołąbki z mięsem i ryżem',category:'Mięso',cuisine:'Polska',description:'Liście kapusty wypełnione farszem z mięsa i ryżu, duszone w sosie pomidorowym.',yield:12,yieldUnit:'szt.',servings:6,prep:45,cook:90,tags:['polskie','gołąbki','kapusta','mięso'],image:'https://upload.wikimedia.org/wikipedia/commons/7/7a/Golubci8.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — Kagor',sourceUrl:'https://commons.wikimedia.org/wiki/File:Golubci8.jpg',license:'CC BY-SA 3.0',imageSource:'external',imageCredit:'Kagor / Wikimedia Commons (CC BY-SA 3.0)',ingredients:[['Kapusta biała',1,'szt.'],['Mięso mielone wieprzowe',600,'g'],['Ryż',180,'g'],['Cebula',180,'g'],['Passata pomidorowa',700,'ml'],['Bulion',300,'ml'],['Sól',10,'g'],['Pieprz czarny',3,'g'],['Majeranek',4,'g']],steps:['Z kapusty usuń głąb, sparz liście i odłóż do ostygnięcia.','Ryż ugotuj do półmiękkości. Wymieszaj z mięsem, cebulą i przyprawami.','Na każdy liść nałóż farsz i ciasno zwiń.','Ułóż gołąbki w naczyniu, zalej passatą wymieszaną z bulionem.','Duś pod przykryciem około 75–90 minut, aż kapusta i farsz będą miękkie.']},
       {name:'Kopytka',category:'Mączne',cuisine:'Polska',description:'Delikatne kluski ziemniaczane z prostego ciasta z ziemniaków, mąki i jajka.',yield:6,yieldUnit:'porcja',servings:6,prep:35,cook:10,tags:['polskie','kluski','ziemniaki'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Kopytka_z_maslem_i_cukrem.jpg',imageSource:'external',imageCredit:'Olivia Fries / Wikimedia Commons (CC BY-SA 4.0)',sourceUrl:'https://commons.wikimedia.org/wiki/File:Kopytka_z_maslem_i_cukrem.jpg',license:'CC BY-SA 4.0',servingType:'Na ciepło',source:'Wikimedia Commons — Olivia Fries',ingredients:[['Ziemniaki',1000,'g'],['Mąka pszenna',250,'g'],['Jajko',1,'szt.'],['Sól',8,'g']],steps:['Ugotuj ziemniaki, dokładnie odparuj i przeciśnij przez praskę.','Dodaj jajko, sól i większość mąki. Szybko zagnieć miękkie ciasto.','Podziel ciasto na wałki i pokrój ukośnie na kopytka.','Gotuj partiami w osolonej wodzie do wypłynięcia.','Podawaj z masłem, sosem lub jako dodatek do mięsa.']},
-      {name:'Naleśniki z twarogiem',category:'Mączne',cuisine:'Polska',description:'Cienkie naleśniki z kremowym farszem z twarogu, śmietany i wanilii.',yield:10,yieldUnit:'szt.',servings:4,prep:25,cook:20,tags:['polskie','naleśniki','słodkie'],image:'./photo-tiramisu.webp',servingType:'Na ciepło',source:'Opracowanie Kucharzyny',ingredients:[['Mąka pszenna',250,'g'],['Mleko',500,'ml'],['Jajka',2,'szt.'],['Masło',30,'g'],['Twaróg półtłusty',400,'g'],['Śmietana',80,'g'],['Cukier',50,'g'],['Cukier waniliowy',8,'g']],steps:['Wymieszaj mąkę, mleko i jajka na gładkie ciasto. Dodaj roztopione masło.','Odstaw ciasto na 10 minut.','Smaż cienkie naleśniki na lekko natłuszczonej patelni.','Twaróg wymieszaj ze śmietaną, cukrem i wanilią.','Napełnij naleśniki farszem i złóż.']},
+      {name:'Naleśniki z twarogiem',category:'Mączne',cuisine:'Polska',description:'Cienkie naleśniki z kremowym farszem z twarogu, śmietany i wanilii.',yield:10,yieldUnit:'szt.',servings:4,prep:25,cook:20,tags:['polskie','naleśniki','słodkie'],image:'https://upload.wikimedia.org/wikipedia/commons/1/10/Naleśniki_z_serem_-_2023.11.13.jpg',servingType:'Na ciepło',source:'Opracowanie Kucharzyny',imageSource:'external-wikimedia-exact',imageCredit:'Aw58 / Wikimedia Commons',license:'CC BY-SA 4.0',sourceUrl:'https://commons.wikimedia.org/wiki/File:Naleśniki_z_serem_-_2023.11.13.jpg',ingredients:[['Mąka pszenna',250,'g'],['Mleko',500,'ml'],['Jajka',2,'szt.'],['Masło',30,'g'],['Twaróg półtłusty',400,'g'],['Śmietana',80,'g'],['Cukier',50,'g'],['Cukier waniliowy',8,'g']],steps:['Wymieszaj mąkę, mleko i jajka na gładkie ciasto. Dodaj roztopione masło.','Odstaw ciasto na 10 minut.','Smaż cienkie naleśniki na lekko natłuszczonej patelni.','Twaróg wymieszaj ze śmietaną, cukrem i wanilią.','Napełnij naleśniki farszem i złóż.']},
       {name:'Racuchy z jabłkami',category:'Desery',cuisine:'Polska',description:'Puszyste drożdżowe racuchy z kawałkami jabłek, smażone na złoto.',yield:12,yieldUnit:'szt.',servings:4,prep:25,cook:20,ferment:45,tags:['polskie','racuchy','jabłka','słodkie'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Racuchy_z_jab%C5%82kami_-_28.08.2026.jpg',imageSource:'external',imageCredit:'Aw58 / Wikimedia Commons (CC BY 4.0)',sourceUrl:'https://commons.wikimedia.org/wiki/File:Racuchy_z_jab%C5%82kami_-_28.08.2026.jpg',license:'CC BY 4.0',servingType:'Na ciepło',source:'Wikimedia Commons — Aw58',ingredients:[['Mąka pszenna',300,'g'],['Mleko',250,'ml'],['Drożdże świeże',20,'g'],['Jajko',1,'szt.'],['Cukier',40,'g'],['Jabłka',300,'g'],['Sól',2,'g'],['Olej',80,'ml']],steps:['Podgrzej mleko do letniej temperatury i rozprowadź w nim drożdże z cukrem.','Dodaj mąkę, jajko i sól. Wymieszaj i odstaw do wyrośnięcia na około 45 minut.','Dodaj pokrojone jabłka.','Smaż porcje na średnim ogniu z obu stron na złoto.','Podawaj z cukrem pudrem lub cynamonem.']},
       {name:'Barszcz czerwony',category:'Zupy',cuisine:'Polska',description:'Aromatyczny barszcz z pieczonych lub gotowanych buraków, zakwaszany dla wyraźnego smaku.',yield:2500,yieldUnit:'ml',servings:6,prep:20,cook:60,tags:['polskie','zupa','buraki','wigilia'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Barszcz_czerwony_z_uszkami_-_2025.01.21.jpg',imageSource:'external',imageCredit:'Aw58 / Wikimedia Commons (CC BY 4.0)',sourceUrl:'https://commons.wikimedia.org/wiki/File:Barszcz_czerwony_z_uszkami_-_2025.01.21.jpg',license:'CC BY 4.0',servingType:'Na ciepło',source:'Wikimedia Commons — Aw58',ingredients:[['Buraki',1000,'g'],['Woda',1800,'ml'],['Cebula',120,'g'],['Czosnek',15,'g'],['Liść laurowy',2,'szt.'],['Ziele angielskie',4,'szt.'],['Zakwas buraczany',300,'ml'],['Sól',12,'g'],['Pieprz czarny',2,'g'],['Majeranek',3,'g']],steps:['Buraki obierz i pokrój. Zalej wodą, dodaj cebulę, czosnek i przyprawy.','Gotuj bardzo spokojnie, bez mocnego wrzenia, aż buraki oddadzą kolor i smak.','Przecedź wywar i dodaj zakwas buraczany.','Dopraw solą, pieprzem i majerankiem. Nie doprowadzaj do mocnego wrzenia po dodaniu zakwasu.','Podawaj czysty lub z uszkami.']},
       {name:'Sałatka jarzynowa',category:'Sałatki',cuisine:'Polska',description:'Klasyczna polska sałatka z gotowanych warzyw, jajek, ogórków kiszonych i majonezu.',yield:1200,yieldUnit:'g',servings:8,prep:45,cook:25,tags:['polskie','sałatka','święta'],image:'https://upload.wikimedia.org/wikipedia/commons/9/96/2023_Sa%C5%82atka_jarzynowa_%281%29.jpg',imageSource:'external',imageCredit:'Jacek Halicki / Wikimedia Commons (CC BY-SA 4.0)',sourceUrl:'https://commons.wikimedia.org/wiki/File:2023_Sa%C5%82atka_jarzynowa_(1).jpg',license:'CC BY-SA 4.0',servingType:'Na zimno',source:'Wikimedia Commons — Jacek Halicki',ingredients:[['Ziemniaki',300,'g'],['Marchew',200,'g'],['Pietruszka korzeń',120,'g'],['Groszek',150,'g'],['Ogórki kiszone',180,'g'],['Jajka',3,'szt.'],['Jabłko',120,'g'],['Majonez',180,'g'],['Musztarda',20,'g'],['Sól',6,'g'],['Pieprz czarny',2,'g']],steps:['Ugotuj ziemniaki, marchew i pietruszkę. Wystudź.','Pokrój warzywa, ogórki, jabłko i jajka w drobną kostkę.','Dodaj groszek, majonez i musztardę.','Wymieszaj delikatnie i dopraw.','Schłodź minimum godzinę przed podaniem.']}
@@ -2322,9 +2348,9 @@ if(!window.__k35SearchCaptureBound){
   function emoji(raw){
     if(/bułk|bagiet|chleb|pieczyw/.test(raw))return E.bread; if(/mąk|skrobi|płatk|kasz/.test(raw))return E.flour; if(/wod/.test(raw))return E.water; if(/sól/.test(raw))return E.salt; if(/cukier/.test(raw))return E.sugar; if(/masł|ghee|tłuszcz/.test(raw))return E.fat; if(/mleko|śmietan|jogurt/.test(raw))return E.milk; if(/jajk|żółtk|białk/.test(raw))return E.egg; if(/ser|twaróg|feta|ricott|mascarpone/.test(raw))return E.cheese; if(/czosnk/.test(raw))return E.garlic; if(/cebul|por/.test(raw))return E.onion; if(/pomidor|passata|ketchup/.test(raw))return E.tomato; if(/papryk|chili|pieprz/.test(raw))return E.pepper; if(/ziemniak/.test(raw))return E.potato; if(/grzyb|pieczark/.test(raw))return E.mushroom; if(/woł|wieprz|schab|golonk|mięso|kacz|baranin|jagnię/.test(raw))return E.meat; if(/kurczak|drób|udko/.test(raw))return E.chicken; if(/kiełbas|chorizo|salami/.test(raw))return E.sausage; if(/ryb|dorsz|łosoś|tuńczyk/.test(raw))return E.fish; if(/krewet|mule|małż|ośmior/.test(raw))return E.seafood; if(/makaron|spaghetti|ramen|lasagne|gnocchi/.test(raw))return E.pasta; if(/ryż|risotto/.test(raw))return E.rice; if(/fasol|ciecierzyc|soczewic|groch|bób/.test(raw))return E.bean; if(/orzech|migdał|pistacj|sezam/.test(raw))return E.nut; if(/miód/.test(raw))return E.honey; if(/cytryn|limonk|pomarańcz/.test(raw))return E.citrus; if(/jabłk|grusz|śliwk|owoc/.test(raw))return E.fruit; if(/bulion|zupa|barszcz|żurek/.test(raw))return E.soup; if(/zioł|bazyl|oregano|tymian|majeran|pietrusz|koperek|szczypior|kminek|kumin|wanil|cynam|imbir/.test(raw))return E.spice; return E.generic;
   }
-  function markup(name){const raw=String(name||'').trim().toLowerCase(), c=code(raw), em=emoji(raw); if(!c)return `<span class="k40-ing-icon k40-ing-emoji" aria-hidden="true">${em}</span>`; return `<span class="k40-ing-wrap"><img class="k40-ing-icon" src="${C}${c}.svg" alt="" loading="lazy" decoding="async" onerror="this.remove();this.nextElementSibling.style.display='grid'"><span class="k40-ing-icon k40-ing-emoji" aria-hidden="true" style="display:none">${em}</span></span>`;}
+  function markup(name){const raw=String(name||'').trim().toLowerCase(), c=code(raw), em=emoji(raw); if(!c)return `<span class="k40-ing-icon k40-ing-emoji" aria-hidden="true">${em}</span>`; return `<span class="k40-ing-wrap"><img class="k40-ing-icon" src="${C}${c}.svg" alt="" loading="lazy" decoding="async" onerror="this.style.display='none';this.nextElementSibling.classList.add('k40-visible')"><span class="k40-ing-icon k40-ing-emoji" aria-hidden="true" style="display:none">${em}</span></span>`;}
   window.k38IngredientIconMarkup=markup; window.k32IngredientIconMarkup=markup; window.k32IngredientIconMarkupV2=markup;
-  const st=document.createElement('style'); st.id='k40-icon-style'; st.textContent='.k40-ing-wrap{width:40px;height:40px;display:block;flex:0 0 40px}.k40-ing-icon{width:40px!important;height:40px!important;object-fit:contain!important;display:block!important}.k40-ing-emoji{display:grid;place-items:center;font-size:27px;line-height:1;border-radius:10px;background:color-mix(in srgb,var(--surface2,#202226) 55%,transparent);border:1px solid color-mix(in srgb,var(--text) 8%,transparent)}'; document.head.appendChild(st);
+  const st=document.createElement('style'); st.id='k40-icon-style'; st.textContent='.k40-ing-wrap{width:40px;height:40px;display:block;flex:0 0 40px}.k40-ing-icon{width:40px!important;height:40px!important;object-fit:contain!important;display:block!important}.k40-ing-emoji{display:none;place-items:center;font-size:27px;line-height:1;border-radius:10px;background:color-mix(in srgb,var(--surface2,#202226) 55%,transparent);border:1px solid color-mix(in srgb,var(--text) 8%,transparent)}.k40-ing-emoji.k40-visible{display:grid!important}'; document.head.appendChild(st);
 })();
 
 /* K40 final Liquid Glass polish: the photograph becomes an atmosphere, not a card. */
@@ -2711,5 +2737,132 @@ document.head.appendChild(s)})();
     if(state.route==='recipe'){
       // The stock panel owns its own missing-to-shopping action.
     }
+  };
+})();
+
+
+/* ============================================================
+   Kucharzyna v5.2.3 — FINAL UI POLISH
+   - emoji-first ingredient icons (single source, no doubled icons)
+   - tighter iOS touch targets and visual hierarchy
+   - refined cards, chips, search, category hero and inventory rows
+   - category hero icon for faster visual scanning
+   ============================================================ */
+(function k523FinalPolish(){
+  const esc=window.escapeHtml||((s)=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])));
+  const emojiFor=(name='')=>{
+    const raw=String(name).toLowerCase().trim();
+    const rules=[
+      [/mąk|skrobi|płatk|kasz/,'🌾'],[/wod|bulion/,'💧'],[/sól|salt/,'🧂'],[/cukier|cukru/,'🍚'],
+      [/drożd/,'🫧'],[/pomidor|passata|pelati|ketchup/,'🍅'],[/czosnk/,'🧄'],[/cebul|por|dymka/,'🧅'],
+      [/marchew/,'🥕'],[/ziemniak/,'🥔'],[/papryk|chili|jalape|pieprz/,'🌶️'],[/cukinia|ogórek/,'🥒'],
+      [/bakłaż/,'🍆'],[/grzyb|pieczark/,'🍄'],[/sałat|rukol|szpinak|jarmuż|kapust/,'🥬'],
+      [/bazyl|oregano|tymian|rozmaryn|koperek|pietrusz|kolendr|zioł/,'🌿'],[/ser|twaróg|feta|ricott|mozz|mascarpone/,'🧀'],
+      [/mleko|śmietan|jogurt/,'🥛'],[/jaj/,'🥚'],[/oliw|olej/,'🫒'],[/masł|ghee/,'🧈'],
+      [/woł|wieprz|baran|jagnię|królik|mięso/,'🥩'],[/kurczak|drób/,'🍗'],[/boczek|pancetta|guanciale|szynka|salami|kiełbasa|chorizo/,'🥓'],
+      [/krewet|małż|mule|ośmior/,'🦐'],[/ryb|dorsz|łosoś|tuńczyk|anchois/,'🐟'],[/makaron|spaghetti|ramen|pasta|lasagne|gnocchi/,'🍝'],
+      [/ryż|risotto/,'🍚'],[/fasol|ciecierzyc|soczew|groch|bób/,'🫘'],[/orzech|migdał|pistacj|sezam/,'🥜'],
+      [/cytryn|limonk|pomarańcz/,'🍋'],[/jabłk|grusz|śliwk|owoc/,'🍎'],[/miód/,'🍯'],[/kakao|czekol/,'🍫'],
+      [/kawa|espresso/,'☕'],[/wino/,'🍷'],[/piwo/,'🍺'],[/śmietanka/,'🥛'],[/tofu|miso/,'🥢'],
+      [/pieczyw|chleb|bułk|bagiet/,'🥖']
+    ];
+    for(const [re,em] of rules) if(re.test(raw)) return em;
+    return '🍽️';
+  };
+  window.k523IngredientEmoji=emojiFor;
+  // One canonical renderer. No image + fallback emoji pair can ever coexist.
+  window.k32IngredientIconMarkup=function(name){
+    const em=emojiFor(name);
+    return `<span class="k523-ing-icon" aria-hidden="true">${em}</span>`;
+  };
+  window.k32IngredientIconMarkupV2=window.k32IngredientIconMarkup;
+  window.k38IngredientIconMarkup=window.k32IngredientIconMarkup;
+
+  const catEmoji={
+    'Pizza':'🍕','Pasta':'🍝','Sosy':'🍅','Sosy bazowe':'🍅','Mięso':'🥩','Ryby':'🐟','Owoce morza':'🦐',
+    'Warzywa':'🥬','Desery':'🍰','Pieczywo':'🥖','Zupy':'🍲','Sałatki':'🥗','Cocktaile':'🍹','Prep':'🧑‍🍳','Inne':'🍽️'
+  };
+  window.k523CategoryEmoji=(cat)=>catEmoji[String(cat||'').trim()]||'🍽️';
+
+  const style=document.createElement('style');
+  style.id='k523-final-polish';
+  style.textContent=`
+    /* Ingredient icon system */
+    .k523-ing-icon{
+      width:42px!important;height:42px!important;min-width:42px!important;flex:0 0 42px!important;
+      display:grid!important;place-items:center!important;border-radius:13px!important;
+      background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 10%,var(--surface)),color-mix(in srgb,#7c5cff 7%,var(--surface)))!important;
+      border:1px solid color-mix(in srgb,var(--text) 8%,transparent)!important;
+      font-size:25px!important;line-height:1!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 3px 10px rgba(0,0,0,.045)!important;
+    }
+    .k32-ing{align-items:center!important;min-height:66px!important;padding:11px 14px!important}
+    .k32-ing-name{font-weight:650!important;line-height:1.25!important;min-width:0!important}
+    .k32-ing strong{font-size:13px!important;color:color-mix(in srgb,var(--text) 78%,var(--muted))!important}
+    .k32-cook-ing{align-items:center!important;min-height:62px!important}
+    .k312-row-main>.k523-ing-icon{margin-right:2px}
+    .k312-row-main{align-items:center!important}
+
+    /* General iOS polish */
+    .main-scroll{scrollbar-width:none!important}
+    .main-scroll::-webkit-scrollbar{display:none!important}
+    .btn,.icon-btn,.chip,.nav-btn,.k42-card,.k421-google,.v3-link,.k33-back-button{transition:transform .16s ease,box-shadow .18s ease,background-color .18s ease,border-color .18s ease!important}
+    .btn:hover,.icon-btn:hover{box-shadow:0 7px 20px rgba(0,0,0,.07)}
+    .btn.primary{box-shadow:0 9px 24px color-mix(in srgb,var(--accent) 22%,transparent)!important}
+    .chip{min-height:42px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
+    .search{box-shadow:0 2px 12px rgba(0,0,0,.035)!important}
+    .card,.hero,.k312-row,.k312-summary,.k44-recipe-stock{box-shadow:0 7px 24px rgba(0,0,0,.055)!important}
+
+    /* Category hero */
+    .k523-category-icon{
+      position:absolute;right:20px;top:20px;z-index:4;width:58px;height:58px;border-radius:19px;
+      display:grid;place-items:center;font-size:31px;
+      background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+      box-shadow:0 12px 30px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.35);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    }
+    .k34-category-hero{box-shadow:0 22px 55px rgba(0,0,0,.15)!important}
+    .k34-category-copy h1{font-weight:850!important}
+    .k34-category-copy p{font-weight:600!important}
+
+    /* Inventory */
+    .k44-row{border-radius:19px!important;padding:13px!important;margin-bottom:8px!important}
+    .k44-row.is-low{border-color:color-mix(in srgb,#f59e0b 30%,var(--line))!important}
+    .k312-quick{box-shadow:inset 0 1px 0 rgba(255,255,255,.35)!important}
+    .k312-quick button,.k312-row-actions>button{transition:transform .12s ease,background .18s ease!important}
+    .k312-row-actions>button{border:1px solid var(--line)!important;background:var(--surface)!important;border-radius:11px!important;width:36px!important;height:36px!important;min-height:36px!important;padding:0!important;display:grid!important;place-items:center!important}
+
+    /* Home cards */
+    .k42-card{min-height:126px!important;border-radius:23px!important;padding:17px!important}
+    .k42-card:hover{transform:translateY(-2px)!important;box-shadow:0 16px 34px rgba(0,0,0,.09)!important}
+    .k42-icon{width:46px!important;height:46px!important;border-radius:15px!important}
+    .k421-google{min-height:72px!important;border-radius:21px!important}
+
+    /* Recipe cards */
+    .k32-recipe-card,.v3-recipe-card,.recipe-card{border-radius:21px!important}
+    .k32-recipe-card img,.v3-recipe-card img,.recipe-thumb img{transition:transform .35s ease!important}
+    .k32-recipe-card:hover img,.v3-recipe-card:hover img,.recipe-card:hover img{transform:scale(1.035)!important}
+
+    @media(max-width:430px){
+      .k523-ing-icon{width:40px!important;height:40px!important;min-width:40px!important;font-size:24px!important}
+      .k32-ing{padding:10px 12px!important}
+      .k523-category-icon{width:52px;height:52px;font-size:28px;right:15px;top:15px}
+      .k42-card{min-height:118px!important}
+    }
+    @media(prefers-reduced-motion:reduce){.k523-ing-icon,.btn,.icon-btn,.chip,.nav-btn,.k42-card,.k421-google,img{transition:none!important}}
+  `;
+  document.head.appendChild(style);
+
+  function addCategoryIcon(){
+    const hero=document.querySelector('.k34-category-hero');
+    if(!hero || hero.querySelector('.k523-category-icon')) return;
+    const title=hero.querySelector('h1')?.textContent?.trim()||'';
+    const icon=catEmoji[title]||'🍽️';
+    hero.insertAdjacentHTML('afterbegin',`<div class="k523-category-icon" aria-hidden="true">${icon}</div>`);
+  }
+  const oldRender523=window.renderV20||renderV20;
+  renderV20=function(){
+    oldRender523();
+    requestAnimationFrame(()=>{addCategoryIcon();});
   };
 })();

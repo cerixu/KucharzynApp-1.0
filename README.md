@@ -1,20 +1,19 @@
-# Kucharzyna v5.2.1
+# Kucharzyna v5.2.3 — UI POLISH
 
-PWA dla iPhone / Safari.
+Wersja bazowa: v5.2.2.
 
-## Przepisy z sieci
-Wyszukiwanie przepisów działa wewnątrz aplikacji przez TheMealDB API. Stare przyciski Google zostały przekierowane do wewnętrznego modułu `Przepisy z sieci`, więc użytkownik nie opuszcza Kucharzyny podczas wyszukiwania.
+## Zmiany
+- emoji-first ingredient icons: jedno źródło ikony, bez podwójnego emoji/obrazu,
+- poprawione zdjęcie receptury „Naleśniki z twarogiem”,
+- poprawione fallbacki zdjęć kategorii, żeby brak grafiki nie podstawiał przypadkowego dania,
+- dopracowane karty, przyciski, chipy, wyszukiwarki i wiersze magazynu,
+- większe i czytelniejsze ikony składników,
+- subtelny polish ekranów kategorii z ikoną kategorii,
+- poprawione stany dotyku i hover bez zmiany logiki aplikacji,
+- podbity cache Service Workera.
 
-## Import z linku
-Moduł importu może pobierać dane Recipe ze stron publikujących Schema.org Recipe oraz korzystać z tekstowego fallbacku.
-
-## Inteligentne składniki
-Zaimportowane składniki mogą zostać połączone z istniejącymi produktami magazynowymi albo zapisane jako nowe produkty. Powiązania są zapamiętywane lokalnie.
+## Źródła zdjęć
+Zdjęcia lokalne są częścią paczki Kucharzyny. Zdjęcia Wikimedia Commons używane jako dokładne zdjęcia konkretnych dań zachowują informacje o autorze/licencji w danych receptury. Zdjęcie Mojito korzysta z Wikimedia Commons, plik „Bacardi Mojito.jpg”, autor JIP, licencja CC BY-SA 4.0.
 
 ## PWA
-- IndexedDB
-- offline-first UI
-- Service Worker
-- iOS safe-area
-- apple-touch-icon
-- startup images dla iPhone 17 Pro Max
+Aplikacja pozostaje offline-first i zoptymalizowana pod Safari/iPhone z obsługą safe-area.
