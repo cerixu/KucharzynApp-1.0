@@ -1,11 +1,11 @@
-const DB_NAME="kucharzyna-db", DB_VERSION=3;
+const DB_NAME="kucharzyna-db", DB_VERSION=4;
 let dbPromise;
 function openDB(){
  if(dbPromise)return dbPromise;
  dbPromise=new Promise((resolve,reject)=>{
   const r=indexedDB.open(DB_NAME,DB_VERSION);
   r.onupgradeneeded=()=>{const db=r.result;
-   for(const s of ["recipes","ingredients","categories","shoppingItems","settings","history","cookState","pizzaProfiles"]) if(!db.objectStoreNames.contains(s)) db.createObjectStore(s,{keyPath:"id"});
+   for(const s of ["recipes","ingredients","categories","shoppingItems","settings","history","cookState","pizzaProfiles","inventoryItems"]) if(!db.objectStoreNames.contains(s)) db.createObjectStore(s,{keyPath:"id"});
   };
   r.onsuccess=()=>resolve(r.result); r.onerror=()=>reject(r.error);
  }); return dbPromise;
@@ -29,4 +29,4 @@ async function del(store,id){return new Promise((res,rej)=>{
 async function clearStore(store){return new Promise((res,rej)=>{
   tx(store,"readwrite").then(s=>{const r=s.clear();r.onsuccess=()=>res();r.onerror=()=>rej(r.error||new Error(`IndexedDB clear failed: ${store}`));}).catch(rej);
 })}
-async function clearAll(){for(const s of ["recipes","ingredients","categories","shoppingItems","settings","history","cookState","pizzaProfiles"])await clearStore(s)}
+async function clearAll(){for(const s of ["recipes","ingredients","categories","shoppingItems","settings","history","cookState","pizzaProfiles","inventoryItems"])await clearStore(s)}

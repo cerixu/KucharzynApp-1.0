@@ -122,3 +122,43 @@ Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut
 - Dodano etykietę REGIONALNE oraz region pochodzenia dla dań, dla których region jest określony.
 - Rozszerzono mapowanie ikon składników, w tym Bułka pszenna, pieczywo, bulion, mąki, mięsa i warzywa; nieznane składniki nie dostają już talerza ze sztućcami.
 - Start otrzymał ambientowe tło z aktualnego zdjęcia hero oraz warstwy Liquid Glass.
+
+
+## v3.10 — Photo-integrated Liquid Glass Start
+- Ekran Start nie używa już zdjęcia jako prostokątnej karty hero.
+- Główne zdjęcie jest atmosferycznym tłem z miękkim zanikiem, a jego kolory przechodzą przez całą powierzchnię Startu.
+- Menu i sekcje są półprzezroczystymi powierzchniami Liquid Glass z rozmyciem i subtelnym światłem.
+- Na iPhone ma mocniejszy efekt głębi i łagodniejsze przejście zdjęcie → tło aplikacji.
+- Fallback bez backdrop-filter pozostaje bezpieczny.
+
+## v3.11 — Liquid Glass + ingredient icon hardening
+- photo-driven Liquid Glass home polish: atmospheric photo, soft color spill, layered glass surfaces and mobile tuning.
+- ingredient icons hardened globally: OpenMoji exact icon where available, semantic emoji fallback when the remote asset is unavailable, with broader ingredient matching.
+- no ingredient falls back to the fork-and-plate icon.
+- OpenMoji graphics are CC BY-SA 4.0; attribution retained in project documentation.
+
+## v3.12 — Magazyn / Lodówka
+- Added local IndexedDB inventory store `inventoryItems`.
+- Professional profile labels the feature **Magazyn**; Amateur profile labels it **Lodówka**.
+- Inventory supports manual add/edit/delete, search, units g/kg/ml/l/szt./porcja.
+- Recipe ingredients are automatically deducted when a cooking session reaches completion.
+- Deduction is protected by a per-cook-session `inventoryConsumed` flag to prevent double subtraction.
+- Compatible weight/volume units are converted automatically; incompatible units are left untouched and reported as missing.
+- Inventory is included in JSON backup/import.
+
+
+## v3.13 — Magazyn/Lodówka: alerty i potwierdzenie zużycia
+- Każdy składnik może mieć własny próg alertu „kończy się”.
+- Start modułu pokazuje listę produktów poniżej progu.
+- Po zakończeniu GOTUJĘ aplikacja pyta, czy odjąć składniki z Magazynu/Lodówki.
+- „Tak, odejmij” zużywa dostępne ilości i zapisuje decyzję.
+- „Nie, zostaw” nie zmienia stanu magazynu i zapisuje decyzję, aby nie pytać ponownie dla tego samego gotowania.
+- Reset GOTUJĘ pozwala ponownie ugotować recepturę i podjąć nową decyzję.
+
+
+## v3.14 — Brakuje do przepisu
+- Na widoku każdej receptury Kucharzyna porównuje wymagane ilości z Magazynem/Lodówką.
+- Pokazuje dokładnie, których składników i jakiej ilości brakuje.
+- Jednostki g/kg oraz ml/l są przeliczane.
+- Jeśli stan wystarcza, pokazuje potwierdzenie „Masz wszystko do tego przepisu”.
+- Nie zmienia ani nie odejmuje stanów magazynowych podczas samego sprawdzania.
