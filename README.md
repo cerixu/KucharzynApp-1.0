@@ -108,3 +108,10 @@ Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut
 - Added a final exact-photo layer so older local fallback mappings cannot override the correct dish image.
 - Recipe metadata stores the Wikimedia source URL, author/credit and license where available.
 - Service Worker cache version bumped to v3.7.
+
+
+## v3.8 — ingredient icons
+- Replaced the old ingredient atlas mapping with recognizable OpenMoji food ingredient icons loaded from jsDelivr.
+- Ingredient icons now use exact/common food glyphs for flour, tomato, garlic, onion, dairy, eggs, meats, seafood, pasta, rice, vegetables, herbs, spices, fruits and sauces.
+- Unknown ingredients fall back to a neutral food icon instead of an unrelated atlas tile.
+- OpenMoji is licensed CC BY-SA 4.0: https://openmoji.org/

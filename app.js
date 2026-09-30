@@ -1989,3 +1989,31 @@ if(!window.__k35SearchCaptureBound){
     }catch(err){console.error('K35 search capture failed',err)}
   },true);
 }
+
+/* K38 ingredient icons: replace the old atlas with recognizable OpenMoji food icons. */
+(function k38InstallIngredientIcons(){
+  const C='https://cdn.jsdelivr.net/npm/openmoji@15.1.0/color/svg/';
+  const M={
+    'mąka':'1F33E','woda':'1F4A7','sól':'1F9C2','cukier':'1F36C','drożdże':'1F35E',
+    'oliwa':'1FAD2','olej':'1FAD2','masło':'1F9C8','mleko':'1F95B','śmietana':'1F95B','śmietanka':'1F95B','jogurt':'1F95B',
+    'jajka':'1F95A','jajko':'1F95A','żółtka':'1F95A','żółtko':'1F95A',
+    'mozzarella':'1F9C0','twaróg':'1F9C0','ricotta':'1F9C0','parmesan':'1F9C0','parmigiano':'1F9C0','pecorino':'1F9C0','gorgonzola':'1F9C0','ser pleśniowy':'1F9C0','ser żółty':'1F9C0','ser':'1F9C0','feta':'1F9C0','mascarpone':'1F9C0',
+    'czosnek':'1F9C4','cebula':'1F9C5','czerwona cebula':'1F9C5','por':'1F9C5','marchew':'1F955','marchewka':'1F955','seler':'1F96C','pietruszka':'1F33F','kolendra':'1F33F','koperek':'1F33F','szczypiorek':'1F33F',
+    'bazylia':'1F33F','oregano':'1F33F','tymianek':'1F33F','rozmaryn':'1F33F','majeranek':'1F33F','szałwia':'1F33F','imbir':'1FADA','trawa cytrynowa':'1F33F',
+    'pomidor':'1F345','pomidory':'1F345','pomidory san marzano':'1F345','pomidory san marzano pelati':'1F345','passata':'1F345','koncentrat pomidorowy':'1F345',
+    'papryka':'1F336','papryka świeża':'1F336','papryczka chili':'1F336','chili':'1F336','ancho chili':'1F336','suszone chili':'1F336','jalapeño':'1F336','cukinia':'1F952','bakłażan':'1F346','ogórek':'1F952',
+    'ziemniaki':'1F954','pieczarki':'1F344','grzyby':'1F344','borowiki':'1F344','trufle':'1F344','szpinak':'1F96C','rukola':'1F96C','sałata':'1F96C','karczochy':'1F966','oliwki':'1FAD2','kapary':'1F96C',
+    'wołowina':'1F969','wołowina mielona':'1F969','wieprzowina':'1F969','wieprzowina mielona':'1F969','kurczak':'1F357','udka z kurczaka':'1F357','baranina mielona':'1F969','jagnięcina':'1F969','królik':'1F407','boczek':'1F953','pancetta':'1F953','guanciale':'1F953','szynka':'1F953','prosciutto':'1F953','salami':'1F953','kiełbasa':'1F32D','chorizo':'1F32D','biała kiełbasa':'1F32D','wędzonka':'1F953',
+    'krewetki':'1F990','krewetka':'1F990','małże':'1F41A','mule':'1F41A','ośmiornica':'1F991','ośmiornica gotowana':'1F991','ryba':'1F41F','biała ryba':'1F41F','dorsz':'1F41F','łosoś':'1F41F','tuńczyk':'1F41F','anchois':'1F41F',
+    'spaghetti':'1F35D','makaron':'1F35D','makaron ryżowy':'1F35D','makaron ramen':'1F35C','tonnarelli':'1F35D','ciasto filo':'1F95F','tortille':'1FAD3',
+    'ryż':'1F35A','ryż arborio':'1F35A','ryż risotto':'1F35A','ryż ugotowany':'1F35A','kasza':'1F33E','groszek':'1FAD9','fasolka':'1FAD8','fasola':'1FAD8','czarna fasola':'1FAD8','ciecierzyca':'1FAD8','sucha ciecierzyca':'1FAD8','soczewica':'1FAD8',
+    'orzechy':'1F330','orzeszki':'1F95C','migdały':'1F330','pistacje':'1F95C','sezam':'1F330','miód':'1F36F','musztarda':'1FAD9','majonez':'1F95A','ketchup':'1F345','sos pomidorowy':'1F345','sos sojowy':'1FAD9','sos rybny':'1F41F','ocet':'1FAD9','ocet ryżowy':'1FAD9','ocet winny':'1FAD9','espresso':'2615','kakao':'1F36B','cytryna':'1F34B','sok z cytryny':'1F34B','sok z limonki':'1F34B','limonka':'1F34B','pomarańcza':'1F34A','szafran':'1F33C','pieprz':'1F336','pieprz czarny':'1F336','pieprz syczuański':'1F336','kumin':'1F33F','kminek':'1F33F','garam masala':'1F33F','five spice':'1F33F','anyż':'1F33F','cynamon':'1F33F','wanilia':'1F33F',
+    'awokado':'1F951','ananas':'1F34D','gruszka':'1F350','śliwki suszone':'1F95D','mleko kokosowe':'1F965','tofu':'1FAD1','tahini':'1FAD9','pasta tamaryndowa':'1FAD9','pasta massaman':'1F336','pasta gochujang':'1F336','gochujang':'1F336','miso':'1FAD9','dashi':'1FAD9','mirin':'1FAD9','hoisin':'1FAD9','doubanjiang':'1F336','liście kaffiru':'1F33F','nori':'1F96C','wakame':'1F96C','achiote':'1F33F'
+  };
+  function codeFor(name){const raw=String(name||'').trim().toLowerCase(); if(M[raw])return M[raw]; const k=Object.keys(M).find(x=>raw.includes(x)||x.includes(raw)); return k?M[k]:null;}
+  window.k38IngredientIconMarkup=function(name){const code=codeFor(name); if(!code)return `<span class="k38-ing-fallback" aria-hidden="true">🍽️</span>`; return `<img class="k38-ing-icon" src="${C}${code}.svg" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">`;};
+  window.k32IngredientIconMarkup=window.k38IngredientIconMarkup;
+  window.k32IngredientIconMarkupV2=window.k38IngredientIconMarkup;
+  window.k38IngredientIconCode=codeFor;
+  const sid='k38-ingredient-icons-style'; if(!document.getElementById(sid)){const s=document.createElement('style');s.id=sid;s.textContent='.k38-ing-icon,.k38-ing-fallback{width:38px!important;height:38px!important;flex:0 0 38px!important;display:block!important;object-fit:contain!important;border-radius:9px!important}.k38-ing-fallback{font-size:28px;line-height:38px;text-align:center;background:transparent}.k32-ing-thumb{background-image:none!important;background-position:initial!important}';document.head.appendChild(s);}
+})();
