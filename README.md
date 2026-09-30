@@ -66,5 +66,12 @@ Po publikacji nowej wersji Service Worker ma nowy numer cache. Jeśli iPhone pok
 Biblioteka zdjęć potraw jest dostarczana lokalnie jako WebP 900×760, zoptymalizowane pod iPhone/Safari. Service Worker cache’uje komplet 67 assetów zdjęciowych offline.
 
 
-## Ingredient Atlas 1.0
-Kucharzyna 3.2.4 uses one transparent `ingredient-atlas.webp` sprite with 96 cut-out ingredient assets for small thumbnails beside recipe ingredients. The atlas uses alpha transparency and a compact 32×3 grid, so the UI avoids dozens of individual image requests while keeping ingredient icons crisp and lightweight.
+## Ingredient Atlas 2.0
+Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut-out ingredient assets for small thumbnails beside recipe ingredients. The atlas uses alpha transparency and a compact 32×3 grid, so the UI avoids dozens of individual image requests while keeping ingredient icons crisp and lightweight.
+
+## 3.2.4 patch
+- Naprawiono wyszukiwanie receptur bez rerenderowania pola podczas pisania.
+- Wyszukiwanie obejmuje nazwę, opis, kategorię, kuchnię, tagi, uwagi i składniki.
+- Dodano/utrwalono recepturę „Pierogi ruskie” z lokalnym zdjęciem `photo-pierogi-ruskie.webp`.
+- Ingredient Atlas korzysta z transparentnego WebP i mapowania 12×8.
+- Service Worker cache bumped to `kucharzyna-v3.2.4-pierogi-atlas-v2`.

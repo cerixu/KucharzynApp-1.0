@@ -15,7 +15,8 @@ const RECIPE_IMAGES={
   "Carbonara":"./photo-carbonara.webp",
   "Spaghetti alla carbonara":"./photo-carbonara.webp",
   "Pizza Napoletana":"./photo-pizza.webp",
-  "Sos pomidorowy":"./photo-tomato.webp"
+  "Sos pomidorowy":"./photo-tomato.webp",
+  "Pierogi ruskie":"./photo-pierogi-ruskie.webp"
 };
 const DEFAULT_RECIPE_IMAGE="./photo-generic.webp";
 function recipeImage(r){
@@ -842,10 +843,10 @@ function bindV20(){
   $$('#main [data-shop-recipe]').forEach(b=>b.onclick=()=>addRecipeShoppingV20(b.dataset.shopRecipe));
   $$('#main [data-back]').forEach(b=>b.onclick=()=>nav(b.dataset.back||'start'));
   $$('#main [data-cat]').forEach(b=>b.onclick=()=>{state.selectedCat=b.dataset.cat;renderV20()});
-  const search=$('#recipeSearch'); if(search){search.oninput=()=>{state.query=search.value;clearTimeout(window.__k3SearchTimer);window.__k3SearchTimer=setTimeout(()=>renderV20(),80)}}
+  const search=$('#recipeSearch'); if(search){search.oninput=()=>{state.query=search.value;const caret=search.selectionStart??search.value.length;clearTimeout(window.__k3SearchTimer);window.__k3SearchTimer=setTimeout(()=>{renderV20();requestAnimationFrame(()=>{const el=$('#recipeSearch');if(el){el.focus({preventScroll:true});try{el.setSelectionRange(caret,caret)}catch(_){}}})},60)}}
   const sort=$('#sort'); if(sort){sort.onchange=()=>{state.sort=sort.value;renderV20()}}
   $$('#main [data-trad-v14]').forEach(b=>b.onclick=()=>{state.tradCatV14=b.dataset.tradV14;renderV20()});
-  const ws=$('#traditionalSearchV14');if(ws){ws.oninput=()=>{state.traditionalQueryV14=ws.value;clearTimeout(window.__k3WorldTimer);window.__k3WorldTimer=setTimeout(()=>renderV20(),80)}}
+  const ws=$('#traditionalSearchV14');if(ws){ws.oninput=()=>{state.traditionalQueryV14=ws.value;const caret=ws.selectionStart??ws.value.length;clearTimeout(window.__k3WorldTimer);window.__k3WorldTimer=setTimeout(()=>{renderV20();requestAnimationFrame(()=>{const el=$('#traditionalSearchV14');if(el){el.focus({preventScroll:true});try{el.setSelectionRange(caret,caret)}catch(_){}}})},60)}}
   $$('#main [data-world-cuisine]').forEach(b=>b.onclick=()=>{const c=b.dataset.worldCuisine;state.query='';state.selectedCat='Wszystkie';state.tradCatV14=c;renderV20();});
   $('#main [data-world-clear]')?.addEventListener('click',()=>{state.tradCatV14='Wszystkie';renderV20()});
   if(state.route==='google'){const g=$('#googleRecipeSearchInput');if(g){g.oninput=()=>state.googleQuery=g.value;g.onkeydown=e=>{if(e.key==='Enter')k3GoogleRecipeSearch()};}$('#googleRecipeGo')?.addEventListener('click',openGoogleRecipeSearch);$('#googleRecipeGo2')?.addEventListener('click',openGoogleRecipeSearch)}
@@ -1129,177 +1130,29 @@ function k32RecipeFamily(r){
 }
 const K32_FAMILY_LABEL={pizza:'Pizza / pieczywo',pasta:'Pasta / ryż',dessert:'Desery',seafood:'Ryby / owoce morza',meat:'Mięso',salad:'Sałatki',soup:'Zupy',sauce:'Sosy',dish:'Danie'};
 const K32_ING_ATLAS={
-  "Bazylia":[31,0],
-  "Drożdże":[4,0],
-  "Guanciale":[2,2],
-  "Mąka":[0,0],
-  "Oliwa":[6,0],
-  "Parmigiano":[16,0],
-  "Pecorino Romano":[17,0],
-  "Pieprz czarny":[2,0],
-  "Pomidory San Marzano":[24,0],
-  "Spaghetti":[19,2],
-  "Sól":[2,0],
-  "Woda":[1,0],
-  "achiote":[18,1],
-  "ananas":[24,0],
-  "ancho chili":[20,1],
-  "anchois":[17,2],
-  "anyż":[1,1],
-  "awokado":[24,0],
-  "bagietka":[0,0],
-  "bakłażan":[23,1],
-  "baranina mielona":[1,2],
-  "bazylia":[31,0],
-  "biała kiełbasa":[2,2],
-  "biała ryba":[13,2],
-  "biszkopty":[18,2],
-  "boczek":[29,1],
-  "bulion":[10,1],
-  "bułka tarta":[18,2],
-  "cebula":[7,1],
-  "chili":[20,1],
-  "ciasto filo":[25,2],
-  "ciecierzyca":[30,2],
-  "cukier":[3,0],
-  "cukinia":[22,1],
-  "cynamon":[1,1],
-  "cytryna":[24,0],
-  "cytryny kiszone":[24,0],
-  "czarna fasola":[30,2],
-  "czerstwy chleb":[18,2],
-  "czerwone wino":[6,0],
-  "czosnek":[4,1],
-  "dashi":[9,0],
-  "dorsz":[13,2],
-  "doubanjiang":[30,0],
-  "drożdże":[4,0],
-  "dymka":[15,1],
-  "espresso":[1,0],
-  "fasola":[30,2],
-  "fasolka":[23,2],
-  "feta":[20,0],
-  "five spice":[20,1],
-  "frytki":[16,1],
-  "galangal":[6,1],
-  "garam masala":[20,1],
-  "ghee":[7,0],
-  "gochujang":[30,0],
-  "groszek":[23,2],
-  "gruszka":[24,0],
-  "grzyby":[24,1],
-  "guanciale":[2,2],
-  "hoisin":[30,0],
-  "imbir":[6,1],
-  "jagnięcina":[27,1],
-  "jajka":[10,0],
-  "jalapeño":[21,1],
-  "jogurt":[21,0],
-  "jogurt grecki":[21,0],
-  "kakao":[30,2],
-  "kapary":[25,2],
-  "kiełbasa":[2,2],
-  "kiełki":[23,2],
-  "kminek":[1,1],
-  "kolendra":[13,1],
-  "koperek":[14,1],
-  "krewetki":[7,2],
-  "królik":[0,2],
-  "kumin":[20,1],
-  "kurczak":[0,2],
-  "limonka":[24,0],
-  "liście kaffiru":[3,1],
-  "majeranek":[0,1],
-  "makaron":[19,2],
-  "makaron ryżowy":[20,2],
-  "marchew":[11,1],
-  "mascarpone":[20,0],
-  "masło":[7,0],
-  "migdały":[31,2],
-  "mirin":[1,0],
-  "miso":[30,0],
-  "miód":[3,0],
-  "mleko":[9,0],
-  "mleko kokosowe":[23,0],
-  "mozzarella":[13,0],
-  "mąka":[0,0],
-  "nori":[3,1],
-  "ocet":[1,0],
-  "ocet ryżowy":[1,0],
-  "ocet winny":[1,0],
-  "ogórek":[22,1],
-  "olej":[6,0],
-  "olej palmowy":[6,0],
-  "olej sezamowy":[6,0],
-  "oliwa":[6,0],
-  "oliwki":[26,2],
-  "orzechy":[31,2],
-  "orzeszki":[31,2],
-  "ośmiornica":[10,2],
-  "paneer":[20,0],
-  "papryka":[18,1],
-  "papryka świeża":[18,1],
-  "passata":[28,0],
-  "pasta massaman":[30,0],
-  "pasta tamaryndowa":[30,0],
-  "pasztet":[16,2],
-  "pieczarki":[24,1],
-  "pieprz":[2,0],
-  "pieprz syczuański":[2,0],
-  "pietruszka":[12,1],
-  "piwo":[1,0],
-  "pomidor":[24,0],
-  "pomidory":[24,0],
-  "ryba":[13,2],
-  "ryż":[28,2],
-  "ryż arborio":[28,2],
-  "ryż risotto":[28,2],
-  "ryż ugotowany":[28,2],
-  "seler":[10,1],
-  "ser":[20,0],
-  "sezam":[31,2],
-  "skrobia ziemniaczana":[5,0],
-  "smalec":[7,0],
-  "soczewica":[30,2],
-  "sok z cytryny":[24,0],
-  "sok z limonki":[24,0],
-  "sos okonomiyaki":[30,0],
-  "sos rybny":[30,0],
-  "sos sojowy":[30,0],
-  "spaghetti":[19,2],
-  "sucha ciecierzyca":[30,2],
-  "suszone chili":[20,1],
-  "szafran":[3,1],
-  "szpinak":[12,1],
-  "sól":[2,0],
-  "tahini":[22,0],
-  "tofu":[20,0],
-  "tonnarelli":[19,2],
-  "tortille":[25,2],
-  "trawa cytrynowa":[15,1],
-  "twaróg":[15,0],
-  "tłuszcz barani":[7,0],
-  "udka z kurczaka":[31,1],
-  "wakame":[3,1],
-  "wanilia":[3,0],
-  "wieprzowina":[29,1],
-  "wieprzowina mielona":[1,2],
-  "woda":[1,0],
-  "wołowina":[27,1],
-  "wędzonka":[29,1],
-  "zakwas żytni":[0,0],
-  "ziemniaki":[16,1],
-  "śliwki suszone":[24,0],
-  "śmietanka":[8,0],
-  "Żółtka":[11,0],
-  "żółtka":[11,0],
-  "kapusta":[12,1],
-  "kapusta biała":[12,1],
-  "kapusta kiszona":[12,1],
-  "kimchi":[12,1],
-  "makaron ramen":[19,2],
-  "śmietana":[8,0], "dorsz":[7,2], "fasola":[31,2], "szczypiorek":[15,1], "cytryna":[24,1], "limonka":[25,1], "miód":[3,0],
-
+  // Row 0: baking basics, fats, dairy, eggs
+  "mąka":[0,0],"mąka typ 00":[0,0],"mąka pszenna":[0,0],"mąka typ 450/550":[0,0],"zakwas żytni":[0,0],
+  "woda":[0,1],"sól":[0,2],"cukier":[0,3],"drożdże":[0,4],"skrobia ziemniaczana":[0,3],
+  "oliwa":[0,6],"olej":[0,6],"olej roślinny":[0,6],"olej palmowy":[0,6],"olej sezamowy":[0,6],
+  "masło":[0,7],"ghee":[0,7],"smalec":[0,7],"mleko":[0,8],"śmietana":[0,9],"śmietanka":[0,9],"jogurt":[0,9],"jogurt grecki":[0,9],
+  "jajka":[0,10],"jajko":[0,10],"żółtka":[0,11],"żółtko":[0,11],
+  // Row 1: cheeses, dairy, aromatics
+  "mozzarella":[1,0],"mozzarella di bufala":[1,0],"twaróg":[1,3],"ricotta":[1,4],"parmesan":[1,5],"parmigiano":[1,5],"pecorino":[1,6],"pecorino romano":[1,6],"gorgonzola":[1,7],"ser pleśniowy":[1,7],"ser żółty":[1,8],"ser":[1,8],"feta":[1,8],"paneer":[1,9],"mascarpone":[1,8],
+  "czosnek":[3,0],"cebula":[3,2],"czerwona cebula":[3,3],"por":[3,9],"marchew":[3,12],"seler":[3,11],"pietruszka":[3,14],"kolendra":[3,15],"koperek":[3,16],"szczypiorek":[3,19],
+  "bazylia":[2,12],"oregano":[2,15],"tymianek":[2,16],"rozmaryn":[2,17],"majeranek":[2,18],"szałwia":[2,19],"imbir":[3,6],"trawa cytrynowa":[3,19],
+  // Row 2/4: tomatoes, vegetables, herbs, mushrooms
+  "pomidor":[2,0],"pomidory":[2,0],"pomidory san marzano":[2,1],"pomidory san marzano pelati":[2,7],"passata":[2,10],"koncentrat pomidorowy":[2,10],
+  "papryka":[4,4],"papryka świeża":[4,4],"papryczka chili":[4,7],"chili":[4,7],"ancho chili":[4,7],"suszone chili":[7,16],"jalapeño":[4,8],"cukinia":[4,10],"bakłażan":[4,11],"ogórek":[4,10],
+  "ziemniaki":[4,0],"marchewka":[4,2],"pieczarki":[4,13],"grzyby":[4,15],"borowiki":[4,16],"trufle":[4,19],"szpinak":[3,13],"rukola":[3,15],"sałata":[3,14],"karczochy":[7,11],"oliwki":[7,9],"kapary":[7,8],
+  // Row 5: meat and cured meat
+  "wołowina":[5,0],"wołowina mielona":[5,1],"wieprzowina":[5,3],"wieprzowina mielona":[5,4],"kurczak":[5,5],"udka z kurczaka":[5,6],"baranina mielona":[5,1],"jagnięcina":[5,1],"królik":[5,4],"boczek":[5,8],"pancetta":[5,8],"guanciale":[5,8],"szynka":[5,10],"prosciutto":[5,10],"salami":[5,12],"kiełbasa":[5,16],"chorizo":[5,18],"biała kiełbasa":[5,16],"wędzonka":[5,8],"tłuszcz barani":[5,1],"pasztet":[6,11],
+  // Row 6: seafood, pasta, grains
+  "krewetki":[6,0],"krewetka":[6,0],"małże":[6,4],"mule":[6,4],"ośmiornica":[6,3],"ośmiornica gotowana":[6,3],"ryba":[6,6],"biała ryba":[6,6],"dorsz":[6,6],"łosoś":[6,7],"tuńczyk":[6,8],"anchois":[6,9],"bułka tarta":[6,10],
+  "spaghetti":[6,0],"makaron":[6,2],"makaron ryżowy":[6,2],"makaron ramen":[6,3],"tonnarelli":[6,1],"ciasto filo":[6,9],"tortille":[6,1],
+  "ryż":[6,13],"ryż arborio":[6,13],"ryż risotto":[6,13],"ryż ugotowany":[6,13],"kasza":[6,12],"groszek":[7,4],"fasolka":[7,4],"fasola":[7,0],"czarna fasola":[7,1],"ciecierzyca":[7,3],"sucha ciecierzyca":[7,3],"soczewica":[7,2],
+  // Row 7: legumes, nuts, condiments, citrus, spices
+  "orzechy":[7,14],"orzeszki":[7,14],"migdały":[7,15],"pistacje":[7,19],"sezam":[7,14],"miód":[7,0],"musztarda":[7,1],"majonez":[7,2],"ketchup":[7,3],"sos pomidorowy":[7,3],"sos sojowy":[7,4],"sos rybny":[7,4],"ocet":[7,5],"ocet ryżowy":[7,5],"ocet winny":[7,5],"espresso":[7,6],"kakao":[7,3],"cytryna":[7,7],"sok z cytryny":[7,7],"sok z limonki":[7,8],"limonka":[7,8],"pomarańcza":[7,9],"szafran":[7,16],"pieprz":[7,12],"pieprz czarny":[7,12],"pieprz syczuański":[7,12],"kumin":[7,11],"kminek":[7,11],"garam masala":[7,13],"five spice":[7,13],"anyż":[7,11],"cynamon":[7,12],"vanilia":[7,13],"wanilia":[7,13],
+  "awokado":[4,10],"ananas":[7,9],"gruszka":[7,9],"śliwki suszone":[7,17],"mleko kokosowe":[0,9],"tofu":[1,9],"tahini":[7,2],"pasta tamaryndowa":[7,5],"pasta massaman":[7,5],"pasta gochujang":[7,3],"gochujang":[7,3],"miso":[7,4],"dashi":[0,8],"mirin":[7,5],"hoisin":[7,4],"doubanjiang":[7,3],"liście kaffiru":[2,18],"nori":[2,19],"wakame":[2,18],"achiote":[7,16],
 };
 function k32IngredientIcon(name=''){
   const raw=String(name).trim().toLowerCase();
@@ -1339,7 +1192,7 @@ const _k32ViewRecipesBase=viewRecipes;
 viewRecipes=function(){
   let rs=[...state.recipes];
   const q=String(state.query||'').trim().toLowerCase();
-  if(q) rs=rs.filter(r=>(`${r.name||''} ${r.description||''} ${(r.tags||[]).join(' ')} ${r.category||''}`).toLowerCase().includes(q));
+  if(q) rs=rs.filter(r=>(`${r.name||''} ${r.description||''} ${(r.tags||[]).join(' ')} ${r.category||''} ${r.cuisine||''} ${ingredientGroupsSafe(r).map(i=>i.name||'').join(' ')} ${r.notes||''}`).toLowerCase().includes(q));
   if(state.selectedCat!=='Wszystkie') rs=rs.filter(r=>r.category===state.selectedCat);
   if(state.sort==='name') rs.sort((a,b)=>a.name.localeCompare(b.name,'pl'));
   else if(state.sort==='fav') rs.sort((a,b)=>Number(b.favorite)-Number(a.favorite)||a.name.localeCompare(b.name,'pl'));
@@ -1693,3 +1546,140 @@ nav=function(route){
   }
   return _k34Nav(route);
 };
+
+/* ============================================================
+   Kucharzyna patch: Ingredient Atlas v2 + reliable local search
+   ============================================================ */
+const K32_ING_ATLAS_V2={
+  'mąka':[0,0],'mąka typ 00':[0,0],'mąka pszenna':[0,0],'mąka typ 450/550':[0,0],'mąka razowa':[0,3],
+  'woda':[1,0],'sól':[2,0],'cukier':[3,0],'drożdże':[4,0],'skrobia ziemniaczana':[5,0],
+  'oliwa':[6,0],'olej':[6,0],'olej roślinny':[6,0],'olej palmowy':[6,0],'olej sezamowy':[6,0],
+  'masło':[7,0],'ghee':[7,0],'smalec':[7,0],'mleko':[8,0],'mleko kokosowe':[11,0],
+  'śmietana':[9,1],'śmietanka':[9,1],'jogurt':[10,1],'jogurt grecki':[10,1],
+  'jajka':[10,0],'jajko':[10,0],'żółtka':[11,0],'żółtko':[11,0],
+  'mozzarella':[0,1],'mozzarella di bufala':[0,1],'twaróg':[3,1],'ricotta':[3,1],
+  'parmesan':[4,1],'parmigiano':[4,1],'pecorino':[5,1],'pecorino romano':[5,1],
+  'gorgonzola':[6,1],'ser pleśniowy':[6,1],'ser żółty':[7,1],'ser':[7,1],'feta':[7,1],
+  'paneer':[8,1],'mascarpone':[8,1],
+  'pomidor':[0,2],'pomidory':[0,2],'pomidory san marzano':[1,2],'pomidory san marzano pelati':[1,2],
+  'pomidor pelati':[1,2],'passata':[6,2],'koncentrat pomidorowy':[6,2],'sos pomidorowy':[6,2],
+  'suszony pomidor':[5,2],'suszone chili':[3,2],'papryka':[2,4],'papryka świeża':[2,4],
+  'papryczka chili':[4,4],'chili':[4,4],'ancho chili':[4,4],'jalapeño':[5,4],'cukinia':[5,4],
+  'bakłażan':[7,4],'ogórek':[5,4],'ziemniaki':[0,4],'marchew':[1,4],'marchewka':[1,4],
+  'pieczarki':[8,4],'grzyby':[9,4],'borowiki':[10,4],'trufle':[11,4],
+  'czosnek':[0,3],'cebula':[2,3],'czerwona cebula':[4,3],'por':[6,3],'seler':[7,3],
+  'pietruszka':[8,3],'kolendra':[9,3],'koperek':[10,3],'szczypiorek':[11,3],'bazylia':[7,2],
+  'oregano':[8,2],'tymianek':[9,2],'rozmaryn':[10,2],'majeranek':[8,2],'szałwia':[11,2],
+  'imbir':[3,3],'trawa cytrynowa':[6,3],
+  'wołowina':[0,5],'wołowina mielona':[1,5],'wieprzowina':[3,5],'wieprzowina mielona':[3,5],
+  'kurczak':[4,5],'udka z kurczaka':[5,5],'pierś z kurczaka':[4,5],'baranina mielona':[1,5],
+  'jagnięcina':[1,5],'królik':[3,5],'boczek':[7,5],'pancetta':[8,5],'guanciale':[7,5],
+  'szynka':[9,5],'prosciutto':[9,5],'salami':[10,5],'kiełbasa':[11,5],'biała kiełbasa':[11,5],
+  'chorizo':[11,5],'wędzonka':[7,5],
+  'krewetki':[0,6],'krewetka':[0,6],'ośmiornica':[3,6],'ośmiornica gotowana':[3,6],
+  'małże':[4,6],'mule':[4,6],'ryba':[6,6],'biała ryba':[6,6],'dorsz':[6,6],'łosoś':[7,6],
+  'tuńczyk':[8,6],'anchois':[9,6],'bułka tarta':[11,6],
+  'spaghetti':[0,7],'makaron':[2,7],'makaron ryżowy':[2,7],'makaron ramen':[2,7],'tonnarelli':[1,7],
+  'ciasto filo':[6,7],'tortille':[1,7],'ryż':[7,7],'ryż arborio':[7,7],'ryż risotto':[7,7],
+  'kasza':[6,7],'groszek':[4,7],'fasolka':[4,7],'fasola':[0,7],'czarna fasola':[1,7],
+  'ciecierzyca':[3,7],'sucha ciecierzyca':[3,7],'soczewica':[2,7],
+  'orzechy':[8,7],'orzeszki':[8,7],'migdały':[9,7],'pistacje':[11,7],'sezam':[8,7],
+  'miód':[0,7],'musztarda':[1,7],'majonez':[2,7],'ketchup':[2,7],'sos sojowy':[3,7],
+  'sos rybny':[3,7],'ocet':[4,7],'ocet ryżowy':[4,7],'ocet winny':[4,7],
+  'espresso':[5,7],'kakao':[2,7],'cytryna':[7,7],'sok z cytryny':[7,7],'limonka':[7,7],
+  'sok z limonki':[7,7],'pomarańcza':[8,7],'szafran':[10,7],'pieprz':[9,7],
+  'pieprz czarny':[9,7],'pieprz syczuański':[9,7],'kumin':[10,7],'kminek':[10,7],
+  'garam masala':[11,7],'five spice':[11,7],'anyż':[10,7],'cynamon':[10,7],'wanilia':[11,7],
+  'awokado':[5,4],'ananas':[8,7],'gruszka':[8,7],'śliwki suszone':[8,7],'tofu':[8,1],
+  'tahini':[2,7],'pasta tamaryndowa':[4,7],'pasta massaman':[4,7],'pasta gochujang':[2,7],
+  'gochujang':[2,7],'miso':[3,7],'dashi':[8,0],'mirin':[4,7],'hoisin':[3,7],
+  'doubanjiang':[2,7],'nori':[11,3],'wakame':[11,3],'achiote':[4,7],
+  'kapary':[4,7],'oliwki':[8,7],'frytki':[0,4],'biszkopty':[0,7],'piwo':[8,0],
+  'bulion':[8,0],'dymka':[11,3],'kiełki':[7,3],'cytryny kiszone':[7,7],
+  'kapusta kiszona':[2,3],'kapusta biała':[2,3],'ser mozzarella':[0,1]
+};
+function k32IngredientIconV2(name=''){
+  const raw=String(name).trim().toLowerCase();
+  if(K32_ING_ATLAS_V2[raw])return K32_ING_ATLAS_V2[raw];
+  const key=Object.keys(K32_ING_ATLAS_V2).find(k=>raw.includes(k)||k.includes(raw));
+  if(key)return K32_ING_ATLAS_V2[key];
+  const rules=[
+    [/mąk|flour/,'mąka'],[/drożd|yeast/,'drożdże'],[/pomidor|passata|pelati/,'pomidor'],[/czosnek/,'czosnek'],[/cebula|dymka/,'cebula'],
+    [/bazyl/,'bazylia'],[/pieprz|pepper/,'pieprz'],[/olej|tłuszcz|ghee/,'oliwa'],[/ser|cheese/,'ser'],[/jogurt|kefir/,'jogurt'],
+    [/śmiet|cream/,'śmietana'],[/mięso|wieprz|boczek|kiełbasa|baran|jagnię|królik/,'wieprzowina'],
+    [/ryb|fish/,'ryba'],[/owoce morza|ośmior|krewet|mule/,'krewetki'],[/orzech|migdał|sezam/,'orzechy'],
+    [/ciecierzy|hummus/,'ciecierzyca'],[/kapust/,'kapusta kiszona'],[/imbir|galangal/,'imbir'],[/cytr/,'cytryna'],[/lima/,'limonka'],
+    [/ziemniak|frytki/,'ziemniaki'],[/marchew/,'marchew'],[/makaron|pasta/,'makaron'],[/ryż|risotto/,'ryż']
+  ];
+  for(const [re,target] of rules){if(re.test(raw)&&K32_ING_ATLAS_V2[target])return K32_ING_ATLAS_V2[target]}
+  return [0,0];
+}
+k32IngredientIcon=k32IngredientIconV2;
+function k32IngredientIconMarkupV2(name){const p=k32IngredientIconV2(name);return `<span class="k32-ing-thumb" style="--ix:${p[0]};--iy:${p[1]}" aria-hidden="true"></span>`}
+k32IngredientIconMarkup=k32IngredientIconMarkupV2;
+
+/* Local search: never rerender the input while the user is typing. */
+function k32ApplyRecipeSearchLive(input){
+  try{
+    const q=String(input?.value||'').trim().toLowerCase(); state.query=input?.value||'';
+    const cards=$$('#main .k32-recipe-card'); let shown=0;
+    for(const card of cards){
+      const id=card.dataset.open; const r=state.recipes.find(x=>x.id===id); if(!r){card.hidden=true;continue;}
+      const hay=[r.name,r.description,r.category,r.cuisine,r.notes,(r.tags||[]).join(' '),ingredientGroupsSafe(r).map(i=>i.name||'').join(' ')].join(' ').toLowerCase();
+      const ok=!q||hay.includes(q); card.hidden=!ok; if(ok)shown++;
+    }
+    const clear=$('#k32-clear-search'); if(clear)clear.hidden=!q;
+    const count=$('.k33-recipe-library .k32-page-head p, .k32-library .k32-page-head p');
+    if(count)count.textContent=`${shown} ${shown===1?'receptura':'receptur'} · ${state.sort==='fav'?'tylko ulubione.':'wszystko zapisane lokalnie.'}`;
+    let empty=$('#k32-live-search-empty');
+    const grid=$('#main .k32-recipe-grid');
+    if(q&&shown===0){if(!empty&&grid){empty=document.createElement('div');empty.id='k32-live-search-empty';empty.className='k33-empty';empty.innerHTML='<div>⌕</div><h3>Brak wyników</h3><p>Spróbuj innej nazwy, składnika albo kategorii.</p>';grid.parentElement.appendChild(empty)}if(grid)grid.hidden=true}
+    else{if(grid)grid.hidden=false;if(empty)empty.remove()}
+  }catch(e){console.error('Live recipe search error',e)}
+}
+const _kSearchBind=bindV20;
+bindV20=function(){
+  _kSearchBind();
+  const input=$('#recipeSearch');
+  if(input){
+    input.oninput=null;
+    input.addEventListener('input',e=>k32ApplyRecipeSearchLive(e.currentTarget));
+    input.addEventListener('keydown',e=>{if(e.key==='Enter'){state.query=e.currentTarget.value;renderV20();requestAnimationFrame(()=>{const el=$('#recipeSearch');el?.focus({preventScroll:true});if(el)try{el.setSelectionRange(el.value.length,el.value.length)}catch(_){}})}});
+  }
+};
+
+/* Ensure the Polish classic recipe exists, even on an older installed database. */
+async function k32EnsurePierogiRuskie(){
+  try{
+    let r=state.recipes.find(x=>String(x.name||'').toLowerCase()==='pierogi ruskie');
+    const ingredients=[['Mąka pszenna typ 450/550',500,'g'],['Woda ciepła',200,'ml'],['Sól',5,'g'],['Ziemniaki',800,'g'],['Twaróg półtłusty',500,'g'],['Cebula',300,'g'],['Masło',50,'g'],['Pieprz czarny',2,'g']];
+    const steps=['Wymieszaj mąkę, sól i ciepłą wodę. Zagnieć gładkie, elastyczne ciasto. Przykryj i odstaw na 30 minut.','Ugotuj ziemniaki, odparuj je i przeciśnij. Dodaj twaróg oraz podsmażoną na maśle cebulę. Dopraw solą i pieprzem.','Rozwałkuj ciasto cienko i wytnij krążki. Na każdy nałóż porcję farszu i dokładnie zlep brzegi.','Gotuj pierogi partiami w osolonej wodzie. Gdy wypłyną, gotuj jeszcze około 2 minuty.','Podawaj z podsmażoną cebulką, masłem lub śmietaną według własnego stylu.'];
+    if(!r){
+      r=makeRecipe({name:'Pierogi ruskie',category:'Mączne',cuisine:'Polska',description:'Klasyczne polskie pierogi z farszem z ziemniaków, twarogu i cebuli. Delikatne ciasto i kremowe nadzienie tworzą bazę do domowego lub profesjonalnego serwisu.',yield:40,yieldUnit:'szt.',servings:4,prep:60,cook:10,ferment:0,temp:0,tags:['polskie','pierogi','mączne','klasyczne'],traditional:true,flag:'🇵🇱',servingType:'Na ciepło',ingredients:ingredients,steps,notes:'Najlepszy farsz jest dobrze odparowany i całkowicie wystudzony przed lepieniem.',source:'Opracowanie Kucharzyny',sourceUrl:'',license:'',taste:{sweet:1,sour:1,salty:4,umami:4,bitter:0,spicy:1}});
+    } else {
+      r.cuisine='Polska'; r.category='Mączne'; r.description='Klasyczne polskie pierogi z farszem z ziemniaków, twarogu i cebuli. Delikatne ciasto i kremowe nadzienie tworzą bazę do domowego lub profesjonalnego serwisu.';r.yield=40;r.yieldUnit='szt.';r.servings=4;r.prep=60;r.cook=10;r.servingType='Na ciepło';r.tags=['polskie','pierogi','mączne','klasyczne'];
+      r.sections=[{id:uid(),name:'Ciasto',ingredients:ingredients.slice(0,3).map(a=>({id:uid(),name:a[0],qty:a[1],unit:a[2],percent:''}))},{id:uid(),name:'Farsz',ingredients:ingredients.slice(3).map(a=>({id:uid(),name:a[0],qty:a[1],unit:a[2],percent:''}))}];r.steps=steps.map(text=>({id:uid(),text}));r.image='./photo-pierogi-ruskie.webp';r.imageSource='bundled';r.imageCredit='Zdjęcie Kucharzyny';r.updatedAt=now();
+    }
+    r.image='./photo-pierogi-ruskie.webp';r.imageSource='bundled';r.imageCredit='Zdjęcie Kucharzyny';
+    if(!r.sections||!r.sections.length)r.sections=[{id:uid(),name:'Główna',ingredients:ingredients.map(a=>({id:uid(),name:a[0],qty:a[1],unit:a[2],percent:''}))}];
+    await put('recipes',r);state.recipes=await getAll('recipes');
+  }catch(e){console.error('Pierogi migration failed',e)}
+}
+
+/* Install the cleaned transparent atlas and update cache references. */
+function k32InstallIngredientAtlasV2(){
+  try{
+    const styleId='k32-ingredient-atlas-v2-style'; if(document.getElementById(styleId))return;
+    const s=document.createElement('style');s.id=styleId;s.textContent=`
+      .k32-ing-thumb{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:10px!important;display:block!important;background-image:url('./ingredient-atlas-transparent.webp')!important;background-repeat:no-repeat!important;background-size:432px 288px!important;background-position:calc(var(--ix,0) * -36px) calc(var(--iy,0) * -36px)!important;background-color:transparent!important;box-shadow:none!important;mix-blend-mode:normal!important;overflow:hidden!important}
+      .k32-cook-ing .k32-ing-thumb{width:38px!important;height:38px!important;flex-basis:38px!important;background-size:456px 304px!important;background-position:calc(var(--ix,0) * -38px) calc(var(--iy,0) * -38px)!important}
+      .k32-search input,#recipeSearch{pointer-events:auto!important;user-select:text!important;-webkit-user-select:text!important;touch-action:manipulation!important;caret-color:var(--text)!important}
+      #k32-live-search-empty{grid-column:1/-1}
+    `;document.head.appendChild(s);
+  }catch(e){console.error('Ingredient atlas style failed',e)}
+}
+
+const _kAtlasBind=bindV20;
+bindV20=function(){_kAtlasBind();k32InstallIngredientAtlasV2()};
+
+setTimeout(async()=>{await k32EnsurePierogiRuskie();renderV20()},950);
