@@ -2,17 +2,10 @@ const { test, expect } = require('@playwright/test');
 
 async function resetApp(page) {
   await page.goto('/');
+  await expect(page.locator('body')).toContainText('Kucharzyna');
   await page.evaluate(async () => {
-    if ('serviceWorker' in navigator) {
-      const regs = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map(r => r.unregister()));
-    }
-    if (indexedDB.databases) {
-      const dbs = await indexedDB.databases();
-      await Promise.all(dbs.filter(db => db.name === 'kucharzyna-db').map(db => new Promise(resolve => {
-        const req = indexedDB.deleteDatabase(db.name);
-        req.onsuccess = req.onerror = req.onblocked = () => resolve();
-      })));
+    if (typeof clearAll === 'function') {
+      await clearAll();
     }
   });
   await page.reload();
@@ -78,7 +71,7 @@ test('shopping list can add and complete an item', async ({ page }) => {
   await page.locator('#shop-ok').click();
 
   await expect(page.locator('#main')).toContainText('E2E Pomidor');
-  const row = page.locator('.v3-shop-row, .shopping-item, .k32-shop-row').filter({ hasText: 'E2E Pomidor' }).first();
+  const row = page.locator('.shopping-item').filter({ hasText: 'E2E Pomidor' }).first();
   await expect(row).toBeVisible();
   const toggle = row.locator('[data-shop-check-v20]').first();
   await toggle.check();
