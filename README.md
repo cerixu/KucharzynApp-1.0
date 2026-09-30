@@ -162,3 +162,10 @@ Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut
 - Jednostki g/kg oraz ml/l są przeliczane.
 - Jeśli stan wystarcza, pokazuje potwierdzenie „Masz wszystko do tego przepisu”.
 - Nie zmienia ani nie odejmuje stanów magazynowych podczas samego sprawdzania.
+
+
+## Kucharzyna v4.0
+- Naprawiono warstwowanie zdjęcia Start: główne zdjęcie jest ostre i widoczne, ambient pozostaje tylko tłem.
+- Usunięto blur z całego hero Start, który wcześniej rozmywał fotografię przez `backdrop-filter`.
+- Uporządkowano Liquid Glass kart menu: mniej przezroczystości, czytelniejszy tekst, delikatny blur tylko na kartach.
+- Zachowano obsługę safe-area i trybu jasnego/ciemnego.
