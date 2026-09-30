@@ -2313,3 +2313,5 @@ document.head.appendChild(s)})();
 })();
 
 /* Service-worker cache version for inventory schema/UI. */
+
+/* Kucharzyna v4.1 START rebuild marker. Visual overrides live in styles.css. */

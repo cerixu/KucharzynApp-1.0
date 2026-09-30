@@ -1,35 +1,8 @@
-# Kucharzyna 👨‍🍳
+# Kucharzyna v3.3 Core — GitHub Pages ROOT
 
-**Kucharzyna** to darmowa, instalowalna aplikacja **PWA na iPhone'a**, zaprojektowana jako cyfrowy notatnik i narzędziownik kucharza. Działa lokalnie i offline, więc własne receptury, zakupy oraz dane kuchenne pozostają na urządzeniu.
+PWA Kucharzyna przygotowana do publikacji jako statyczna strona na GitHub Pages.
 
-### Co robi Kucharzyna?
-
-- 📖 **Receptury** — własne przepisy, składniki, instrukcje, zdjęcia, uwagi i historia zmian.
-- 🍳 **GOTUJĘ** — prowadzenie przez recepturę krok po kroku, z zapisem postępu i timerem.
-- 🌍 **Kuchnie świata** — uporządkowane receptury według kuchni i regionów.
-- 🧮 **Kalkulatory** — m.in. pizza/ciasto, skalowanie receptur i obliczenia procentowe.
-- 🛒 **Zakupy** — lista zakupów tworzona ręcznie lub bezpośrednio z receptur.
-- 📦 **Magazyn / Lodówka** — stan składników, progi ostrzegawcze i sprawdzanie, czego brakuje do przygotowania przepisu.
-- 💰 **Food Cost** — narzędzia dla profesjonalnej kuchni do liczenia kosztu receptur i porcji.
-- 🔎 **Wyszukiwanie** — szybkie znajdowanie receptur po nazwie, składnikach, tagach i innych danych.
-- 💾 **Backup** — eksport i import danych receptur oraz ustawień w formacie JSON.
-- 📱 **PWA na iOS** — można dodać do ekranu początkowego i korzystać jak z aplikacji.
-- 🌙 **Light / Dark Mode** — interfejs dopasowuje się do ustawień systemu.
-
-### Dla kogo?
-
-Kucharzyna ma dwa tryby pracy:
-
-**Pro / Profesjonalny** — receptury produkcyjne, magazyn, zakupy, kalkulatory i Food Cost.
-
-**Amator** — prostszy interfejs do gotowania w domu, bez funkcji typowo restauracyjnych.
-
-### Prywatność
-
-Kucharzyna jest aplikacją statyczną/offline-first. Nie wymaga własnego serwera, konta ani systemu śledzenia użytkownika. Dane aplikacji są przechowywane lokalnie w przeglądarce urządzenia.
-
----
-
+## v3.3 — Core / zdjęcia / wyszukiwanie / składniki
 - Stały przycisk `←` w lewym górnym rogu na każdym ekranie.
 - Inteligentny powrót: gotowanie → receptura → poprzedni ekran.
 - Stały przycisk `⚙ Ustawienia` w górnym pasku, również w trybie Amator.
