@@ -7,10 +7,13 @@ async function resetApp(page) {
       const regs = await navigator.serviceWorker.getRegistrations();
       await Promise.all(regs.map(r => r.unregister()));
     }
-    await new Promise(resolve => {
-      const req = indexedDB.deleteDatabase('kucharzyna-db');
-      req.onsuccess = req.onerror = req.onblocked = () => resolve();
-    });
+    if (indexedDB.databases) {
+      const dbs = await indexedDB.databases();
+      await Promise.all(dbs.filter(db => db.name === 'kucharzyna-db').map(db => new Promise(resolve => {
+        const req = indexedDB.deleteDatabase(db.name);
+        req.onsuccess = req.onerror = req.onblocked = () => resolve();
+      })));
+    }
   });
   await page.reload();
   await expect(page.locator('body')).toContainText('Kucharzyna');
