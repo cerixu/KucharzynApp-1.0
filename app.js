@@ -420,6 +420,44 @@ function parseReaderRecipe(text,url){
   const host=new URL(url).hostname.replace(/^www\./,'');
   return makeRecipe({name:title,category:'Inne',cuisine:'',description:`Zaimportowano z ${host}.`,yield:1,yieldUnit:'porcja',servings:1,prep:0,cook:0,ferment:0,temp:0,tags:['import','internet'],traditional:false,flag:'',ingredients:ings.map(i=>[i.name,i.qty,i.unit,'']),steps:steps.length?steps:['Uzupełnij instrukcję po imporcie.'],notes:`Zaimportowano z ${host}. Sprawdź dane przed zapisaniem.`,source:host,sourceUrl:url,image:'',imageUrl:'',imageSource:host,imageCredit:host,onlineSourceId:''});
 }
+function normalizeIngredientNameV52(name){
+  const n=String(name||'').trim().toLocaleLowerCase('pl').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+  const stop=/^(drobno|grubo|swiezy|swieza|swieze|swiezego|swiezej|posiekany|posiekana|posiekane|starty|starta|starte|tarty|tarta|tarte|ugotowany|ugotowana|ugotowane|opcjonalnie|do smaku|wedlug uznania)\s+/;
+  return n.replace(stop,'').replace(/\s+/g,' ').trim();
+}
+function ingredientSimilarityV52(a,b){
+  a=normalizeIngredientNameV52(a);b=normalizeIngredientNameV52(b);if(!a||!b)return 0;if(a===b)return 1;
+  const aa=new Set(a.split(' ')),bb=new Set(b.split(' '));let common=0;for(const x of aa)if(bb.has(x))common++;const j=common/(aa.size+bb.size-common||1);
+  if(a.startsWith(b+' ')||b.startsWith(a+' '))return Math.max(j,.82);return j;
+}
+function suggestInventoryMatchV52(name,items){
+  const key=window.k312InventoryKey?window.k312InventoryKey(name):normalizeIngredientNameV52(name);
+  let exact=items.find(x=>(window.k312InventoryKey?window.k312InventoryKey(x.name):normalizeIngredientNameV52(x.name))===key);
+  if(exact)return {item:exact,score:1,reason:'Dokładne dopasowanie'};
+  let best=null,score=0;for(const x of items){const sc=ingredientSimilarityV52(name,x.name);if(sc>score){score=sc;best=x}}
+  return best&&score>=.62?{item:best,score,reason:'Podobna nazwa'}:null;
+}
+async function openIngredientMapperV52(recipe){
+  const items=await getAll('inventoryItems');
+  const rows=[];for(const sec of recipe.sections||[])for(const ing of sec.ingredients||[]){
+    if(!ing.name)continue;const suggestion=suggestInventoryMatchV52(ing.name,items);rows.push({id:ing.id,name:ing.name,unit:ing.unit,qty:ing.qty,suggestion,selected:suggestion?.item?.name||''});
+  }
+  if(!rows.length){state.editTemp=recipe;state.editId=null;state.route='edit';renderV20();return;}
+  const options=(row)=>`<option value="__new__">＋ Utwórz nowy produkt</option>${items.map(x=>`<option value="${escapeHtml(x.id)}" ${row.suggestion?.item?.id===x.id?'selected':''}>${escapeHtml(x.name)} · ${escapeHtml(x.unit)}</option>`).join('')}`;
+  openModal(`<div class="v52-mapper"><div class="v3-kicker">INTELIGENTNE SKŁADNIKI</div><h2>Połącz z magazynem</h2><p class="muted">Kucharzyna rozpoznała składniki. Potwierdź dopasowanie albo utwórz nowy produkt. Twoje wybory zostaną zapisane w recepturze.</p><div class="v52-map-list">${rows.map((r,i)=>`<div class="v52-map-row" data-v52-row="${i}"><div class="v52-map-main"><b>${escapeHtml(r.name)}</b><small>${fmt(r.qty)} ${escapeHtml(r.unit)}${r.suggestion?` · <span class="v52-confidence">${escapeHtml(r.suggestion.reason)}</span>`:' · brak dopasowania'}</small></div><select class="v52-map-select" data-v52-select="${i}">${options(r)}</select></div>`).join('')}</div><div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Anuluj</button><button class="btn primary" id="v52-map-save">Zapisz dopasowania i edytuj</button></div></div>`);
+  $('#v52-map-save').onclick=async()=>{
+    for(const row of rows){
+      const el=$(`[data-v52-select="${row.id===undefined?'':rows.indexOf(row)}"]`);const val=el?.value||'__new__';let invName='';
+      if(val!=='__new__'){const item=items.find(x=>x.id===val);if(item)invName=item.name;}
+      else {
+        const existing=items.find(x=>(window.k312InventoryKey?window.k312InventoryKey(x.name):normalizeIngredientNameV52(x.name))===(window.k312InventoryKey?window.k312InventoryKey(row.name):normalizeIngredientNameV52(row.name)));
+        if(existing)invName=existing.name;else{const item={id:uid(),name:row.name,qty:0,unit:row.unit||'g',key:window.k312InventoryKey?window.k312InventoryKey(row.name):normalizeIngredientNameV52(row.name),alertQty:0,alertEnabled:false,updatedAt:now()};await put('inventoryItems',item);items.push(item);invName=item.name;}
+      }
+      for(const sec of recipe.sections||[])for(const ing of sec.ingredients||[])if(ing.id===row.id)ing.inventoryName=invName||ing.name;
+    }
+    state.inventory=await getAll('inventoryItems');closeModal();state.editTemp=recipe;state.editId=null;state.route='edit';renderV20();toast('Dopasowania składników zapisane ✓');
+  };
+}
 async function importRecipeFromUrl(){
   const input=$('#url-import-input');const status=$('#url-import-status');const url=normalizeRecipeUrl(input?.value);
   if(!url){if(status)status.innerHTML='<span class="url-import-error">Podaj prawidłowy link zaczynający się od http:// lub https://.</span>';return}
@@ -432,7 +470,7 @@ async function importRecipeFromUrl(){
     const text=await res.text();
     const recipe=parseReaderRecipe(text,url);
     if(!recipe)throw new Error('Nie znaleziono danych receptury');
-    closeModal();state.editTemp=recipe;state.editId=null;state.route='edit';renderV20();toast('Przepis odczytany — sprawdź dane i zapisz');
+    closeModal();openIngredientMapperV52(recipe);
   }catch(e){console.error('URL recipe import failed',e);state.urlImportError=e?.message||'Błąd';if(status)status.innerHTML='<span class="url-import-error">Nie udało się rozpoznać receptury z tego linku. Spróbuj innej strony albo użyj importu z tekstu.</span>';}
   finally{state.urlImportLoading=false}
 }
@@ -519,7 +557,7 @@ async function autoScaleRecipeIngredient(){ /* deprecated: proportions are saved
 function editorV14(id){
  const r=id?state.recipes.find(x=>x.id===id):(state.editTemp||makeRecipe({name:'',category:'Inne',description:'',yield:'',yieldUnit:'porcja',prep:'',cook:'',ferment:'',temp:'',tags:[],traditional:false,flag:'',servings:1,ingredients:[],steps:[],notes:'',source:'',sourceUrl:''}));
  if(!id)state.editTemp=r;const t=r.taste||{};
- const sections=(r.sections||[]).map(s=>`<div class="editor-section" data-section="${s.id}"><div class="editor-section-head"><div><span class="kicker">SEKCJA</span><input class="sec-name" value="${escapeHtml(s.name)}"></div><button class="icon-btn danger remove-sec" title="Usuń sekcję">×</button></div><div class="editor-ingredients">${(s.ingredients||[]).map(i=>`<div class="editor-ingredient ing" data-ing="${i.id||uid()}"><div class="drag-handle">☷</div><div class="editor-ingredient-name"><label>Składnik</label><input class="i-name" value="${escapeHtml(i.name)}" placeholder="np. Mąka 00"></div><div class="editor-ingredient-qty"><label>Gramatura</label><input class="i-qty" type="number" step="any" inputmode="decimal" value="${i.qty??''}" placeholder="0"></div><div class="editor-ingredient-unit"><label>Jednostka</label><select class="i-unit"><option ${i.unit==='g'?'selected':''}>g</option><option ${i.unit==='kg'?'selected':''}>kg</option><option ${i.unit==='ml'?'selected':''}>ml</option><option ${i.unit==='l'?'selected':''}>l</option><option ${i.unit==='szt.'?'selected':''}>szt.</option><option ${i.unit==='łyżka'?'selected':''}>łyżka</option><option ${i.unit==='łyżeczka'?'selected':''}>łyżeczka</option><option ${i.unit==='szczypta'?'selected':''}>szczypta</option><option ${i.unit==='porcja'?'selected':''}>porcja</option></select></div><button class="icon-btn danger remove-ing" title="Usuń składnik">×</button></div>`).join('')}</div><button class="add-row-btn add-ing">＋ Dodaj składnik</button></div>`).join('');
+ const sections=(r.sections||[]).map(s=>`<div class="editor-section" data-section="${s.id}"><div class="editor-section-head"><div><span class="kicker">SEKCJA</span><input class="sec-name" value="${escapeHtml(s.name)}"></div><button class="icon-btn danger remove-sec" title="Usuń sekcję">×</button></div><div class="editor-ingredients">${(s.ingredients||[]).map(i=>`<div class="editor-ingredient ing" data-ing="${i.id||uid()}"><div class="drag-handle">☷</div><div class="editor-ingredient-name"><label>Składnik</label><input class="i-name" value="${escapeHtml(i.name)}" placeholder="np. Mąka 00">${i.inventoryName?`<span class="v52-linked">📦 ${escapeHtml(i.inventoryName)}</span>`:""}</div><div class="editor-ingredient-qty"><label>Gramatura</label><input class="i-qty" type="number" step="any" inputmode="decimal" value="${i.qty??''}" placeholder="0"></div><div class="editor-ingredient-unit"><label>Jednostka</label><select class="i-unit"><option ${i.unit==='g'?'selected':''}>g</option><option ${i.unit==='kg'?'selected':''}>kg</option><option ${i.unit==='ml'?'selected':''}>ml</option><option ${i.unit==='l'?'selected':''}>l</option><option ${i.unit==='szt.'?'selected':''}>szt.</option><option ${i.unit==='łyżka'?'selected':''}>łyżka</option><option ${i.unit==='łyżeczka'?'selected':''}>łyżeczka</option><option ${i.unit==='szczypta'?'selected':''}>szczypta</option><option ${i.unit==='porcja'?'selected':''}>porcja</option></select></div><button class="icon-btn danger remove-ing" title="Usuń składnik">×</button></div>`).join('')}</div><button class="add-row-btn add-ing">＋ Dodaj składnik</button></div>`).join('');
  return `<div class="editor-top"><button class="btn ghost" data-back="recipes">‹ Anuluj</button><button class="btn primary" data-v14-save>✓ Zapisz</button></div><div class="editor-title"><div class="kicker">EDYCJA RECEPTURY</div><h1>${id?'Edytuj recepturę':'Nowa receptura'}</h1></div>
  <section class="editor-card"><div class="editor-card-title"><div><div class="kicker">PODSTAWY</div><h2>Informacje</h2></div></div><div class="form-grid"><div class="wide"><label>Nazwa</label><input id="v14-name" value="${escapeHtml(r.name)}"></div><div><label>Kategoria</label><input id="v14-cat" value="${escapeHtml(r.category||'Inne')}"></div><div><label>Wydajność</label><input id="v14-yield" type="number" step="any" value="${r.yield??''}"></div><div><label>Jednostka</label><input id="v14-unit" value="${escapeHtml(r.yieldUnit||'porcja')}"></div><div><label>Porcje</label><input id="v14-servings" type="number" step="any" value="${r.servings??1}"></div><div><label>Rodzaj podania</label><select id="v14-serving-type"><option value="Na ciepło" ${r.servingType==='Na ciepło'?'selected':''}>Na ciepło</option><option value="Na zimno" ${r.servingType==='Na zimno'?'selected':''}>Na zimno</option><option value="Przekąska" ${r.servingType==='Przekąska'?'selected':''}>Przekąska</option></select></div><div><label>Prep min</label><input id="v14-prep" type="number" value="${r.prep??''}"></div><div><label>Gotowanie min</label><input id="v14-cook" type="number" value="${r.cook??''}"></div><div class="wide"><label>Opis</label><textarea id="v14-desc" rows="3">${escapeHtml(r.description||'')}</textarea></div></div></section>
  <section class="editor-card"><div class="editor-card-title"><div><div class="kicker">RECEPTURA</div><h2>Składniki</h2><p>Każdy składnik ma osobną nazwę, gramaturę i jednostkę.</p></div><button class="btn small" id="v14-add-section">＋ Sekcja</button></div><div id="v14-sections">${sections}</div></section>
@@ -533,7 +571,7 @@ async function saveEditorV14(){
  const val=id=>$(id)?.value||"";
  r.name=val("#v14-name").trim()||"Bez nazwy";r.category=val("#v14-cat");r.yield=+val("#v14-yield")||0;r.yieldUnit=val("#v14-unit").trim()||"porcja";r.servings=+val("#v14-servings")||1;r.servingType=val("#v14-serving-type")||"Na ciepło";r.prep=+val("#v14-prep")||0;r.cook=+val("#v14-cook")||0;r.ferment=+val("#v14-ferment")||0;r.description=val("#v14-desc");r.notes=val("#v14-notes");r.source=val("#v14-source");r.sourceUrl=val("#v14-source-url");r.imageUrl=val("#v14-image-url").trim();
  r.taste={sweet:+val("#v14-sweet")||0,sour:+val("#v14-sour")||0,salty:+val("#v14-salty")||0,umami:+val("#v14-umami")||0,bitter:+val("#v14-bitter")||0,spicy:+val("#v14-spicy")||0};
- r.sections=$$("#main .editor-section").map(sec=>({id:sec.dataset.section||uid(),name:sec.querySelector(".sec-name")?.value.trim()||"Sekcja",ingredients:[...sec.querySelectorAll(".editor-ingredient")].map(el=>({id:el.dataset.ing||uid(),name:el.querySelector(".i-name")?.value.trim()||"",qty:+el.querySelector(".i-qty")?.value||0,unit:el.querySelector(".i-unit")?.value||"g"})).filter(i=>i.name)}));
+ r.sections=$$("#main .editor-section").map(sec=>{const oldSec=(r.sections||[]).find(x=>x.id===sec.dataset.section);return {id:sec.dataset.section||uid(),name:sec.querySelector(".sec-name")?.value.trim()||"Sekcja",ingredients:[...sec.querySelectorAll(".editor-ingredient")].map(el=>{const id=el.dataset.ing||uid();const oldIng=(oldSec?.ingredients||[]).find(x=>x.id===id);return {id,name:el.querySelector(".i-name")?.value.trim()||"",qty:+el.querySelector(".i-qty")?.value||0,unit:el.querySelector(".i-unit")?.value||"g",...(oldIng?.inventoryName?{inventoryName:oldIng.inventoryName}:{})}}).filter(i=>i.name)};});
  r.steps=$$("#main .editor-step").map(el=>({id:el.dataset.step||uid(),text:el.querySelector(".step-text")?.value.trim()||""})).filter(x=>x.text);
  const file=$("#v14-image-file")?.files?.[0];if(file)r.image=await compressImage(file);else if(!r.imageUrl&&old?.image)r.image=old.image;r.updatedAt=now();
  if(old)await put("history",{id:uid(),recipeId:r.id,date:now(),snapshot:old,summary:"Zapisano zmianę receptury"});await put("recipes",r);state.recipes=await getAll("recipes");state.route="recipe";state.selectedId=r.id;delete state.editTemp;render();toast("Receptura zapisana");
@@ -2342,7 +2380,7 @@ if(!window.__k35SearchCaptureBound){
     let items=await getAll('inventoryItems');let changed=0;const missing=[];
     for(const s of r.sections||[]) for(const ing of s.ingredients||[]){
       const need=+ing.qty||0;if(!ing.name||need<=0)continue;
-      const key=invKey(ing.name);let item=items.find(x=>x.key===key&&compatible(x.unit,ing.unit));
+      const key=invKey(ing.inventoryName||ing.name);let item=items.find(x=>x.key===key&&compatible(x.unit,ing.unit));
       if(!item){missing.push(ing.name);continue;}
       const take=convert(need,ing.unit,item.unit);if(take==null){missing.push(ing.name);continue;}
       item.qty=Math.max(0,(+item.qty||0)-take);item.updatedAt=now();await put('inventoryItems',item);changed++;
@@ -2585,7 +2623,7 @@ document.head.appendChild(s)})();
   const keyShop44=(n,u)=>norm(n)+'|'+unit44(u);
   const stockFor44=(name,u)=> (state.inventory||[]).filter(x=>key44(x.name)===key44(name)&&compatible44(x.unit,u));
   const available44=(name,u)=>stockFor44(name,u).reduce((sum,x)=>sum+(convert44(Number(x.qty)||0,x.unit,u)||0),0);
-  const ingredientList44=r=>{const out=[];for(const s of r?.sections||[])for(const i of s.ingredients||[]){if(!i.name||!(+i.qty>0))continue;const k=key44(i.name)+'|'+unit44(i.unit);const hit=out.find(x=>x.k===k);if(hit)hit.need+=+i.qty;else out.push({k,name:i.name,need:+i.qty,unit:unit44(i.unit)})}return out};
+  const ingredientList44=r=>{const out=[];for(const s of r?.sections||[])for(const i of s.ingredients||[]){if(!i.name||!(+i.qty>0))continue;const stockName=i.inventoryName||i.name;const k=key44(stockName)+'|'+unit44(i.unit);const hit=out.find(x=>x.k===k);if(hit)hit.need+=+i.qty;else out.push({k,name:i.name,stockName,need:+i.qty,unit:unit44(i.unit)})}return out};
   const status44=r=>{const rows=ingredientList44(r).map(x=>({...x,available:available44(x.name,x.unit),missing:Math.max(0,x.need-available44(x.name,x.unit))}));return {rows,missing:rows.filter(x=>x.missing>1e-9),complete:rows.length>0&&rows.every(x=>x.missing<=1e-9),empty:rows.length===0};};
 
   async function addMissing44(rows){
@@ -2593,9 +2631,9 @@ document.head.appendChild(s)})();
     const items=await getAll('shoppingItems');
     const map=new Map(items.map(x=>[keyShop44(x.name,x.unit),x]));
     for(const m of rows){
-      const k=keyShop44(m.name,m.unit), existing=map.get(k);
+      const k=keyShop44(m.stockName||m.name,m.unit), existing=map.get(k);
       if(existing){existing.qty=(+existing.qty||0)+m.missing;existing.done=false;await put('shoppingItems',existing)}
-      else {const x={id:uid(),name:m.name,qty:m.missing,unit:m.unit,done:false,source:'magazyn-braki'};await put('shoppingItems',x);map.set(k,x)}
+      else {const x={id:uid(),name:m.stockName||m.name,displayName:m.name,qty:m.missing,unit:m.unit,done:false,source:'magazyn-braki'};await put('shoppingItems',x);map.set(k,x)}
     }
     state.shopping=await getAll('shoppingItems');
     toast(`Dodano ${rows.length} brakujących ${rows.length===1?'pozycję':'pozycji'} do zakupów ✓`);

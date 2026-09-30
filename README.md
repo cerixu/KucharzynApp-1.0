@@ -225,5 +225,5 @@ Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut
 - Źródło przepisu pozostaje zapisane przy recepturze.
 
 
-## v5.1 — Import z linku
+## v5.2 — Import z linku
 Kucharzyna potrafi odczytać przepis z podanego URL przez Reader API i rozpoznać dane Recipe publikowane w standardzie Schema.org, a następnie otworzyć je jako zwykłą recepturę do sprawdzenia i zapisania.
