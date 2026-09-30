@@ -205,3 +205,12 @@ Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut
 - Spokojny układ editorial/iOS zamiast pomarańczowej warstwy szkła.
 - Menu Start na pełnych kartach powierzchniowych, bez agresywnej przezroczystości.
 - Zachowane funkcje receptur, magazynu/lodówki, zakupów, kalkulatorów, kuchni świata i ustawień.
+
+
+## v4.2.3
+
+- Szybka zmiana ilości w Magazynie/Lodówce: `−` / `+`.
+- Dla produktów wagowych: krok 100 g.
+- Dla płynów: krok 100 ml.
+- Dla sztuk i porcji: krok 1.
+- Zmiany są zapisywane od razu w IndexedDB i aktualizują alerty magazynowe.
