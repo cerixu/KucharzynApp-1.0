@@ -4,10 +4,10 @@ module.exports = defineConfig({
   testDir: './tests',
   timeout: 30000,
   expect: { timeout: 7000 },
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  workers: 1,
   reporter: [['html', { open: 'never' }], ['list']],
   use: {
     baseURL: process.env.KUCHARZYNA_URL || 'http://127.0.0.1:4173/',
