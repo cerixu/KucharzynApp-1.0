@@ -94,3 +94,10 @@ Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut
 - Podmieniono część wcześniejszych zdjęć zastępczych na dokładniejsze zdjęcia potraw.
 - Zdjęcia zewnętrzne wymagają internetu; aplikacja zachowuje lokalny fallback, gdy obraz jest niedostępny.
 - Service Worker otrzymał nową wersję cache.
+
+
+## v3.5 — wyszukiwanie kategorii
+- Naprawiono wyszukiwanie wewnątrz kategorii receptur.
+- Naprawiono wyszukiwanie kuchni świata oraz dań w wybranej kuchni.
+- Wyszukiwanie działa na żywo bez ponownego renderowania całego widoku, dzięki czemu klawiatura i fokus na iOS Safari nie znikają po każdej literze.
+- Zmieniono wersję cache Service Workera.

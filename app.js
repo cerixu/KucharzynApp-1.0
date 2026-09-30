@@ -22,7 +22,7 @@ const DEFAULT_RECIPE_IMAGE="./photo-generic.webp";
 function recipeImage(r){
   const local=RECIPE_IMAGES[r?.name];
   if(local) return local;
-  if(typeof r?.image==='string' && /^(data:|blob:)/.test(r.image)) return r.image;
+  if(typeof r?.image==='string' && /^(data:|blob:|https?:)/.test(r.image)) return r.image;
   const c=String(r?.category||'').toLowerCase();
   if(c.includes('pizza')||c.includes('pieczy')) return './photo-pizza.webp';
   if(c.includes('pasta')||c.includes('makaron')) return './photo-carbonara.webp';
@@ -768,17 +768,48 @@ function enrichRecipeDescriptions(){const special={'Pizza Napoletana':'Klasyczne
 async function repairAllRecipes(){
   for(const r of state.recipes){
     r.steps=completeRecipeSteps(r);
-    if(RECIPE_IMAGES[r.name]){r.image=RECIPE_IMAGES[r.name];r.imageUrl='';r.imageSource='local';r.imageCredit='Grafika wygenerowana dla Kucharzyny';}
-    else if(typeof r.image==='string' && /^https?:/i.test(r.image)){r.image=DEFAULT_RECIPE_IMAGE;r.imageUrl='';r.imageSource='local';r.imageCredit='Grafika wygenerowana dla Kucharzyny';}
-    else if(!r.image){r.image=DEFAULT_RECIPE_IMAGE;r.imageSource='local';r.imageCredit='Grafika wygenerowana dla Kucharzyny';}
+    if(RECIPE_IMAGES[r.name]){r.image=RECIPE_IMAGES[r.name];r.imageUrl='';r.imageSource='local';r.imageCredit='Grafika Kucharzyny';}
+    else if(!(typeof r.image==='string' && /^https?:/i.test(r.image)) && !r.image){r.image=DEFAULT_RECIPE_IMAGE;r.imageUrl='';r.imageSource='local-fallback';r.imageCredit='Grafika zastępcza Kucharzyny';}
     if(r.traditional && (!r.sourceUrl||!r.license)){r.source='Wikibooks Cookbook';r.sourceUrl='https://en.wikibooks.org/wiki/Cookbook:Recipes';r.license='CC BY-SA 4.0 — opracowanie Kucharzyny';}
     await put('recipes',r);
   }
   state.recipes=await getAll('recipes');
 }
 
-// Run repairs after the original boot has finished.
-setTimeout(async()=>{try{await repairAllRecipes();await ensureRecipeImages();enrichRecipeDescriptions();renderV20();}catch(e){}},700);
+async function hydrateMissingWebImages(){
+  const targets=state.recipes.filter(r=>!RECIPE_IMAGES[r.name] && (!r.image || r.image===DEFAULT_RECIPE_IMAGE || r.imageSource==='local-fallback'));
+  const fetchOne=async r=>{
+    const queries=[r.name,`${r.name} recipe`];
+    for(const q of queries){
+      for(const lang of ['pl','en']){
+        try{
+          const url=`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q.replace(/ /g,'_'))}`;
+          const res=await fetch(url,{headers:{Accept:'application/json'}});
+          if(!res.ok)continue;
+          const data=await res.json();
+          const src=data?.originalimage?.source||data?.thumbnail?.source;
+          if(src){
+            r.image=src;
+            r.imageUrl=data?.content_urls?.desktop?.page||`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(q.replace(/ /g,'_'))}`;
+            r.sourceUrl=r.imageUrl;
+            r.imageSource='wikipedia';
+            r.imageCredit=`Wikipedia / Wikimedia Commons — ${lang}`;
+            await put('recipes',r);
+            return true;
+          }
+        }catch(e){}
+      }
+    }
+    return false;
+  };
+  for(let i=0;i<targets.length;i+=5){
+    await Promise.all(targets.slice(i,i+5).map(fetchOne));
+  }
+  state.recipes=await getAll('recipes');
+}
+
+// Run repairs and then automatically fill recipes that still use the generic image.
+setTimeout(async()=>{try{await repairAllRecipes();await ensureRecipeImages();await hydrateMissingWebImages();enrichRecipeDescriptions();renderV20();}catch(e){}},700);
 
 /* ===== Kucharzyna 2.0 modules ===== */
 function ingredientGroups(r){return (r.sections||[]).flatMap(s=>s.ingredients||[]).filter(i=>i.name)}
@@ -1744,3 +1775,68 @@ const _kAtlasBind=bindV20;
 bindV20=function(){_kAtlasBind();k32InstallIngredientAtlasV2()};
 
 setTimeout(async()=>{await k32EnsurePierogiRuskie();await k33EnsurePolishRecipes();renderV20()},950);
+
+/* K35 SEARCH FIX: all category searches are live and NEVER rerender on each keystroke.
+   Re-rendering the whole view was causing iOS Safari to dismiss the keyboard after every character. */
+function k35LiveFilter(containerSelector, cardSelector, query, getText){
+  try{
+    const root=document.querySelector(containerSelector); if(!root)return;
+    const grid=root.querySelector(cardSelector); if(!grid)return;
+    const q=String(query||'').trim().toLocaleLowerCase('pl');
+    const cards=[...grid.children];
+    let shown=0;
+    cards.forEach(card=>{
+      if(!(card instanceof HTMLElement))return;
+      const text=String(getText?getText(card):card.textContent||'').toLocaleLowerCase('pl');
+      const ok=!q||text.includes(q);
+      card.hidden=!ok;
+      if(ok)shown++;
+    });
+    grid.hidden=shown===0;
+    let empty=root.querySelector('.k35-live-empty');
+    if(shown===0){
+      if(!empty){
+        empty=document.createElement('div');
+        empty.className='k33-empty k35-live-empty';
+        empty.innerHTML='<div>⌕</div><h3>Brak wyników</h3><p>Spróbuj innej nazwy, składnika albo kategorii.</p>';
+        grid.parentElement?.appendChild(empty);
+      }
+      empty.hidden=false;
+    }else if(empty){empty.hidden=true}
+  }catch(err){console.error('K35 live search failed',err)}
+}
+function k35FilterCategorySearch(input){
+  state.categoryQuery=input.value||'';
+  k35LiveFilter('.k34-category-page','.k32-recipe-grid',input.value);
+  const clear=document.querySelector('#k34-category-clear'); if(clear)clear.hidden=!String(input.value||'').length;
+}
+function k35FilterWorldCuisine(input){
+  state.worldCuisineQuery=input.value||'';
+  k35LiveFilter('.k33-world-menu','.k33-cuisine-grid',input.value);
+}
+function k35FilterWorldDishes(input){
+  state.worldDishQuery=input.value||'';
+  k35LiveFilter('.k33-world-detail','.k33-world-recipe-grid',input.value);
+}
+if(!window.__k35SearchCaptureBound){
+  window.__k35SearchCaptureBound=true;
+  document.addEventListener('input',e=>{
+    try{
+      const t=e.target;
+      if(!(t instanceof HTMLInputElement))return;
+      if(t.id==='recipeSearch'){
+        e.stopImmediatePropagation();
+        k32ApplyRecipeSearchLive(t);
+      }else if(t.id==='k34-category-search'){
+        e.stopImmediatePropagation();
+        k35FilterCategorySearch(t);
+      }else if(t.id==='k33-world-search'){
+        e.stopImmediatePropagation();
+        k35FilterWorldCuisine(t);
+      }else if(t.id==='k33-world-dish-search'){
+        e.stopImmediatePropagation();
+        k35FilterWorldDishes(t);
+      }
+    }catch(err){console.error('K35 search capture failed',err)}
+  },true);
+}
