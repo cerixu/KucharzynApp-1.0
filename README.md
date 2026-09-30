@@ -1,8 +1,8 @@
-# Kucharzyna v3.2.2 — GitHub Pages ROOT
+# Kucharzyna v3.3 Core — GitHub Pages ROOT
 
 PWA Kucharzyna przygotowana do publikacji jako statyczna strona na GitHub Pages.
 
-## v3.2 — UX / nawigacja / gotowanie / zdjęcia
+## v3.3 — Core / zdjęcia / wyszukiwanie / składniki
 - Stały przycisk `←` w lewym górnym rogu na każdym ekranie.
 - Inteligentny powrót: gotowanie → receptura → poprzedni ekran.
 - Stały przycisk `⚙ Ustawienia` w górnym pasku, również w trybie Amator.
@@ -18,6 +18,9 @@ PWA Kucharzyna przygotowana do publikacji jako statyczna strona na GitHub Pages.
 - Service Worker podbity do wersji v3.2.2 i precache'uje całą lokalną bibliotekę zdjęć.
 - Każda z 66 bazowych receptur ma przypisane osobne zdjęcie.
 - W recepturach temperatura została zastąpiona polem `Na ciepło / Na zimno / Przekąska`; temperatura technologiczna pozostaje tylko w kalkulatorze pizzy.
+- Wyszukiwarka lokalna nie renderuje ekranu podczas wpisywania, więc Safari nie traci fokusu klawiatury.
+- Ingredient Atlas używa transparentnego WebP oraz fallbacków emoji dla składników bez osobnego zdjęcia.
+- Pierogi ruskie są automatycznie dodawane/migrowane do istniejącej bazy wraz ze zdjęciem i podziałem na Ciasto/Farsz.
 
 ## Pliki
 - `index.html`
@@ -75,3 +78,19 @@ Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut
 - Dodano/utrwalono recepturę „Pierogi ruskie” z lokalnym zdjęciem `photo-pierogi-ruskie.webp`.
 - Ingredient Atlas korzysta z transparentnego WebP i mapowania 12×8.
 - Service Worker cache bumped to `kucharzyna-v3.2.4-pierogi-atlas-v2`.
+
+
+## v3.3 — Polska
+- Dodano Pierogi z mięsem oraz rozszerzono bibliotekę o kolejne polskie klasyki: Kotlet schabowy, Placki ziemniaczane, Gołąbki z mięsem i ryżem, Kopytka, Naleśniki z twarogiem, Racuchy z jabłkami, Barszcz czerwony i Sałatkę jarzynową.
+- Istniejące instalacje dostają te receptury przez migrację IndexedDB, bez kasowania własnych receptur.
+- Dla trzech nowych dań użyto zdjęć z Wikimedia Commons na licencjach CC BY-SA; w recepturze zapisano autora, źródło i licencję. Pozostałe nowe dania korzystają z lokalnych istniejących assetów jako fallback, bez udawania dedykowanego zdjęcia.
+- Zdjęcia zewnętrzne działają online; przy braku sieci aplikacja przechodzi do lokalnego fallbacku.
+
+
+## v3.4 — Polska: większa biblioteka zdjęć i przepisów
+- Rozszerzono kuchnię polską o 13 dodatkowych receptur: Bigos, Żurek, Biały barszcz, Mizeria, Kotlet mielony, Kaczka z jabłkami, Golonka po polsku, Flaki po warszawsku, Krupnik, Kluski śląskie, Pyzy z mięsem, Sernik i Makowiec.
+- Łącznie biblioteka migracji obejmuje 22 polskie klasyki razem z wcześniejszą paczką.
+- Dodano zdjęcia z Wikimedia Commons jako zewnętrzne grafiki z zapisanym autorem, źródłem i licencją.
+- Podmieniono część wcześniejszych zdjęć zastępczych na dokładniejsze zdjęcia potraw.
+- Zdjęcia zewnętrzne wymagają internetu; aplikacja zachowuje lokalny fallback, gdy obraz jest niedostępny.
+- Service Worker otrzymał nową wersję cache.

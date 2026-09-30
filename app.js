@@ -1551,71 +1551,71 @@ nav=function(route){
    Kucharzyna patch: Ingredient Atlas v2 + reliable local search
    ============================================================ */
 const K32_ING_ATLAS_V2={
-  'mąka':[0,0],'mąka typ 00':[0,0],'mąka pszenna':[0,0],'mąka typ 450/550':[0,0],'mąka razowa':[0,3],
-  'woda':[1,0],'sól':[2,0],'cukier':[3,0],'drożdże':[4,0],'skrobia ziemniaczana':[5,0],
-  'oliwa':[6,0],'olej':[6,0],'olej roślinny':[6,0],'olej palmowy':[6,0],'olej sezamowy':[6,0],
-  'masło':[7,0],'ghee':[7,0],'smalec':[7,0],'mleko':[8,0],'mleko kokosowe':[11,0],
-  'śmietana':[9,1],'śmietanka':[9,1],'jogurt':[10,1],'jogurt grecki':[10,1],
-  'jajka':[10,0],'jajko':[10,0],'żółtka':[11,0],'żółtko':[11,0],
-  'mozzarella':[0,1],'mozzarella di bufala':[0,1],'twaróg':[3,1],'ricotta':[3,1],
+  'mąka':[0,0],'mąka typ 00':[0,0],'mąka pszenna':[0,0],'mąka typ 450/550':[0,0],'mąka razowa':[3,0],
+  'woda':[1,0],'sól':[2,0],'cukier':[3,0],'drożdże':[4,0],'skrobia ziemniaczana':[3,0],
+  'oliwa':[6,0],'oliwa z oliwek':[6,0],'olej':[6,0],'olej roślinny':[6,0],'olej sezamowy':[6,0],
+  'masło':[7,0],'ghee':[7,0],'smalec':[7,0],'mleko':[8,0],'mleko kokosowe':[8,0],
+  'jajka':[8,0],'jajko':[8,0],'żółtka':[8,0],'żółtko':[8,0],
+  'mozzarella':[0,1],'mozzarella di bufala':[0,1],'burrata':[1,1],'twaróg':[3,1],'ricotta':[3,1],
   'parmesan':[4,1],'parmigiano':[4,1],'pecorino':[5,1],'pecorino romano':[5,1],
-  'gorgonzola':[6,1],'ser pleśniowy':[6,1],'ser żółty':[7,1],'ser':[7,1],'feta':[7,1],
-  'paneer':[8,1],'mascarpone':[8,1],
+  'gorgonzola':[6,1],'ser pleśniowy':[6,1],'ser żółty':[7,1],'ser':[5,1],'feta':[7,1],
+  'paneer':[8,1],'mascarpone':[8,1],'jogurt':[9,1],'jogurt grecki':[9,1],'śmietana':[10,1],'śmietanka':[10,1],
   'pomidor':[0,2],'pomidory':[0,2],'pomidory san marzano':[1,2],'pomidory san marzano pelati':[1,2],
-  'pomidor pelati':[1,2],'passata':[6,2],'koncentrat pomidorowy':[6,2],'sos pomidorowy':[6,2],
-  'suszony pomidor':[5,2],'suszone chili':[3,2],'papryka':[2,4],'papryka świeża':[2,4],
-  'papryczka chili':[4,4],'chili':[4,4],'ancho chili':[4,4],'jalapeño':[5,4],'cukinia':[5,4],
-  'bakłażan':[7,4],'ogórek':[5,4],'ziemniaki':[0,4],'marchew':[1,4],'marchewka':[1,4],
-  'pieczarki':[8,4],'grzyby':[9,4],'borowiki':[10,4],'trufle':[11,4],
-  'czosnek':[0,3],'cebula':[2,3],'czerwona cebula':[4,3],'por':[6,3],'seler':[7,3],
-  'pietruszka':[8,3],'kolendra':[9,3],'koperek':[10,3],'szczypiorek':[11,3],'bazylia':[7,2],
-  'oregano':[8,2],'tymianek':[9,2],'rozmaryn':[10,2],'majeranek':[8,2],'szałwia':[11,2],
-  'imbir':[3,3],'trawa cytrynowa':[6,3],
-  'wołowina':[0,5],'wołowina mielona':[1,5],'wieprzowina':[3,5],'wieprzowina mielona':[3,5],
-  'kurczak':[4,5],'udka z kurczaka':[5,5],'pierś z kurczaka':[4,5],'baranina mielona':[1,5],
-  'jagnięcina':[1,5],'królik':[3,5],'boczek':[7,5],'pancetta':[8,5],'guanciale':[7,5],
-  'szynka':[9,5],'prosciutto':[9,5],'salami':[10,5],'kiełbasa':[11,5],'biała kiełbasa':[11,5],
-  'chorizo':[11,5],'wędzonka':[7,5],
-  'krewetki':[0,6],'krewetka':[0,6],'ośmiornica':[3,6],'ośmiornica gotowana':[3,6],
-  'małże':[4,6],'mule':[4,6],'ryba':[6,6],'biała ryba':[6,6],'dorsz':[6,6],'łosoś':[7,6],
-  'tuńczyk':[8,6],'anchois':[9,6],'bułka tarta':[11,6],
+  'pomidor pelati':[1,2],'passata':[6,2],'koncentrat pomidorowy':[4,2],'sos pomidorowy':[6,2],
+  'suszony pomidor':[5,2],'suszone chili':[5,2],
+  'bazylia':[7,2],'oregano':[8,2],'tymianek':[9,2],'rozmaryn':[10,2],'szałwia':[11,2],
+  'czosnek':[0,3],'cebula':[3,3],'czerwona cebula':[4,3],'por':[5,3],'seler':[6,3],
+  'pietruszka':[8,3],'kolendra':[8,3],'koperek':[9,3],'szczypiorek':[11,3],'dymka':[11,3],
+  'imbir':[2,3],'trawa cytrynowa':[6,3],
+  'ziemniaki':[0,4],'ziemniak':[0,4],'batat':[1,4],'marchew':[1,4],'marchewka':[1,4],
+  'papryka':[2,4],'papryka świeża':[2,4],'papryczka chili':[4,4],'chili':[4,4],'jalapeño':[5,4],
+  'cukinia':[6,4],'ogórek':[6,4],'bakłażan':[7,4],'pieczarki':[8,4],'grzyby':[8,4],'borowiki':[9,4],'trufle':[11,4],
+  'wołowina':[0,5],'wołowina mielona':[1,5],'wieprzowina':[2,5],'wieprzowina mielona':[2,5],
+  'kurczak':[3,5],'pierś z kurczaka':[3,5],'udka z kurczaka':[4,5],'baranina mielona':[6,5],
+  'jagnięcina':[4,5],'królik':[5,5],'boczek':[7,5],'pancetta':[7,5],'guanciale':[7,5],
+  'szynka':[8,5],'prosciutto':[8,5],'salami':[9,5],'kiełbasa':[11,5],'biała kiełbasa':[11,5],'chorizo':[11,5],
+  'krewetki':[0,6],'krewetka':[0,6],'ośmiornica':[3,6],'ośmiornica gotowana':[3,6],'małże':[5,6],'mule':[5,6],
+  'ryba':[6,6],'biała ryba':[6,6],'dorsz':[6,6],'łosoś':[7,6],'tuńczyk':[8,6],'anchois':[9,6],'bułka tarta':[10,6],
   'spaghetti':[0,7],'makaron':[2,7],'makaron ryżowy':[2,7],'makaron ramen':[2,7],'tonnarelli':[1,7],
-  'ciasto filo':[6,7],'tortille':[1,7],'ryż':[7,7],'ryż arborio':[7,7],'ryż risotto':[7,7],
-  'kasza':[6,7],'groszek':[4,7],'fasolka':[4,7],'fasola':[0,7],'czarna fasola':[1,7],
-  'ciecierzyca':[3,7],'sucha ciecierzyca':[3,7],'soczewica':[2,7],
-  'orzechy':[8,7],'orzeszki':[8,7],'migdały':[9,7],'pistacje':[11,7],'sezam':[8,7],
-  'miód':[0,7],'musztarda':[1,7],'majonez':[2,7],'ketchup':[2,7],'sos sojowy':[3,7],
-  'sos rybny':[3,7],'ocet':[4,7],'ocet ryżowy':[4,7],'ocet winny':[4,7],
-  'espresso':[5,7],'kakao':[2,7],'cytryna':[7,7],'sok z cytryny':[7,7],'limonka':[7,7],
-  'sok z limonki':[7,7],'pomarańcza':[8,7],'szafran':[10,7],'pieprz':[9,7],
-  'pieprz czarny':[9,7],'pieprz syczuański':[9,7],'kumin':[10,7],'kminek':[10,7],
-  'garam masala':[11,7],'five spice':[11,7],'anyż':[10,7],'cynamon':[10,7],'wanilia':[11,7],
-  'awokado':[5,4],'ananas':[8,7],'gruszka':[8,7],'śliwki suszone':[8,7],'tofu':[8,1],
-  'tahini':[2,7],'pasta tamaryndowa':[4,7],'pasta massaman':[4,7],'pasta gochujang':[2,7],
-  'gochujang':[2,7],'miso':[3,7],'dashi':[8,0],'mirin':[4,7],'hoisin':[3,7],
-  'doubanjiang':[2,7],'nori':[11,3],'wakame':[11,3],'achiote':[4,7],
-  'kapary':[4,7],'oliwki':[8,7],'frytki':[0,4],'biszkopty':[0,7],'piwo':[8,0],
-  'bulion':[8,0],'dymka':[11,3],'kiełki':[7,3],'cytryny kiszone':[7,7],
-  'kapusta kiszona':[2,3],'kapusta biała':[2,3],'ser mozzarella':[0,1]
+  'ciasto filo':[5,7],'tortille':[1,7],'ryż':[8,7],'ryż arborio':[8,7],'ryż risotto':[8,7],
+  'kasza':[7,7],'groszek':[3,7],'fasolka':[2,7],'fasola':[0,7],'czarna fasola':[1,7],
+  'ciecierzyca':[11,7],'sucha ciecierzyca':[11,7],'soczewica':[6,7],
+  'orzechy':[9,7],'orzeszki':[9,7],'migdały':[10,7],'pistacje':[11,7],
+  'miód':[0,7],'musztarda':[1,7],'majonez':[2,7],'ketchup':[3,7],'sos sojowy':[4,7],
+  'sos rybny':[4,7],'ocet':[5,7],'ocet ryżowy':[5,7],'ocet winny':[5,7],
+  'espresso':[4,7],'kakao':[3,7],'cytryna':[7,7],'sok z cytryny':[7,7],'limonka':[8,7],
+  'sok z limonki':[8,7],'pomarańcza':[9,7],'szafran':[10,7],'pieprz':[7,7],
+  'pieprz czarny':[7,7],'pieprz syczuański':[7,7],'kumin':[10,7],'kminek':[10,7],
+  'cynamon':[10,7],'wanilia':[11,7],'awokado':[6,4],'ananas':[9,7],'gruszka':[9,7],
+  'tofu':[1,1],'tahini':[2,7],'miso':[4,7],'dashi':[1,0],'mirin':[5,7],'hoisin':[4,7],
+  'gochujang':[6,2],'kapary':[5,7],'oliwki':[5,7],'frytki':[0,4],'biszkopty':[5,7],'piwo':[1,0],
+  'bulion':[1,0],'nori':[11,3],'wakame':[11,3],'kapusta kiszona':[4,3],'kapusta biała':[4,3]
 };
+const K32_ING_FALLBACK_EMOJI=[
+  [/mąk|flour|kasz/,'🌾'],[/wod|bulion/,'💧'],[/sól|salt/,'🧂'],[/cuk/,'🍚'],[/droż/,'🧈'],
+  [/pomidor|passata|pelati/,'🍅'],[/czosnek/,'🧄'],[/cebul|por|dymka/,'🧅'],[/marchew/,'🥕'],[/ziemniak/,'🥔'],
+  [/papryk|chili|jalape/,'🌶️'],[/cukinia|ogórek/,'🥒'],[/bakłaż/,'🍆'],[/grzyb/,'🍄'],[/sałat|rukol/,'🥬'],
+  [/bazyl|oregano|tymian|rozmaryn|koperek|pietrusz|kolendr/,'🌿'],[/ser|twaróg|ricotta|mozz/,'🧀'],[/mleko|śmiet|jogurt/,'🥛'],
+  [/jaj/,'🥚'],[/oliw|olej/,'🫒'],[/masł|ghee/,'🧈'],[/woł|wieprz|baran|jagnię|królik|mięso/,'🥩'],
+  [/kurczak|drób/,'🍗'],[/boczek|pancetta|guanciale|szynka|salami|kiełbasa|chorizo/,'🥓'],
+  [/krewet|małż|mule|ośmior|ryb|łosoś|tuńczyk|anchois/,'🐟'],[/makaron|spaghetti|ramen|pasta/,'🍝'],
+  [/ryż|risotto/,'🍚'],[/fasol|ciecierzy|soczew/,'🫘'],[/orzech|migdał|pistac/,'🥜'],
+  [/cytr|limon/,'🍋'],[/miód/,'🍯'],[/pieprz|kumin|cynam|szafran|kminek/,'🫚'],[/kakao/,'🍫']
+];
 function k32IngredientIconV2(name=''){
   const raw=String(name).trim().toLowerCase();
-  if(K32_ING_ATLAS_V2[raw])return K32_ING_ATLAS_V2[raw];
+  if(K32_ING_ATLAS_V2[raw])return {p:K32_ING_ATLAS_V2[raw],emoji:''};
   const key=Object.keys(K32_ING_ATLAS_V2).find(k=>raw.includes(k)||k.includes(raw));
-  if(key)return K32_ING_ATLAS_V2[key];
-  const rules=[
-    [/mąk|flour/,'mąka'],[/drożd|yeast/,'drożdże'],[/pomidor|passata|pelati/,'pomidor'],[/czosnek/,'czosnek'],[/cebula|dymka/,'cebula'],
-    [/bazyl/,'bazylia'],[/pieprz|pepper/,'pieprz'],[/olej|tłuszcz|ghee/,'oliwa'],[/ser|cheese/,'ser'],[/jogurt|kefir/,'jogurt'],
-    [/śmiet|cream/,'śmietana'],[/mięso|wieprz|boczek|kiełbasa|baran|jagnię|królik/,'wieprzowina'],
-    [/ryb|fish/,'ryba'],[/owoce morza|ośmior|krewet|mule/,'krewetki'],[/orzech|migdał|sezam/,'orzechy'],
-    [/ciecierzy|hummus/,'ciecierzyca'],[/kapust/,'kapusta kiszona'],[/imbir|galangal/,'imbir'],[/cytr/,'cytryna'],[/lima/,'limonka'],
-    [/ziemniak|frytki/,'ziemniaki'],[/marchew/,'marchew'],[/makaron|pasta/,'makaron'],[/ryż|risotto/,'ryż']
-  ];
-  for(const [re,target] of rules){if(re.test(raw)&&K32_ING_ATLAS_V2[target])return K32_ING_ATLAS_V2[target]}
-  return [0,0];
+  if(key)return {p:K32_ING_ATLAS_V2[key],emoji:''};
+  const rule=K32_ING_FALLBACK_EMOJI.find(([re])=>re.test(raw));
+  return {p:null,emoji:rule?rule[1]:'🍽️'};
 }
 k32IngredientIcon=k32IngredientIconV2;
-function k32IngredientIconMarkupV2(name){const p=k32IngredientIconV2(name);return `<span class="k32-ing-thumb" style="--ix:${p[0]};--iy:${p[1]}" aria-hidden="true"></span>`}
+function k32IngredientIconMarkupV2(name){
+  const o=k32IngredientIconV2(name);
+  if(!o.p)return `<span class="k32-ing-thumb k32-ing-emoji" aria-hidden="true">${o.emoji}</span>`;
+  return `<span class="k32-ing-thumb" style="--ix:${o.p[0]};--iy:${o.p[1]}" aria-hidden="true"></span>`;
+}
 k32IngredientIconMarkup=k32IngredientIconMarkupV2;
 
 /* Local search: never rerender the input while the user is typing. */
@@ -1648,6 +1648,20 @@ bindV20=function(){
   }
 };
 
+/* Hard-stop legacy search handlers: typing must never trigger a full rerender. */
+if(!window.__k32SearchCaptureBound){
+  window.__k32SearchCaptureBound=true;
+  document.addEventListener('input',e=>{
+    try{
+      const t=e.target;
+      if(t && t.id==='recipeSearch'){
+        e.stopImmediatePropagation();
+        k32ApplyRecipeSearchLive(t);
+      }
+    }catch(err){console.error('Search capture failed',err)}
+  },true);
+}
+
 /* Ensure the Polish classic recipe exists, even on an older installed database. */
 async function k32EnsurePierogiRuskie(){
   try{
@@ -1666,12 +1680,59 @@ async function k32EnsurePierogiRuskie(){
   }catch(e){console.error('Pierogi migration failed',e)}
 }
 
+
+/* Polish recipe expansion: adds missing classics to existing installs without duplicating them. */
+async function k33EnsurePolishRecipes(){
+  try{
+    const recipes=[
+      {name:'Pierogi z mięsem',category:'Mączne',cuisine:'Polska',description:'Polskie pierogi z soczystym farszem z gotowanego mięsa, cebuli i pieprzu.',yield:40,yieldUnit:'szt.',servings:4,prep:70,cook:10,tags:['polskie','pierogi','mączne','mięsne'],image:'./photo-pierogi-ruskie.webp',servingType:'Na ciepło',ingredients:[['Mąka pszenna typ 450/550',500,'g'],['Woda ciepła',220,'ml'],['Sól',5,'g'],['Gotowana łopatka wieprzowa',450,'g'],['Cebula',180,'g'],['Masło',40,'g'],['Pieprz czarny',3,'g'],['Bulion',80,'ml']],steps:['Zagnieć mąkę, wodę i sól na elastyczne ciasto. Odstaw pod przykryciem na 30 minut.','Ugotowane mięso zmiel. Cebulę zeszklij na maśle i połącz z mięsem. Dopraw solą i pieprzem, podlej odrobiną bulionu.','Rozwałkuj ciasto, wytnij krążki i nałóż farsz. Zlep dokładnie brzegi.','Gotuj partiami w osolonej wodzie. Po wypłynięciu gotuj jeszcze około 2 minuty.','Podawaj z cebulką podsmażoną na maśle lub ze skwarkami.'],source:'Opracowanie Kucharzyny'},
+      {name:'Kotlet schabowy',category:'Mięso',cuisine:'Polska',description:'Klasyczny panierowany kotlet ze schabu, chrupiący z zewnątrz i soczysty w środku.',yield:4,yieldUnit:'porcja',servings:4,prep:20,cook:15,tags:['polskie','mięso','schabowy','klasyczne'],image:'https://upload.wikimedia.org/wikipedia/commons/4/40/Kotlet_Schabowy.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — Dmitry Dzema',sourceUrl:'https://commons.wikimedia.org/wiki/File:Kotlet_Schabowy.jpg',license:'CC BY-SA 4.0',imageSource:'external',imageCredit:'Dmitry Dzema / Wikimedia Commons (CC BY-SA 4.0)',ingredients:[['Schab bez kości',600,'g'],['Mąka pszenna',60,'g'],['Jajka',2,'szt.'],['Bułka tarta',120,'g'],['Sól',8,'g'],['Pieprz czarny',2,'g'],['Smalec lub olej',60,'g']],steps:['Schab pokrój na cztery plastry i delikatnie rozbij. Dopraw solą i pieprzem.','Panieruj kolejno w mące, roztrzepanym jajku i bułce tartej.','Smaż na dobrze rozgrzanym tłuszczu z obu stron do złotego koloru.','Odsącz i podawaj od razu z ziemniakami oraz surówką.']},
+      {name:'Placki ziemniaczane',category:'Mączne',cuisine:'Polska',description:'Chrupiące placki z tartych ziemniaków z cebulą, smażone na złoty kolor.',yield:12,yieldUnit:'szt.',servings:4,prep:20,cook:20,tags:['polskie','ziemniaki','mączne','smażone'],image:'https://upload.wikimedia.org/wikipedia/commons/8/86/Polish_potato_pancakes.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — Kavyass',sourceUrl:'https://commons.wikimedia.org/wiki/File:Polish_potato_pancakes.jpg',license:'CC BY-SA 4.0',imageSource:'external',imageCredit:'Kavyass / Wikimedia Commons (CC BY-SA 4.0)',ingredients:[['Ziemniaki',1000,'g'],['Cebula',120,'g'],['Jajko',1,'szt.'],['Mąka pszenna',40,'g'],['Sól',8,'g'],['Pieprz czarny',2,'g'],['Olej',100,'ml']],steps:['Zetrzyj ziemniaki i cebulę na drobnych oczkach. Odstaw na chwilę i odlej nadmiar płynu.','Dodaj jajko, mąkę, sól i pieprz. Wymieszaj.','Smaż cienkie porcje na dobrze rozgrzanym oleju z obu stron na złoto.','Podawaj od razu ze śmietaną, cukrem lub wytrawnymi dodatkami.']},
+      {name:'Gołąbki z mięsem i ryżem',category:'Mięso',cuisine:'Polska',description:'Liście kapusty wypełnione farszem z mięsa i ryżu, duszone w sosie pomidorowym.',yield:12,yieldUnit:'szt.',servings:6,prep:45,cook:90,tags:['polskie','gołąbki','kapusta','mięso'],image:'https://upload.wikimedia.org/wikipedia/commons/7/7a/Golubci8.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — Kagor',sourceUrl:'https://commons.wikimedia.org/wiki/File:Golubci8.jpg',license:'CC BY-SA 3.0',imageSource:'external',imageCredit:'Kagor / Wikimedia Commons (CC BY-SA 3.0)',ingredients:[['Kapusta biała',1,'szt.'],['Mięso mielone wieprzowe',600,'g'],['Ryż',180,'g'],['Cebula',180,'g'],['Passata pomidorowa',700,'ml'],['Bulion',300,'ml'],['Sól',10,'g'],['Pieprz czarny',3,'g'],['Majeranek',4,'g']],steps:['Z kapusty usuń głąb, sparz liście i odłóż do ostygnięcia.','Ryż ugotuj do półmiękkości. Wymieszaj z mięsem, cebulą i przyprawami.','Na każdy liść nałóż farsz i ciasno zwiń.','Ułóż gołąbki w naczyniu, zalej passatą wymieszaną z bulionem.','Duś pod przykryciem około 75–90 minut, aż kapusta i farsz będą miękkie.']},
+      {name:'Kopytka',category:'Mączne',cuisine:'Polska',description:'Delikatne kluski ziemniaczane z prostego ciasta z ziemniaków, mąki i jajka.',yield:6,yieldUnit:'porcja',servings:6,prep:35,cook:10,tags:['polskie','kluski','ziemniaki'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Kopytka_z_maslem_i_cukrem.jpg',imageSource:'external',imageCredit:'Olivia Fries / Wikimedia Commons (CC BY-SA 4.0)',sourceUrl:'https://commons.wikimedia.org/wiki/File:Kopytka_z_maslem_i_cukrem.jpg',license:'CC BY-SA 4.0',servingType:'Na ciepło',source:'Wikimedia Commons — Olivia Fries',ingredients:[['Ziemniaki',1000,'g'],['Mąka pszenna',250,'g'],['Jajko',1,'szt.'],['Sól',8,'g']],steps:['Ugotuj ziemniaki, dokładnie odparuj i przeciśnij przez praskę.','Dodaj jajko, sól i większość mąki. Szybko zagnieć miękkie ciasto.','Podziel ciasto na wałki i pokrój ukośnie na kopytka.','Gotuj partiami w osolonej wodzie do wypłynięcia.','Podawaj z masłem, sosem lub jako dodatek do mięsa.']},
+      {name:'Naleśniki z twarogiem',category:'Mączne',cuisine:'Polska',description:'Cienkie naleśniki z kremowym farszem z twarogu, śmietany i wanilii.',yield:10,yieldUnit:'szt.',servings:4,prep:25,cook:20,tags:['polskie','naleśniki','słodkie'],image:'./photo-tiramisu.webp',servingType:'Na ciepło',source:'Opracowanie Kucharzyny',ingredients:[['Mąka pszenna',250,'g'],['Mleko',500,'ml'],['Jajka',2,'szt.'],['Masło',30,'g'],['Twaróg półtłusty',400,'g'],['Śmietana',80,'g'],['Cukier',50,'g'],['Cukier waniliowy',8,'g']],steps:['Wymieszaj mąkę, mleko i jajka na gładkie ciasto. Dodaj roztopione masło.','Odstaw ciasto na 10 minut.','Smaż cienkie naleśniki na lekko natłuszczonej patelni.','Twaróg wymieszaj ze śmietaną, cukrem i wanilią.','Napełnij naleśniki farszem i złóż.']},
+      {name:'Racuchy z jabłkami',category:'Desery',cuisine:'Polska',description:'Puszyste drożdżowe racuchy z kawałkami jabłek, smażone na złoto.',yield:12,yieldUnit:'szt.',servings:4,prep:25,cook:20,ferment:45,tags:['polskie','racuchy','jabłka','słodkie'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Racuchy_z_jab%C5%82kami_-_28.08.2026.jpg',imageSource:'external',imageCredit:'Aw58 / Wikimedia Commons (CC BY 4.0)',sourceUrl:'https://commons.wikimedia.org/wiki/File:Racuchy_z_jab%C5%82kami_-_28.08.2026.jpg',license:'CC BY 4.0',servingType:'Na ciepło',source:'Wikimedia Commons — Aw58',ingredients:[['Mąka pszenna',300,'g'],['Mleko',250,'ml'],['Drożdże świeże',20,'g'],['Jajko',1,'szt.'],['Cukier',40,'g'],['Jabłka',300,'g'],['Sól',2,'g'],['Olej',80,'ml']],steps:['Podgrzej mleko do letniej temperatury i rozprowadź w nim drożdże z cukrem.','Dodaj mąkę, jajko i sól. Wymieszaj i odstaw do wyrośnięcia na około 45 minut.','Dodaj pokrojone jabłka.','Smaż porcje na średnim ogniu z obu stron na złoto.','Podawaj z cukrem pudrem lub cynamonem.']},
+      {name:'Barszcz czerwony',category:'Zupy',cuisine:'Polska',description:'Aromatyczny barszcz z pieczonych lub gotowanych buraków, zakwaszany dla wyraźnego smaku.',yield:2500,yieldUnit:'ml',servings:6,prep:20,cook:60,tags:['polskie','zupa','buraki','wigilia'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Barszcz_czerwony_z_uszkami_-_2025.01.21.jpg',imageSource:'external',imageCredit:'Aw58 / Wikimedia Commons (CC BY 4.0)',sourceUrl:'https://commons.wikimedia.org/wiki/File:Barszcz_czerwony_z_uszkami_-_2025.01.21.jpg',license:'CC BY 4.0',servingType:'Na ciepło',source:'Wikimedia Commons — Aw58',ingredients:[['Buraki',1000,'g'],['Woda',1800,'ml'],['Cebula',120,'g'],['Czosnek',15,'g'],['Liść laurowy',2,'szt.'],['Ziele angielskie',4,'szt.'],['Zakwas buraczany',300,'ml'],['Sól',12,'g'],['Pieprz czarny',2,'g'],['Majeranek',3,'g']],steps:['Buraki obierz i pokrój. Zalej wodą, dodaj cebulę, czosnek i przyprawy.','Gotuj bardzo spokojnie, bez mocnego wrzenia, aż buraki oddadzą kolor i smak.','Przecedź wywar i dodaj zakwas buraczany.','Dopraw solą, pieprzem i majerankiem. Nie doprowadzaj do mocnego wrzenia po dodaniu zakwasu.','Podawaj czysty lub z uszkami.']},
+      {name:'Sałatka jarzynowa',category:'Sałatki',cuisine:'Polska',description:'Klasyczna polska sałatka z gotowanych warzyw, jajek, ogórków kiszonych i majonezu.',yield:1200,yieldUnit:'g',servings:8,prep:45,cook:25,tags:['polskie','sałatka','święta'],image:'https://upload.wikimedia.org/wikipedia/commons/9/96/2023_Sa%C5%82atka_jarzynowa_%281%29.jpg',imageSource:'external',imageCredit:'Jacek Halicki / Wikimedia Commons (CC BY-SA 4.0)',sourceUrl:'https://commons.wikimedia.org/wiki/File:2023_Sa%C5%82atka_jarzynowa_(1).jpg',license:'CC BY-SA 4.0',servingType:'Na zimno',source:'Wikimedia Commons — Jacek Halicki',ingredients:[['Ziemniaki',300,'g'],['Marchew',200,'g'],['Pietruszka korzeń',120,'g'],['Groszek',150,'g'],['Ogórki kiszone',180,'g'],['Jajka',3,'szt.'],['Jabłko',120,'g'],['Majonez',180,'g'],['Musztarda',20,'g'],['Sól',6,'g'],['Pieprz czarny',2,'g']],steps:['Ugotuj ziemniaki, marchew i pietruszkę. Wystudź.','Pokrój warzywa, ogórki, jabłko i jajka w drobną kostkę.','Dodaj groszek, majonez i musztardę.','Wymieszaj delikatnie i dopraw.','Schłodź minimum godzinę przed podaniem.']}
+    ];
+    recipes.push(
+      {name:'Bigos',category:'Dania główne',cuisine:'Polska',description:'Długo duszona kapusta kiszona i świeża z mięsem, kiełbasą oraz suszonymi śliwkami.',yield:2500,yieldUnit:'g',servings:8,prep:35,cook:150,tags:['polskie','bigos','kapusta','klasyczne'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Bigos_-_19.03.2026.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — Aw58',sourceUrl:'https://commons.wikimedia.org/wiki/File:Bigos_-_19.03.2026.jpg',license:'CC BY 4.0',imageSource:'external',imageCredit:'Aw58 / Wikimedia Commons (CC BY 4.0)',ingredients:[['Kapusta kiszona',1200,'g'],['Kapusta biała',600,'g'],['Łopatka wieprzowa',450,'g'],['Kiełbasa',300,'g'],['Cebula',180,'g'],['Suszone śliwki',100,'g'],['Grzyby suszone',30,'g'],['Koncentrat pomidorowy',50,'g'],['Liść laurowy',3,'szt.'],['Ziele angielskie',6,'szt.'],['Pieprz czarny',4,'g'],['Sól',8,'g']],steps:['Namocz grzyby i ugotuj do miękkości. Zachowaj wywar.','Podsmaż mięso, kiełbasę i cebulę.','Dodaj obie kapusty, grzyby, śliwki, koncentrat i przyprawy.','Dolej niewielką ilość wywaru i duś bardzo spokojnie około 2–2,5 godziny.','Wystudź i następnego dnia ponownie podgrzej. Bigos zyskuje na smaku po odpoczynku.']},
+      {name:'Żurek',category:'Zupy',cuisine:'Polska',description:'Kwaśna zupa na zakwasie żytnim z białą kiełbasą, majerankiem i jajkiem.',yield:2500,yieldUnit:'ml',servings:6,prep:20,cook:50,tags:['polskie','żurek','zupa','wielkanoc'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Zurek.JPG',servingType:'Na ciepło',source:'Wikimedia Commons — Julienbzh35',sourceUrl:'https://commons.wikimedia.org/wiki/File:Zurek.JPG',license:'CC BY 1.0',imageSource:'external',imageCredit:'Julienbzh35 / Wikimedia Commons (CC BY 1.0)',ingredients:[['Zakwas żytni',500,'ml'],['Bulion',1800,'ml'],['Biała kiełbasa',500,'g'],['Wędzony boczek',120,'g'],['Cebula',120,'g'],['Czosnek',12,'g'],['Majeranek',5,'g'],['Liść laurowy',2,'szt.'],['Ziele angielskie',4,'szt.'],['Śmietana 18%',150,'g'],['Jajka',3,'szt.'],['Sól',8,'g'],['Pieprz czarny',2,'g']],steps:['Ugotuj kiełbasę w bulionie z liściem laurowym i zielem angielskim.','Boczek i cebulę podsmaż, dodaj czosnek.','Dodaj zawartość patelni do bulionu i wlej zakwas.','Gotuj spokojnie, dodaj majeranek i zahartowaną śmietanę.','Podawaj z połówką jajka i kawałkami białej kiełbasy.']},
+      {name:'Biały barszcz',category:'Zupy',cuisine:'Polska',description:'Kremowo-kwaśna zupa na białym barszczu, z białą kiełbasą, warzywami i jajkiem.',yield:2500,yieldUnit:'ml',servings:6,prep:20,cook:45,tags:['polskie','biały barszcz','zupa','wielkanoc'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Bia%C5%82y_barszcz_-_25.08.2026.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — Aw58',sourceUrl:'https://commons.wikimedia.org/wiki/File:Bia%C5%82y_barszcz_-_25.08.2026.jpg',license:'CC BY 4.0',imageSource:'external',imageCredit:'Aw58 / Wikimedia Commons (CC BY 4.0)',ingredients:[['Bulion',1800,'ml'],['Biały barszcz / zakwas',500,'ml'],['Biała kiełbasa',500,'g'],['Marchew',120,'g'],['Pietruszka korzeń',80,'g'],['Cebula',120,'g'],['Czosnek',12,'g'],['Śmietana 18%',150,'g'],['Majeranek',5,'g'],['Jajka',3,'szt.'],['Sól',8,'g'],['Pieprz czarny',2,'g']],steps:['Ugotuj kiełbasę w bulionie z warzywami i przyprawami.','Wyjmij kiełbasę, pokrój ją na porcje i odłóż.','Dodaj zakwas i zahartowaną śmietanę. Nie gotuj gwałtownie.','Dopraw majerankiem, solą i pieprzem.','Podawaj z kiełbasą i jajkiem.']},
+      {name:'Mizeria',category:'Sałatki',cuisine:'Polska',description:'Klasyczna surówka z ogórka, kwaśnej śmietany, koperku i odrobiny kwasowości.',yield:700,yieldUnit:'g',servings:4,prep:15,cook:0,tags:['polskie','mizeria','ogórek','dodatek'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Mizeria_-_2024.01.28.jpg',servingType:'Na zimno',source:'Wikimedia Commons — Aw58',sourceUrl:'https://commons.wikimedia.org/wiki/File:Mizeria_-_2024.01.28.jpg',license:'CC BY-SA 4.0',imageSource:'external',imageCredit:'Aw58 / Wikimedia Commons (CC BY-SA 4.0)',ingredients:[['Ogórki gruntowe',600,'g'],['Śmietana 18%',120,'g'],['Koperek',20,'g'],['Sok z cytryny',15,'ml'],['Cukier',5,'g'],['Sól',6,'g'],['Pieprz czarny',1,'g']],steps:['Ogórki pokrój cienko i lekko posól.','Po kilku minutach odlej nadmiar wody.','Dodaj śmietanę, koperek, sok z cytryny i odrobinę cukru.','Dopraw pieprzem i sprawdź równowagę kwasowości.','Schłodź przed podaniem.']},
+      {name:'Kotlet mielony',category:'Mięso',cuisine:'Polska',description:'Soczysty kotlet z mięsa mielonego z cebulą i namoczoną bułką, smażony na złoto.',yield:8,yieldUnit:'szt.',servings:4,prep:25,cook:20,tags:['polskie','mięso','kotlet','klasyczne'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Kotlety_mielone_-_14.03.2026.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — Aw58',sourceUrl:'https://commons.wikimedia.org/wiki/File:Kotlety_mielone_-_14.03.2026.jpg',license:'CC BY 4.0',imageSource:'external',imageCredit:'Aw58 / Wikimedia Commons (CC BY 4.0)',ingredients:[['Mięso mielone wieprzowe',700,'g'],['Cebula',150,'g'],['Bułka pszenna',80,'g'],['Mleko',120,'ml'],['Jajko',1,'szt.'],['Bułka tarta',80,'g'],['Sól',9,'g'],['Pieprz czarny',3,'g'],['Olej',80,'ml']],steps:['Bułkę namocz w mleku i dokładnie odciśnij.','Cebulę zeszklij lub dodaj surową, zależnie od stylu.','Wymieszaj mięso, bułkę, cebulę, jajko i przyprawy do uzyskania kleistej masy.','Uformuj kotlety i lekko obtocz w bułce tartej.','Smaż na średnim ogniu z obu stron, aż będą dobrze zrumienione i ugotowane w środku.']},
+      {name:'Kaczka z jabłkami',category:'Mięso',cuisine:'Polska',description:'Pieczona kaczka z jabłkami, majerankiem i czosnkiem, inspirowana kuchnią wielkopolską.',yield:4,yieldUnit:'porcja',servings:4,prep:30,cook:150,tags:['polskie','kaczka','wielkopolska','pieczone'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Polish_duck_with_apples.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — MOs810',sourceUrl:'https://commons.wikimedia.org/wiki/File:Polish_duck_with_apples.jpg',license:'CC BY-SA 3.0',imageSource:'external',imageCredit:'MOs810 / Wikimedia Commons (CC BY-SA 3.0)',ingredients:[['Kaczka',1,'szt.'],['Jabłka kwaśne',500,'g'],['Czosnek',15,'g'],['Majeranek',6,'g'],['Sól',14,'g'],['Pieprz czarny',3,'g'],['Woda',250,'ml']],steps:['Kaczkę osusz i natrzyj solą, pieprzem, czosnkiem i majerankiem.','Wnętrze wypełnij kawałkami jabłek.','Ułóż kaczkę piersią do góry w brytfannie i podlej wodą.','Piecz do miękkości, podlewając wytopionym tłuszczem. Na końcu zwiększ temperaturę, aby dopiec skórę.','Odstaw mięso przed porcjowaniem.']},
+      {name:'Golonka po polsku',category:'Mięso',cuisine:'Polska',description:'Miękka golonka długo gotowana i dopieczona do rumianej, chrupiącej skóry.',yield:2,yieldUnit:'porcja',servings:2,prep:20,cook:180,tags:['polskie','golonka','wieprzowina','piwo'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Nowy_Tomysl_golonka.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — MOs810',sourceUrl:'https://commons.wikimedia.org/wiki/File:Nowy_Tomysl_golonka.jpg',license:'CC BY-SA 4.0',imageSource:'external',imageCredit:'MOs810 / Wikimedia Commons (CC BY-SA 4.0)',ingredients:[['Golonka wieprzowa',2,'szt.'],['Marchew',150,'g'],['Pietruszka korzeń',100,'g'],['Cebula',150,'g'],['Liść laurowy',3,'szt.'],['Ziele angielskie',6,'szt.'],['Czosnek',15,'g'],['Sól',18,'g'],['Pieprz czarny',3,'g'],['Piwo jasne',500,'ml']],steps:['Golonki opłucz i gotuj z warzywami oraz przyprawami do miękkości.','Wyjmij, osusz i natrzyj czosnkiem oraz pieprzem.','Ułóż w naczyniu i podlej piwem.','Piecz, aż skóra mocno się zrumieni i stanie się chrupiąca.','Podawaj z musztardą, chrzanem i kapustą.']},
+      {name:'Flaki po warszawsku',category:'Zupy',cuisine:'Polska',description:'Gęsta, aromatyczna zupa z oczyszczonych flaków wołowych z majerankiem i przyprawami.',yield:3000,yieldUnit:'ml',servings:8,prep:35,cook:150,tags:['polskie','flaki','zupa','wołowina'],image:'https://upload.wikimedia.org/wikipedia/commons/7/73/Flaki_Poland_3657.JPG',servingType:'Na ciepło',source:'Wikimedia Commons — MOs810',sourceUrl:'https://commons.wikimedia.org/wiki/File:Flaki_Poland_3657.JPG',license:'CC BY-SA 3.0',imageSource:'external',imageCredit:'MOs810 / Wikimedia Commons (CC BY-SA 3.0)',ingredients:[['Flaki wołowe oczyszczone',1200,'g'],['Bulion wołowy',2200,'ml'],['Marchew',200,'g'],['Pietruszka korzeń',120,'g'],['Seler',100,'g'],['Cebula',150,'g'],['Masło',50,'g'],['Mąka pszenna',40,'g'],['Majeranek',8,'g'],['Imbir mielony',2,'g'],['Gałka muszkatołowa',1,'g'],['Pieprz czarny',3,'g'],['Sól',10,'g']],steps:['Flaki dokładnie wypłucz i obgotuj, następnie odcedź.','Gotuj w świeżym bulionie do miękkości.','Warzywa pokrój w cienkie słupki i dodaj do zupy.','Z masła i mąki przygotuj jasną zasmażkę i zahartuj ją bulionem.','Dodaj majeranek, imbir, gałkę i pieprz. Gotuj jeszcze kilka minut.']},
+      {name:'Krupnik',category:'Zupy',cuisine:'Polska',description:'Pożywna polska zupa jęczmienna z ziemniakami, warzywami i majerankiem.',yield:3000,yieldUnit:'ml',servings:8,prep:25,cook:70,tags:['polskie','krupnik','zupa','kasza'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Krupnik_soup_Poland.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — MOs810',sourceUrl:'https://commons.wikimedia.org/wiki/File:Krupnik_soup_Poland.jpg',license:'CC BY-SA 4.0',imageSource:'external',imageCredit:'MOs810 / Wikimedia Commons (CC BY-SA 4.0)',ingredients:[['Bulion',2400,'ml'],['Kasza jęczmienna',180,'g'],['Ziemniaki',500,'g'],['Marchew',180,'g'],['Pietruszka korzeń',100,'g'],['Seler',100,'g'],['Cebula',120,'g'],['Masło',40,'g'],['Liść laurowy',2,'szt.'],['Ziele angielskie',5,'szt.'],['Majeranek',5,'g'],['Sól',10,'g'],['Pieprz czarny',2,'g']],steps:['Warzywa pokrój w kostkę i dodaj do bulionu.','Wsyp kaszę i gotuj do jej prawie pełnej miękkości.','Dodaj pokrojone ziemniaki i gotuj do miękkości.','Dopraw majerankiem, solą i pieprzem.','Odstaw na kilka minut przed podaniem.']},
+      {name:'Kluski śląskie',category:'Mączne',cuisine:'Polska',description:'Okrągłe kluski ziemniaczane z charakterystycznym wgłębieniem na sos.',yield:6,yieldUnit:'porcja',servings:6,prep:35,cook:10,tags:['polskie','śląskie','kluski','ziemniaki'],image:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Kluski_slaskie_(Poznan).jpg',servingType:'Na ciepło',source:'Wikimedia Commons — MOs810',sourceUrl:'https://commons.wikimedia.org/wiki/File:Kluski_slaskie_(Poznan).jpg',license:'CC BY-SA 4.0',imageSource:'external',imageCredit:'MOs810 / Wikimedia Commons (CC BY-SA 4.0)',ingredients:[['Ziemniaki ugotowane',1000,'g'],['Skrobia ziemniaczana',250,'g'],['Jajko',1,'szt.'],['Sól',8,'g']],steps:['Ugotowane ziemniaki przeciśnij i dokładnie wystudź.','Wymieszaj z jajkiem, solą i skrobią. Zagnieć krótko.','Uformuj kulki i zrób kciukiem charakterystyczne wgłębienie.','Gotuj partiami w osolonej wodzie do wypłynięcia.','Podawaj z sosem, roladą, modrą kapustą lub skwarkami.']},
+      {name:'Pyzy z mięsem',category:'Mączne',cuisine:'Polska',description:'Duże ziemniaczane pyzy z mięsnym nadzieniem, charakterystyczne dla kuchni wielkopolskiej.',yield:12,yieldUnit:'szt.',servings:6,prep:60,cook:20,tags:['polskie','pyzy','wielkopolska','ziemniaki'],image:'https://upload.wikimedia.org/wikipedia/commons/4/49/Pyzy_z_mi%C4%99sem.jpg',servingType:'Na ciepło',source:'Wikimedia Commons — Ewkaa',sourceUrl:'https://commons.wikimedia.org/wiki/File:Pyzy_z_mięsem.jpg',license:'CC BY-SA 4.0',imageSource:'external',imageCredit:'Ewkaa / Wikimedia Commons (CC BY-SA 4.0)',ingredients:[['Ziemniaki ugotowane',700,'g'],['Ziemniaki surowe',700,'g'],['Mąka ziemniaczana',80,'g'],['Mięso wieprzowe gotowane',400,'g'],['Cebula',150,'g'],['Sól',10,'g'],['Pieprz czarny',3,'g'],['Smalec',40,'g']],steps:['Ugotowane ziemniaki przeciśnij. Surowe zetrzyj i bardzo dobrze odciśnij.','Połącz ziemniaki z mąką ziemniaczaną i solą.','Mięso zmiel, połącz z podsmażoną cebulą i pieprzem.','Formuj placuszki z ciasta, nadziewaj mięsem i szczelnie zamykaj.','Gotuj w osolonej wodzie do wypłynięcia i podawaj ze skwarkami lub cebulą.']},
+      {name:'Sernik',category:'Desery',cuisine:'Polska',description:'Polski sernik pieczony na bazie twarogu, jajek i cukru, o kremowym środku.',yield:12,yieldUnit:'porcja',servings:12,prep:30,cook:65,tags:['polskie','sernik','deser','święta'],image:'https://upload.wikimedia.org/wikipedia/commons/9/96/Sernik_-_Pastel_de_queso%2C_Gastronom%C3%ADa_polaca%2C_Gniezno%2C_Polonia1.jpg',servingType:'Na zimno',source:'Wikimedia Commons — Diego Delso',sourceUrl:'https://commons.wikimedia.org/wiki/File:Sernik_-_Pastel_de_queso,_Gastronom%C3%ADa_polaca,_Gniezno,_Polonia1.jpg',license:'CC BY-SA 3.0',imageSource:'external',imageCredit:'Diego Delso / Wikimedia Commons (CC BY-SA 3.0)',ingredients:[['Twaróg sernikowy',1000,'g'],['Jajka',6,'szt.'],['Cukier',180,'g'],['Masło',120,'g'],['Śmietana 18%',150,'g'],['Mąka ziemniaczana',30,'g'],['Wanilia',2,'g'],['Rodzynki',120,'g']],steps:['Twaróg utrzyj z miękkim masłem i cukrem.','Dodawaj po jednym jajku, następnie śmietanę, wanilię i skrobię.','Na końcu wmieszaj rodzynki.','Przełóż masę do formy i piecz do ścięcia środka.','Wystudź stopniowo i schłodź przed krojeniem.']},
+      {name:'Makowiec',category:'Desery',cuisine:'Polska',description:'Tradycyjne polskie ciasto drożdżowe z masą makową, bakaliami i skórką pomarańczową.',yield:12,yieldUnit:'porcja',servings:12,prep:45,cook:45,ferment:90,tags:['polskie','makowiec','deser','święta'],image:'https://upload.wikimedia.org/wikipedia/commons/8/89/Makowiec_slice.jpg',servingType:'Na zimno',source:'Wikimedia Commons — Husky',sourceUrl:'https://commons.wikimedia.org/wiki/File:Makowiec_slice.jpg',license:'CC BY-SA 3.0',imageSource:'external',imageCredit:'Husky / Wikimedia Commons (CC BY-SA 3.0)',ingredients:[['Mąka pszenna',500,'g'],['Mleko',200,'ml'],['Drożdże świeże',25,'g'],['Cukier',100,'g'],['Masło',100,'g'],['Jajka',2,'szt.'],['Mak mielony',300,'g'],['Miód',80,'g'],['Rodzynki',100,'g'],['Orzechy włoskie',100,'g'],['Skórka pomarańczowa',60,'g']],steps:['Zagnieć ciasto drożdżowe z mąki, mleka, drożdży, cukru, masła i jajek. Odstaw do wyrośnięcia.','Mak sparz i przygotuj z miodem, bakaliami oraz skórką pomarańczową.','Rozwałkuj ciasto, rozsmaruj masę makową i zwiń w roladę.','Zostaw do ponownego wyrośnięcia.','Piecz do złotego koloru i całkowitego dopieczenia.']}
+    );
+    for(const x of recipes){
+      let r=state.recipes.find(y=>String(y.name||'').toLowerCase()===x.name.toLowerCase());
+      if(!r){
+        r=makeRecipe({...x,traditional:true,flag:'🇵🇱',ferment:x.ferment||0,temp:0,taste:{sweet:1,sour:1,salty:3,umami:3,bitter:0,spicy:0}});
+      }else{
+        Object.assign(r,{category:x.category,cuisine:'Polska',description:x.description,yield:x.yield,yieldUnit:x.yieldUnit,servings:x.servings,prep:x.prep,cook:x.cook,ferment:x.ferment||0,tags:x.tags,traditional:true,flag:'🇵🇱',servingType:x.servingType,source:x.source,sourceUrl:x.sourceUrl||r.sourceUrl||'',license:x.license||r.license||'',image:x.image,imageSource:x.imageSource||'bundled',imageCredit:x.imageCredit||'Kucharzyna'});
+        r.sections=[{id:uid(),name:'Główna',ingredients:x.ingredients.map(a=>({id:uid(),name:a[0],qty:a[1],unit:a[2],percent:''}))}];r.steps=x.steps.map(text=>({id:uid(),text}));
+      }
+      r.image=x.image;r.imageSource=x.imageSource||'bundled';r.imageCredit=x.imageCredit||'Kucharzyna';
+      if(!r.sections?.length)r.sections=[{id:uid(),name:'Główna',ingredients:x.ingredients.map(a=>({id:uid(),name:a[0],qty:a[1],unit:a[2],percent:''}))}];
+      await put('recipes',r);
+    }
+    state.recipes=await getAll('recipes');
+  }catch(e){console.error('Polish recipe expansion failed',e)}
+}
+
 /* Install the cleaned transparent atlas and update cache references. */
 function k32InstallIngredientAtlasV2(){
   try{
     const styleId='k32-ingredient-atlas-v2-style'; if(document.getElementById(styleId))return;
     const s=document.createElement('style');s.id=styleId;s.textContent=`
       .k32-ing-thumb{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:10px!important;display:block!important;background-image:url('./ingredient-atlas-transparent.webp')!important;background-repeat:no-repeat!important;background-size:432px 288px!important;background-position:calc(var(--ix,0) * -36px) calc(var(--iy,0) * -36px)!important;background-color:transparent!important;box-shadow:none!important;mix-blend-mode:normal!important;overflow:hidden!important}
+      .k32-ing-emoji{display:grid!important;place-items:center!important;background:color-mix(in srgb,var(--surface2,#202226) 72%,transparent)!important;font-size:22px!important;line-height:1!important;border:1px solid color-mix(in srgb,var(--text) 8%,transparent)!important}
       .k32-cook-ing .k32-ing-thumb{width:38px!important;height:38px!important;flex-basis:38px!important;background-size:456px 304px!important;background-position:calc(var(--ix,0) * -38px) calc(var(--iy,0) * -38px)!important}
       .k32-search input,#recipeSearch{pointer-events:auto!important;user-select:text!important;-webkit-user-select:text!important;touch-action:manipulation!important;caret-color:var(--text)!important}
       #k32-live-search-empty{grid-column:1/-1}
@@ -1682,4 +1743,4 @@ function k32InstallIngredientAtlasV2(){
 const _kAtlasBind=bindV20;
 bindV20=function(){_kAtlasBind();k32InstallIngredientAtlasV2()};
 
-setTimeout(async()=>{await k32EnsurePierogiRuskie();renderV20()},950);
+setTimeout(async()=>{await k32EnsurePierogiRuskie();await k33EnsurePolishRecipes();renderV20()},950);

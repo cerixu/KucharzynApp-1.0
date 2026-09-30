@@ -569,7 +569,7 @@ html.light .v3-primary-action,html.light .v3-add-btn{color:#241707!important}
    One compact WebP atlas, tiny visual tokens beside ingredients.
    ============================================================ */
 .k32-ing,.k32-cook-ing{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:10px}
-.k32-ing-thumb{width:34px;height:34px;display:block;flex:0 0 34px;border-radius:11px;background-image:url('./ingredient-atlas-final.webp');background-repeat:no-repeat;background-size:1500px 268px;background-position:calc(var(--ix,0) * -75px) calc(var(--iy,0) * -67px);background-color:transparent;box-shadow:none;overflow:hidden}
+.k32-ing-thumb{width:34px;height:34px;display:block;flex:0 0 34px;border-radius:11px;background-image:url('./ingredient-atlas-transparent.webp');background-repeat:no-repeat;background-size:432px 288px;background-position:calc(var(--ix,0) * -36px) calc(var(--iy,0) * -36px);background-color:transparent;box-shadow:none;overflow:hidden;mix-blend-mode:normal}
 .k32-ing-thumb{mix-blend-mode:screen;}
 .k32-ing-thumb-fallback{display:grid;place-items:center;color:var(--muted);font-size:18px;font-weight:900;background:var(--surface2)}
 .k32-ing-name,.k32-cook-ing-name{min-width:0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -579,3 +579,5 @@ html.light .v3-primary-action,html.light .v3-add-btn{color:#241707!important}
   .k32-ing,.k32-cook-ing{grid-template-columns:34px minmax(0,1fr) auto;gap:8px}
   .k32-ing-thumb{width:32px;height:32px;flex-basis:32px;border-radius:10px}
 }
+
+.k32-ing-emoji{display:grid!important;place-items:center!important;background:color-mix(in srgb,var(--surface2,#202226) 72%,transparent)!important;font-size:22px!important;line-height:1!important;border:1px solid color-mix(in srgb,var(--text) 8%,transparent)!important;border-radius:10px!important}
