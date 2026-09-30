@@ -1274,7 +1274,7 @@ function k33RecipesView(){
   else if(state.sort!=='fav') rs.sort((a,b)=>(b.lastUsedAt||b.updatedAt||'').localeCompare(a.lastUsedAt||a.updatedAt||''));
   const cats=['Wszystkie',...state.categories.map(c=>c.name)];
   const isFav=state.sort==='fav';
-  return `<div class="k32-library k33-recipe-library"><div class="k32-page-head"><div><span class="kicker">${isFav?'TWOJE ULUBIONE':'TWOJA BAZA'}</span><h1>${isFav?'Ulubione':'Receptury'}</h1><p>${rs.length} ${rs.length===1?'receptura':'receptur'} · ${isFav?'tylko przepisy oznaczone sercem.':'wszystko zapisane lokalnie.'}</p></div><button class="btn primary k32-new" data-action="new">＋ Nowa</button></div><div class="k32-search"><span>⌕</span><input id="recipeSearch" placeholder="Szukaj po nazwie, składniku lub kategorii…" value="${escapeHtml(state.query||'')}"><button id="k32-clear-search" aria-label="Wyczyść" ${q?'':'hidden'}>×</button></div>${isFav?`<div class="k33-fav-banner"><span>♥</span><div><b>Twoje ulubione przepisy</b><small>Ta lista pokazuje wyłącznie receptury, które oznaczyłeś jako ulubione.</small></div></div>`:`<div class="chips k32-chips">${cats.map(c=>`<button class="chip ${state.selectedCat===c?'active':''}" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join('')}</div>`}<div class="k32-toolbar"><select id="sort"><option value="recent" ${state.sort==='recent'?'selected':''}>Ostatnio używane</option><option value="name" ${state.sort==='name'?'selected':''}>Nazwa A–Z</option><option value="fav" ${state.sort==='fav'?'selected':''}>Ulubione</option></select><button class="btn" data-google="1">Google</button><button class="btn" data-action="import">Importuj</button></div>${rs.length?`<div class="k32-recipe-grid">${rs.map(k32RecipeCard).join('')}</div>`:`<div class="k33-empty"><div>${isFav?'♡':'🍽️'}</div><h3>${isFav?'Nie masz jeszcze ulubionych':'Nie znaleziono receptur'}</h3><p>${isFav?'Otwórz recepturę i dotknij serca, żeby dodać ją do tego menu.':'Zmień wyszukiwanie lub dodaj nową recepturę.'}</p>${isFav?`<button class="btn primary" data-sort-all>Przeglądaj wszystkie</button>`:`<button class="btn primary" data-action="new">＋ Nowa receptura</button>`}</div>`}</div>`;
+  return `<div class="k32-library k33-recipe-library"><div class="k32-page-head"><div><span class="kicker">${isFav?'TWOJE ULUBIONE':'TWOJA BAZA'}</span><h1>${isFav?'Ulubione':'Receptury'}</h1><p>${rs.length} ${rs.length===1?'receptura':'receptur'} · ${isFav?'tylko przepisy oznaczone sercem.':'wszystko zapisane lokalnie.'}</p></div><button class="btn primary k32-new" data-action="new">＋ Nowa</button></div><div class="k32-search"><span>⌕</span><input id="recipeSearch" placeholder="Szukaj po nazwie, składniku lub kategorii…" value="${escapeHtml(state.query||'')}"><button id="k32-clear-search" aria-label="Wyczyść" ${q?'':'hidden'}>×</button></div>${isFav?`<div class="k33-fav-banner"><span>♥</span><div><b>Twoje ulubione przepisy</b><small>Ta lista pokazuje wyłącznie receptury, które oznaczyłeś jako ulubione.</small></div></div>`:`<div class="chips k32-chips">${cats.map(c=>`<button class="chip ${state.selectedCat===c?'active':''}" data-k33-category="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join('')}</div>`}<div class="k32-toolbar"><select id="sort"><option value="recent" ${state.sort==='recent'?'selected':''}>Ostatnio używane</option><option value="name" ${state.sort==='name'?'selected':''}>Nazwa A–Z</option><option value="fav" ${state.sort==='fav'?'selected':''}>Ulubione</option></select><button class="btn" data-google="1">Google</button><button class="btn" data-action="import">Importuj</button></div>${rs.length?`<div class="k32-recipe-grid">${rs.map(k32RecipeCard).join('')}</div>`:`<div class="k33-empty"><div>${isFav?'♡':'🍽️'}</div><h3>${isFav?'Nie masz jeszcze ulubionych':'Nie znaleziono receptur'}</h3><p>${isFav?'Otwórz recepturę i dotknij serca, żeby dodać ją do tego menu.':'Zmień wyszukiwanie lub dodaj nową recepturę.'}</p>${isFav?`<button class="btn primary" data-sort-all>Przeglądaj wszystkie</button>`:`<button class="btn primary" data-action="new">＋ Nowa receptura</button>`}</div>`}</div>`;
 }
 viewRecipes=k33RecipesView;
 
@@ -1374,4 +1374,128 @@ const _k33BackRoute=backRoute;
 backRoute=function(){
   if(state.route==='traditional'&&state.tradCatV14){state.tradCatV14='';state.worldDishQuery='';renderV20();requestAnimationFrame(()=>document.querySelector('.main-scroll')?.scrollTo({top:0,left:0,behavior:'auto'}));return}
   _k33BackRoute();
+};
+
+/* K34 CATEGORY DRILL-DOWN: each recipe category opens its own menu. */
+function k34CategoryRecipes(category){
+  const c=String(category||'').trim();
+  return state.recipes.filter(r=>String(r.category||'').trim()===c);
+}
+function k34CategoryImage(category){
+  const r=k34CategoryRecipes(category)[0];
+  return r?recipeImage(r):'./photo-generic.jpg';
+}
+function k34RecipeCategoryView(){
+  const category=String(state.recipeCategoryView||'').trim();
+  if(!category || category==='Wszystkie') return k33RecipesView();
+  let rs=k34CategoryRecipes(category);
+  const q=String(state.categoryQuery||'').trim().toLowerCase();
+  if(q) rs=rs.filter(r=>(`${r.name||''} ${r.description||''} ${(r.tags||[]).join(' ')}`).toLowerCase().includes(q));
+  if(state.sort==='name') rs.sort((a,b)=>a.name.localeCompare(b.name,'pl'));
+  else if(state.sort==='fav') rs=rs.filter(r=>r.favorite).sort((a,b)=>a.name.localeCompare(b.name,'pl'));
+  else rs.sort((a,b)=>(b.lastUsedAt||b.updatedAt||'').localeCompare(a.lastUsedAt||a.updatedAt||''));
+  const total=k34CategoryRecipes(category).length;
+  const img=k34CategoryImage(category);
+  return `<div class="k34-category-page">
+    <button class="k33-back-button" data-k34-category-back>‹ Wszystkie kategorie</button>
+    <section class="k34-category-hero"><img src="${escapeHtml(img)}" alt="${escapeHtml(category)}" onerror="this.onerror=null;this.src='./photo-generic.jpg'"><div class="k34-category-overlay"></div><div class="k34-category-copy"><span class="kicker">KATEGORIA PRZEPISÓW</span><h1>${escapeHtml(category)}</h1><p>${total} ${total===1?'receptura':'receptur'} w tej kategorii</p></div></section>
+    <div class="k34-category-head"><div><span class="kicker">MENU</span><h2>Dania: ${escapeHtml(category)}</h2></div><button class="btn" data-k34-category-back>‹ Kategorie</button></div>
+    <div class="k32-search"><span>⌕</span><input id="k34-category-search" placeholder="Szukaj w tej kategorii…" value="${escapeHtml(state.categoryQuery||'')}"><button id="k34-category-clear" aria-label="Wyczyść" ${q?'':'hidden'}>×</button></div>
+    <div class="k34-category-tools"><button class="chip ${state.sort==='recent'?'active':''}" data-k34-sort="recent">Ostatnio używane</button><button class="chip ${state.sort==='name'?'active':''}" data-k34-sort="name">Nazwa A–Z</button><button class="chip ${state.sort==='fav'?'active':''}" data-k34-sort="fav">Ulubione</button></div>
+    ${rs.length?`<div class="k32-recipe-grid">${rs.map(k32RecipeCard).join('')}</div>`:`<div class="k33-empty"><div>🍽️</div><h3>Brak dań</h3><p>${state.sort==='fav'?'W tej kategorii nie masz jeszcze ulubionych przepisów.':'Nie znaleziono przepisu pasującego do wyszukiwania.'}</p></div>`}
+  </div>`;
+}
+const _k34RecipesView=k33RecipesView;
+k33RecipesView=function(){
+  return state.recipeCategoryView ? k34RecipeCategoryView() : _k34RecipesView();
+};
+viewRecipes=k33RecipesView;
+
+const _k34Topbar=k3TopbarTitle;
+k3TopbarTitle=function(){
+  _k34Topbar();
+  const el=$('#topbarTitle');
+  if(el && state.route==='recipes' && state.recipeCategoryView) el.textContent=state.recipeCategoryView;
+};
+
+const _k34Bind=bindV20;
+bindV20=function(){
+  _k34Bind();
+  if(state.route==='recipes'){
+    $$('#main [data-k33-category]').forEach(b=>b.addEventListener('click',()=>{
+      const c=b.dataset.k33Category||'';
+      if(!c||c==='Wszystkie'){state.recipeCategoryView='';state.selectedCat='Wszystkie';}
+      else {state.recipeCategoryView=c;state.selectedCat=c;state.categoryQuery='';}
+      state.sort='recent';renderV20();requestAnimationFrame(()=>document.querySelector('.main-scroll')?.scrollTo({top:0,left:0,behavior:'auto'}));
+    }));
+    $$('#main [data-k34-category-back]').forEach(b=>b.addEventListener('click',()=>{
+      state.recipeCategoryView='';state.categoryQuery='';state.selectedCat='Wszystkie';state.sort='recent';renderV20();
+    }));
+    const cs=$('#k34-category-search');
+    if(cs) cs.addEventListener('input',e=>{state.categoryQuery=e.target.value;clearTimeout(window.__k34CategoryTimer);window.__k34CategoryTimer=setTimeout(()=>renderV20(),90)});
+    $('#k34-category-clear')?.addEventListener('click',()=>{state.categoryQuery='';renderV20()});
+    $$('#main [data-k34-sort]').forEach(b=>b.addEventListener('click',()=>{state.sort=b.dataset.k34Sort||'recent';renderV20()}));
+  }
+};
+
+const _k34Back=backRoute;
+backRoute=function(){
+  if(state.route==='recipes' && state.recipeCategoryView){state.recipeCategoryView='';state.categoryQuery='';state.selectedCat='Wszystkie';state.sort='recent';renderV20();requestAnimationFrame(()=>document.querySelector('.main-scroll')?.scrollTo({top:0,left:0,behavior:'auto'}));return;}
+  _k34Back();
+};
+
+/* K34 consistency: Amateur category tiles use the same category drill-down. */
+const _k34BindV14=bindV14;
+bindV14=function(){
+  _k34BindV14();
+  $$('#main [data-cat-am]').forEach(b=>b.onclick=()=>{
+    const c=b.dataset.catAm||'';
+    state.route='recipes';
+    state.recipeCategoryView=c;
+    state.selectedCat=c;
+    state.categoryQuery='';
+    state.sort='recent';
+    renderV20();
+    requestAnimationFrame(()=>document.querySelector('.main-scroll')?.scrollTo({top:0,left:0,behavior:'auto'}));
+  });
+};
+
+/* K34 shopping groups: operate on the complete merged product group. */
+const _k34ShoppingBind=bindV20;
+bindV20=function(){
+  _k34ShoppingBind();
+  if(state.route==='shopping'){
+    $$('#main [data-shop-check-v33]').forEach(b=>b.addEventListener('click',async e=>{
+      e.preventDefault();e.stopImmediatePropagation();
+      try{
+        const source=state.shopping.find(i=>i.id===b.dataset.shopCheckV33); if(!source)return;
+        const key=shopKey(source.name,source.unit), next=!source.done;
+        const members=state.shopping.filter(i=>shopKey(i.name,i.unit)===key);
+        for(const item of members){item.done=next;await put('shoppingItems',item)}
+        state.shopping=await getAll('shoppingItems');renderV20();
+      }catch(err){toast('Nie udało się zmienić statusu produktu')}
+    },true));
+    $$('#main [data-shop-adjust-v33]').forEach(b=>b.addEventListener('click',async e=>{
+      e.preventDefault();e.stopImmediatePropagation();
+      try{
+        const source=state.shopping.find(i=>i.id===b.dataset.shopAdjustV33); if(!source)return;
+        const key=shopKey(source.name,source.unit), delta=+b.dataset.delta||0;
+        const members=state.shopping.filter(i=>shopKey(i.name,i.unit)===key);
+        if(!members.length)return;
+        const first=members[0]; first.qty=Math.max(0,(+first.qty||0)+delta); await put('shoppingItems',first);
+        state.shopping=await getAll('shoppingItems');renderV20();
+      }catch(err){toast('Nie udało się zmienić ilości')}
+    },true));
+  }
+};
+
+/* K34 tab behavior: tapping the Recipes tab always returns to the category root. */
+const _k34Nav=nav;
+nav=function(route){
+  if(route==='recipes'){
+    state.recipeCategoryView='';
+    state.categoryQuery='';
+    state.selectedCat='Wszystkie';
+  }
+  return _k34Nav(route);
 };
