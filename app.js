@@ -12,25 +12,25 @@ const seed=[
 
 // Lokalne, wygenerowane grafiki. Zero zależności od zewnętrznych serwisów zdjęciowych.
 const RECIPE_IMAGES={
-  "Carbonara":"./photo-carbonara.jpg",
-  "Spaghetti alla carbonara":"./photo-carbonara.jpg",
-  "Pizza Napoletana":"./photo-pizza.jpg",
-  "Sos pomidorowy":"./photo-tomato.jpg"
+  "Carbonara":"./photo-carbonara.webp",
+  "Spaghetti alla carbonara":"./photo-carbonara.webp",
+  "Pizza Napoletana":"./photo-pizza.webp",
+  "Sos pomidorowy":"./photo-tomato.webp"
 };
-const DEFAULT_RECIPE_IMAGE="./photo-generic.jpg";
+const DEFAULT_RECIPE_IMAGE="./photo-generic.webp";
 function recipeImage(r){
   const local=RECIPE_IMAGES[r?.name];
   if(local) return local;
   if(typeof r?.image==='string' && /^(data:|blob:)/.test(r.image)) return r.image;
   const c=String(r?.category||'').toLowerCase();
-  if(c.includes('pizza')||c.includes('pieczy')) return './photo-pizza.jpg';
-  if(c.includes('pasta')||c.includes('makaron')) return './photo-carbonara.jpg';
-  if(c.includes('sos')||c.includes('zup')) return './photo-tomato.jpg';
+  if(c.includes('pizza')||c.includes('pieczy')) return './photo-pizza.webp';
+  if(c.includes('pasta')||c.includes('makaron')) return './photo-carbonara.webp';
+  if(c.includes('sos')||c.includes('zup')) return './photo-tomato.webp';
   return DEFAULT_RECIPE_IMAGE;
 }
 function ingredientGroupsSafe(r){return (r?.sections||[]).flatMap(s=>s.ingredients||[])}
 function recipeDescription(r){const d=String(r?.description||'').trim();if(d.length>=105&&!/^Klasyczne danie kuchni/i.test(d))return d;const names=ingredientGroupsSafe(r).slice(0,5).map(i=>i.name).filter(Boolean);const ing=names.length?names.join(', '):'starannie dobrane składniki';const cat=String(r?.category||'').toLowerCase();const process=cat.includes('pasta')||cat.includes('makaron')?'Kluczowe jest zachowanie właściwej konsystencji i wykończenie dania poza zbyt wysoką temperaturą.':cat.includes('pizza')||cat.includes('pieczywo')?'Najwięcej zależy tu od jakości mąki, prowadzenia fermentacji oraz kontroli temperatury podczas wypieku.':cat.includes('sos')?'Liczy się spokojna redukcja, koncentracja smaku i końcowa korekta soli, kwasowości oraz tłuszczu.':cat.includes('deser')?'Warto pilnować temperatury i momentu zakończenia obróbki, ponieważ konsystencja zmienia się także podczas studzenia.':'Receptura jest praktyczną bazą do pracy w kuchni; czasy i intensywność obróbki warto dopasować do konkretnego produktu.';return `${r?.name||'Danie'} to ${r?.traditional?'tradycyjna receptura oparta na charakterystycznych składnikach i technice przygotowania.':'praktyczna receptura do przygotowania w domu lub profesjonalnej kuchni.'} W tej wersji wykorzystujemy ${ing}. ${process}`.replace(/  +/g,' ').trim()}
-function photoMarkup(r,cls='global-photo'){const src=recipeImage(r);return `<img class="${cls}" src="${escapeHtml(src)}" alt="${escapeHtml(r?.name||'Potrawa')}" loading="eager" onerror="this.onerror=null;this.src='./photo-generic.jpg'">` }
+function photoMarkup(r,cls='global-photo'){const src=recipeImage(r);return `<img class="${cls}" src="${escapeHtml(src)}" alt="${escapeHtml(r?.name||'Potrawa')}" loading="eager" decoding="async" onerror="this.onerror=null;this.src='./photo-generic.webp'">` }
 function normalizeIngredientName(name=""){
  const m={
   "five spice":"chińska mieszanka pięciu przypraw","gochujang":"pasta gochujang","ancho chili":"suszona papryka ancho","achiote":"pasta achiote","mirin":"mirin (japońskie wino ryżowe)","dashi":"bulion dashi","ghee":"masło klarowane","paneer":"ser paneer","doubanjiang":"pasta doubanjiang (fermentowana fasola chili)",
@@ -78,7 +78,7 @@ async function ensureRecipeImages(){
 }
 function imageMarkup(r, cls='recipe20-hero'){
   const src=recipeImage(r);
-  if(src) return `<img class="${cls}" src="${escapeHtml(src)}" alt="${escapeHtml(r.name)}" loading="lazy" onerror="this.onerror=null;this.src='${escapeHtml(RECIPE_IMAGES[r.name]||'')}';this.classList.add('image-failed')">`;
+  if(src) return `<img class="${cls}" src="${escapeHtml(src)}" alt="${escapeHtml(r.name)}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${escapeHtml(RECIPE_IMAGES[r.name]||'')}';this.classList.add('image-failed')">`;
   return `<div class="${cls} image-placeholder" aria-label="Brak zdjęcia">🍽️<span>Zdjęcie potrawy</span></div>`;
 }
 function normalizeRecipes(){
@@ -114,7 +114,7 @@ function nav(route){state.route=route;render();$(".main-scroll").scrollTop=0}
 function saveSetting(){put("settings",{id:"settings",...state.settings})}
 function fmt(n){return Number.isInteger(Number(n))?String(n):Number(n).toFixed(2).replace(/\.?0+$/,"")}
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function recipeCard(r){const src=recipeImage(r);return `<article class="card recipe-card" data-open="${r.id}"><div class="recipe-thumb">${src?`<img src="${escapeHtml(src)}" loading="lazy" alt="${escapeHtml(r.name)}" onerror="this.remove();this.parentElement.classList.add('image-missing');if(!this.parentElement.querySelector('.img-fallback'))this.parentElement.insertAdjacentHTML('beforeend','<span class=\"img-fallback\" aria-hidden=\"true\">🍽️</span>')">`:'<span class="img-fallback" aria-hidden="true">🍽️</span>'}</div><div class="grow"><div class="row between"><h3>${escapeHtml(r.name)} ${r.traditional?`<span class="star">★</span>`:""} ${r.flag||""}</h3><button class="icon-btn small fav" data-fav="${r.id}" aria-label="Ulubione">${r.favorite?"★":"☆"}</button></div><div class="recipe-meta">${escapeHtml(r.category||"Inne")} · ${r.yield?fmt(r.yield)+" "+escapeHtml(r.yieldUnit||""):""} ${r.lastUsedAt?"· ostatnio używana":""}</div></div></article>`}
+function recipeCard(r){const src=recipeImage(r);return `<article class="card recipe-card" data-open="${r.id}"><div class="recipe-thumb">${src?`<img src="${escapeHtml(src)}" loading="lazy" decoding="async" alt="${escapeHtml(r.name)}" onerror="this.remove();this.parentElement.classList.add('image-missing');if(!this.parentElement.querySelector('.img-fallback'))this.parentElement.insertAdjacentHTML('beforeend','<span class=\"img-fallback\" aria-hidden=\"true\">🍽️</span>')">`:'<span class="img-fallback" aria-hidden="true">🍽️</span>'}</div><div class="grow"><div class="row between"><h3>${escapeHtml(r.name)} ${r.traditional?`<span class="star">★</span>`:""} ${r.flag||""}</h3><button class="icon-btn small fav" data-fav="${r.id}" aria-label="Ulubione">${r.favorite?"★":"☆"}</button></div><div class="recipe-meta">${escapeHtml(r.category||"Inne")} · ${r.yield?fmt(r.yield)+" "+escapeHtml(r.yieldUnit||""):""} ${r.lastUsedAt?"· ostatnio używana":""}</div></div></article>`}
 function render(){
  $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.route===state.route));
  const views={start:viewStart,recipes:viewRecipes,calculators:viewCalculators,shopping:viewShopping,settings:viewSettings};
@@ -323,7 +323,7 @@ function tasteMeterV14(t){
 }
 function recipeCardV14(r){
  const img=recipeImage(r);
- const media=img?`<img loading="lazy" src="${escapeHtml(img)}" alt="${escapeHtml(r.name)}" onerror="this.closest('.recipe-thumb').innerHTML='<div class=&quot;food-placeholder&quot;>${r.flag||"🍽️"}</div>'">`:`<div class="food-placeholder">${r.flag||"🍽️"}</div>`;
+ const media=img?`<img loading="lazy" decoding="async" src="${escapeHtml(img)}" alt="${escapeHtml(r.name)}" onerror="this.closest('.recipe-thumb').innerHTML='<div class=&quot;food-placeholder&quot;>${r.flag||"🍽️"}</div>'">`:`<div class="food-placeholder">${r.flag||"🍽️"}</div>`;
  return `<article class="card recipe-card" data-open="${r.id}"><div class="recipe-thumb">${media}</div><div class="grow"><div class="row between"><h3>${escapeHtml(r.name)} ${r.traditional?`<span class="star">★</span>`:""} ${r.flag||""}</h3><button class="icon-btn small fav" data-fav="${r.id}" aria-label="Ulubione">${r.favorite?"★":"☆"}</button></div><div class="recipe-meta">${escapeHtml(r.category||"Inne")} · ${r.cuisine?escapeHtml(r.cuisine)+" · ":""}${r.yield?fmt(r.yield)+" "+escapeHtml(r.yieldUnit||""):""}</div></div></article>`;
 }
 function viewTraditionalV14(){
@@ -361,7 +361,7 @@ function recipeViewV14(id){
  const totalWeight=all.filter(i=>typeof i.qty==='number'&&i.unit&&/^(g|kg|ml|l)$/i.test(i.unit)).reduce((n,i)=>n+i.qty*(i.unit==='kg'||i.unit==='l'?1000:1),0);
  return `<div class="recipe-page">
  <div class="recipe-page-top"><button class="btn ghost" data-back="recipes">‹ Receptury</button><div class="recipe-page-actions"><button class="icon-btn" data-fav="${r.id}" aria-label="Ulubiona">${r.favorite?'★':'☆'}</button><button class="btn" data-edit="${r.id}">✎ Edytuj</button></div></div>
- ${img?`<div class="recipe-cover"><img src="${escapeHtml(img)}" alt="${escapeHtml(r.name)}" loading="eager" onerror="this.closest('.recipe-cover').classList.add('image-error');this.style.display='none'"><div class="image-error-fallback">🍽️</div>${r.imageCredit?`<small>${escapeHtml(r.imageCredit)}</small>`:''}</div>`:''}
+ ${img?`<div class="recipe-cover"><img src="${escapeHtml(img)}" alt="${escapeHtml(r.name)}" loading="eager" decoding="async" onerror="this.closest('.recipe-cover').classList.add('image-error');this.style.display='none'"><div class="image-error-fallback">🍽️</div>${r.imageCredit?`<small>${escapeHtml(r.imageCredit)}</small>`:''}</div>`:''}
  <section class="recipe-intro"><div class="kicker">${escapeHtml(r.category||'Inne')} ${r.flag||''} ${r.traditional?'<span class="recipe-badge">★ TRADYCYJNA</span>':''}</div><h1>${escapeHtml(r.name)}</h1>${r.description?`<p>${escapeHtml(r.description)}</p>`:''}<div class="recipe-meta"><span>🍽️ <b>${fmt(r.yield||0)} ${escapeHtml(r.yieldUnit||'')}</b></span><span>⏱️ <b>${fmt((r.prep||0)+(r.cook||0))} min</b></span><span>🥣 <b>${count} składników</b></span>${totalWeight?`<span>⚖️ <b>${fmt(totalWeight)} g</b></span>`:''}</div></section>
  <div class="recipe-toolbar"><button class="btn primary" data-cook="${r.id}">▶ GOTUJĘ</button><button class="btn" data-edit="${r.id}">✎ EDYTUJ</button><button class="btn" data-scale="${r.id}">⇄ PRZELICZ</button><button class="btn" data-shop-recipe="${r.id}">＋ ZAKUPY</button></div>
  ${tasteMeterV14(r.taste)}
@@ -538,72 +538,72 @@ window.addEventListener("unhandledrejection",event=>{
    Kucharzyna 3.2.1 — complete recipe photo library + serving type
    ============================================================ */
 const K32_PHOTO_MAP={
-  "Pizza Napoletana":"./photo-pizza.jpg",
-  "Carbonara":"./photo-carbonara.jpg",
-  "Sos pomidorowy":"./photo-tomato.jpg",
-  "Spaghetti alla carbonara":"./photo-spaghetti-alla-carbonara.jpg",
-  "Cacio e pepe":"./photo-cacio-e-pepe.jpg",
-  "Pasta alla puttanesca":"./photo-pasta-alla-puttanesca.jpg",
-  "Pasta al pomodoro":"./photo-pasta-al-pomodoro.jpg",
-  "Risotto alla Milanese":"./photo-risotto-alla-milanese.jpg",
-  "Panzanella":"./photo-panzanella.jpg",
-  "Arancini":"./photo-arancini.jpg",
-  "Pasta e fagioli":"./photo-pasta-e-fagioli.jpg",
-  "Pho Ga":"./photo-pho-ga.jpg",
-  "Bun Cha":"./photo-bun-cha.jpg",
-  "Banh Mi":"./photo-banh-mi.jpg",
-  "Pad Thai":"./photo-pad-thai.jpg",
-  "Tom Kha Gai":"./photo-tom-kha-gai.jpg",
-  "Massaman Curry":"./photo-massaman-curry.jpg",
-  "Khao Pad":"./photo-khao-pad.jpg",
-  "Miso Shiru":"./photo-miso-shiru.jpg",
-  "Karaage":"./photo-karaage.jpg",
-  "Okonomiyaki":"./photo-okonomiyaki.jpg",
-  "Sukiyaki":"./photo-sukiyaki.jpg",
-  "Ramen Shoyu":"./photo-ramen-shoyu.jpg",
-  "Mapo Tofu":"./photo-mapo-tofu.jpg",
-  "Kung Pao Chicken":"./photo-kung-pao-chicken.jpg",
-  "Jiaozi":"./photo-jiaozi.jpg",
-  "Char Siu":"./photo-char-siu.jpg",
-  "Butter Chicken":"./photo-butter-chicken.jpg",
-  "Palak Paneer":"./photo-palak-paneer.jpg",
-  "Dal Tadka":"./photo-dal-tadka.jpg",
-  "Naan":"./photo-naan.jpg",
-  "Moussaka":"./photo-moussaka.jpg",
-  "Tzatziki":"./photo-tzatziki.jpg",
-  "Spanakopita":"./photo-spanakopita.jpg",
-  "Baklava":"./photo-baklava.jpg",
-  "Menemen":"./photo-menemen.jpg",
-  "Adana Kebab":"./photo-adana-kebab.jpg",
-  "Ratatouille":"./photo-ratatouille.jpg",
-  "Coq au vin":"./photo-coq-au-vin.jpg",
-  "Quiche Lorraine":"./photo-quiche-lorraine.jpg",
-  "Paella Valenciana":"./photo-paella-valenciana.jpg",
-  "Tortilla Española":"./photo-tortilla-espa-ola.jpg",
-  "Gazpacho":"./photo-gazpacho.jpg",
-  "Pulpo a la Gallega":"./photo-pulpo-a-la-gallega.jpg",
-  "Goulash":"./photo-goulash.jpg",
-  "Pierogi ruskie":"./photo-pierogi-ruskie.jpg",
-  "Żurek":"./photo-zurek.jpg",
-  "Bigos":"./photo-bigos.jpg",
-  "Ceviche":"./photo-ceviche.jpg",
-  "Lomo Saltado":"./photo-lomo-saltado.jpg",
-  "Feijoada":"./photo-feijoada.jpg",
-  "Moqueca":"./photo-moqueca.jpg",
-  "Harira":"./photo-harira.jpg",
-  "Tagine z kurczakiem i cytryną":"./photo-tagine-z-kurczakiem-i-cytryna.jpg",
-  "Hummus":"./photo-hummus.jpg",
-  "Falafel":"./photo-falafel.jpg",
-  "Kimchi Jjigae":"./photo-kimchi-jjigae.jpg",
-  "Bulgogi":"./photo-bulgogi.jpg",
-  "Bibimbap":"./photo-bibimbap.jpg",
-  "Tacos al Pastor":"./photo-tacos-al-pastor.jpg",
-  "Mole Poblano":"./photo-mole-poblano.jpg",
-  "Guacamole":"./photo-guacamole.jpg",
-  "Fish and Chips":"./photo-fish-and-chips.jpg",
-  "Shepherd's Pie":"./photo-shepherd-s-pie.jpg",
-  "Crème brûlée":"./photo-cr-me-br-l-e.jpg",
-  "Tiramisu":"./photo-tiramisu.jpg"
+  "Pizza Napoletana":"./photo-pizza.webp",
+  "Carbonara":"./photo-carbonara.webp",
+  "Sos pomidorowy":"./photo-tomato.webp",
+  "Spaghetti alla carbonara":"./photo-spaghetti-alla-carbonara.webp",
+  "Cacio e pepe":"./photo-cacio-e-pepe.webp",
+  "Pasta alla puttanesca":"./photo-pasta-alla-puttanesca.webp",
+  "Pasta al pomodoro":"./photo-pasta-al-pomodoro.webp",
+  "Risotto alla Milanese":"./photo-risotto-alla-milanese.webp",
+  "Panzanella":"./photo-panzanella.webp",
+  "Arancini":"./photo-arancini.webp",
+  "Pasta e fagioli":"./photo-pasta-e-fagioli.webp",
+  "Pho Ga":"./photo-pho-ga.webp",
+  "Bun Cha":"./photo-bun-cha.webp",
+  "Banh Mi":"./photo-banh-mi.webp",
+  "Pad Thai":"./photo-pad-thai.webp",
+  "Tom Kha Gai":"./photo-tom-kha-gai.webp",
+  "Massaman Curry":"./photo-massaman-curry.webp",
+  "Khao Pad":"./photo-khao-pad.webp",
+  "Miso Shiru":"./photo-miso-shiru.webp",
+  "Karaage":"./photo-karaage.webp",
+  "Okonomiyaki":"./photo-okonomiyaki.webp",
+  "Sukiyaki":"./photo-sukiyaki.webp",
+  "Ramen Shoyu":"./photo-ramen-shoyu.webp",
+  "Mapo Tofu":"./photo-mapo-tofu.webp",
+  "Kung Pao Chicken":"./photo-kung-pao-chicken.webp",
+  "Jiaozi":"./photo-jiaozi.webp",
+  "Char Siu":"./photo-char-siu.webp",
+  "Butter Chicken":"./photo-butter-chicken.webp",
+  "Palak Paneer":"./photo-palak-paneer.webp",
+  "Dal Tadka":"./photo-dal-tadka.webp",
+  "Naan":"./photo-naan.webp",
+  "Moussaka":"./photo-moussaka.webp",
+  "Tzatziki":"./photo-tzatziki.webp",
+  "Spanakopita":"./photo-spanakopita.webp",
+  "Baklava":"./photo-baklava.webp",
+  "Menemen":"./photo-menemen.webp",
+  "Adana Kebab":"./photo-adana-kebab.webp",
+  "Ratatouille":"./photo-ratatouille.webp",
+  "Coq au vin":"./photo-coq-au-vin.webp",
+  "Quiche Lorraine":"./photo-quiche-lorraine.webp",
+  "Paella Valenciana":"./photo-paella-valenciana.webp",
+  "Tortilla Española":"./photo-tortilla-espa-ola.webp",
+  "Gazpacho":"./photo-gazpacho.webp",
+  "Pulpo a la Gallega":"./photo-pulpo-a-la-gallega.webp",
+  "Goulash":"./photo-goulash.webp",
+  "Pierogi ruskie":"./photo-pierogi-ruskie.webp",
+  "Żurek":"./photo-zurek.webp",
+  "Bigos":"./photo-bigos.webp",
+  "Ceviche":"./photo-ceviche.webp",
+  "Lomo Saltado":"./photo-lomo-saltado.webp",
+  "Feijoada":"./photo-feijoada.webp",
+  "Moqueca":"./photo-moqueca.webp",
+  "Harira":"./photo-harira.webp",
+  "Tagine z kurczakiem i cytryną":"./photo-tagine-z-kurczakiem-i-cytryna.webp",
+  "Hummus":"./photo-hummus.webp",
+  "Falafel":"./photo-falafel.webp",
+  "Kimchi Jjigae":"./photo-kimchi-jjigae.webp",
+  "Bulgogi":"./photo-bulgogi.webp",
+  "Bibimbap":"./photo-bibimbap.webp",
+  "Tacos al Pastor":"./photo-tacos-al-pastor.webp",
+  "Mole Poblano":"./photo-mole-poblano.webp",
+  "Guacamole":"./photo-guacamole.webp",
+  "Fish and Chips":"./photo-fish-and-chips.webp",
+  "Shepherd's Pie":"./photo-shepherd-s-pie.webp",
+  "Crème brûlée":"./photo-cr-me-br-l-e.webp",
+  "Tiramisu":"./photo-tiramisu.webp"
 };
 const K32_COLD=new Set(["Panzanella","Tzatziki","Gazpacho","Ceviche","Hummus","Guacamole","Tiramisu","Crème brûlée"]);
 const K32_SNACK=new Set(["Arancini","Banh Mi","Jiaozi","Falafel","Tacos al Pastor"]);
@@ -631,13 +631,6 @@ async function k32MigrateRecipePresentation(){
     return changed;
   }catch(e){console.error('Recipe presentation migration failed',e);return 0;}
 }
-const _k32RecipeViewFinal=recipeViewV20;
-recipeViewV20=function(id){
-  const r=state.recipes.find(x=>x.id===id);
-  const html=_k32RecipeViewFinal(id);
-  if(!r)return html;
-  return html.replace(/<div class="k32-info"><span>🔥 Temperatura<\/span><b>.*?<\/b><\/div>/,'<div class="k32-info"><span>🍽️ Sposób podania</span><b>'+escapeHtml(k32ServingTypeFor(r))+'</b></div>');
-};
 const _k32CookViewFinal=viewCookV20;
 viewCookV20=function(){
   const r=state.recipes.find(x=>x.id===state.selectedId);
@@ -700,7 +693,7 @@ function amateurView(){
     <section class="am-section"><div class="am-title"><h2>Pomysły na dziś</h2></div><div class="am-recipe-row">${state.recipes.slice(0,8).map(amateurCard).join('')}</div></section>
   </div>`;
 }
-function amateurCard(r){const img=recipeImage(r);return `<article class="am-card" data-open="${r.id}"><div class="am-card-img">${img?`<img src="${escapeHtml(img)}" alt="${escapeHtml(r.name)}" loading="lazy">`:'🍽️'}</div><div class="am-card-body"><div class="am-card-name">${escapeHtml(r.name)}</div><div class="am-card-meta">${escapeHtml(r.category||'Przepis')} · ${r.yield?fmt(r.yield)+' '+escapeHtml(r.yieldUnit||''):''}</div></div></article>`}
+function amateurCard(r){const img=recipeImage(r);return `<article class="am-card" data-open="${r.id}"><div class="am-card-img">${img?`<img src="${escapeHtml(img)}" alt="${escapeHtml(r.name)}" loading="lazy" decoding="async">`:'🍽️'}</div><div class="am-card-body"><div class="am-card-name">${escapeHtml(r.name)}</div><div class="am-card-meta">${escapeHtml(r.category||'Przepis')} · ${r.yield?fmt(r.yield)+' '+escapeHtml(r.yieldUnit||''):''}</div></div></article>`}
 
 const _renderV14=renderV14;
 renderV14=function(){
@@ -797,19 +790,19 @@ function viewCookV20(){const r=state.recipes.find(x=>x.id===state.selectedId);if
 
 function viewTraditionalV14(){
  const cuisines=[
-  ['Włochy','Klasyka makaronu, pizzy i risotto','🇮🇹','./photo-carbonara.jpg'],
-  ['Polska','Domowe smaki i tradycyjne dania','🇵🇱','./photo-tomato.jpg'],
-  ['Azjatycka','Wok, makarony i intensywne aromaty','🌏','./photo-carbonara.jpg'],
-  ['Meksykańska','Tacos, salsa i kuchnia uliczna','🇲🇽','./photo-pizza.jpg'],
-  ['Francuska','Technika, sosy i klasyka','🇫🇷','./photo-tomato.jpg'],
-  ['Hiszpańska','Tapas, ryż i wyraziste smaki','🇪🇸','./photo-pizza.jpg'],
-  ['Bliski Wschód','Przyprawy, grill i mezze','🌙','./photo-tomato.jpg'],
-  ['Amerykańska','Comfort food i kuchnia nowoczesna','🇺🇸','./photo-pizza.jpg']
+  ['Włochy','Klasyka makaronu, pizzy i risotto','🇮🇹','./photo-carbonara.webp'],
+  ['Polska','Domowe smaki i tradycyjne dania','🇵🇱','./photo-tomato.webp'],
+  ['Azjatycka','Wok, makarony i intensywne aromaty','🌏','./photo-carbonara.webp'],
+  ['Meksykańska','Tacos, salsa i kuchnia uliczna','🇲🇽','./photo-pizza.webp'],
+  ['Francuska','Technika, sosy i klasyka','🇫🇷','./photo-tomato.webp'],
+  ['Hiszpańska','Tapas, ryż i wyraziste smaki','🇪🇸','./photo-pizza.webp'],
+  ['Bliski Wschód','Przyprawy, grill i mezze','🌙','./photo-tomato.webp'],
+  ['Amerykańska','Comfort food i kuchnia nowoczesna','🇺🇸','./photo-pizza.webp']
  ];
  const q=String(state.traditionalQueryV14||'').toLowerCase();
  const shown=cuisines.filter(c=>!q||(c[0]+' '+c[1]).toLowerCase().includes(q));
  const selected=state.tradCatV14&&state.tradCatV14!=="Wszystkie"?state.recipes.filter(r=>r.traditional&&((r.cuisine||'').toLowerCase()===String(state.tradCatV14).toLowerCase()||(r.cuisine||'').toLowerCase().includes(String(state.tradCatV14).toLowerCase().replace('azjatycka','azja')))):[];
- return `<div class="v3-world"><div class="v3-page-head"><div><span class="v3-kicker">INSPIRACJE</span><h1>Kuchnie świata</h1><p>Odkrywaj klasyczne kierunki kulinarne i przechodź prosto do pasujących receptur.</p></div></div><div class="v3-search v3-world-search"><span>⌕</span><input id="traditionalSearchV14" placeholder="Szukaj kuchni lub regionu…" value="${escapeHtml(state.traditionalQueryV14||'')}"></div><div class="v3-world-grid">${shown.map(c=>`<button class="v3-world-card" data-world-cuisine="${escapeHtml(c[0])}"><img src="${c[3]}" alt="${escapeHtml(c[0])}" onerror="this.src='./photo-generic.jpg'"><div class="v3-world-copy"><b>${c[2]} ${escapeHtml(c[0])}</b><span>${escapeHtml(c[1])}</span></div></button>`).join('')}</div>${selected.length?`<section class="v3-world-results"><div class="v3-section-head"><div><span class="v3-kicker">${escapeHtml(state.tradCatV14)}</span><h2>Receptury</h2></div><button class="v3-link" data-world-clear>Wszystkie</button></div><div class="v3-recipe-list">${selected.map(r=>v3RecipeCard(r,true)).join('')}</div></section>`:`<section class="v3-world-feature"><span>🍽️</span><div><b>Masz ochotę na konkretną kuchnię?</b><p>Wybierz kraj lub region powyżej. Kucharzyna pokaże zapisane klasyczne receptury z tego kierunku.</p></div></section>`}</div>`;
+ return `<div class="v3-world"><div class="v3-page-head"><div><span class="v3-kicker">INSPIRACJE</span><h1>Kuchnie świata</h1><p>Odkrywaj klasyczne kierunki kulinarne i przechodź prosto do pasujących receptur.</p></div></div><div class="v3-search v3-world-search"><span>⌕</span><input id="traditionalSearchV14" placeholder="Szukaj kuchni lub regionu…" value="${escapeHtml(state.traditionalQueryV14||'')}"></div><div class="v3-world-grid">${shown.map(c=>`<button class="v3-world-card" data-world-cuisine="${escapeHtml(c[0])}"><img src="${c[3]}" alt="${escapeHtml(c[0])}" onerror="this.src='./photo-generic.webp'"><div class="v3-world-copy"><b>${c[2]} ${escapeHtml(c[0])}</b><span>${escapeHtml(c[1])}</span></div></button>`).join('')}</div>${selected.length?`<section class="v3-world-results"><div class="v3-section-head"><div><span class="v3-kicker">${escapeHtml(state.tradCatV14)}</span><h2>Receptury</h2></div><button class="v3-link" data-world-clear>Wszystkie</button></div><div class="v3-recipe-list">${selected.map(r=>v3RecipeCard(r,true)).join('')}</div></section>`:`<section class="v3-world-feature"><span>🍽️</span><div><b>Masz ochotę na konkretną kuchnię?</b><p>Wybierz kraj lub region powyżej. Kucharzyna pokaże zapisane klasyczne receptury z tego kierunku.</p></div></section>`}</div>`;
 }
 
 function viewCalculatorsV20(){
@@ -919,7 +912,7 @@ function v3SvgIcon(name){const paths={book:'<path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H
 function v3RecipeCard(r,wide=false){
   const src=recipeImage(r); const total=(+r.prep||0)+(+r.cook||0);
   return `<article class="v3-recipe-card ${wide?'v3-wide':''}" data-open="${r.id}">
-    <div class="v3-card-photo"><img src="${escapeHtml(src)}" loading="lazy" alt="${escapeHtml(r.name)}" onerror="this.onerror=null;this.src='./photo-generic.jpg'"><button class="v3-heart" data-fav="${r.id}" aria-label="${r.favorite?'Usuń z ulubionych':'Dodaj do ulubionych'}">${r.favorite?'♥':'♡'}</button></div>
+    <div class="v3-card-photo"><img src="${escapeHtml(src)}" loading="lazy" decoding="async" alt="${escapeHtml(r.name)}" onerror="this.onerror=null;this.src='./photo-generic.webp'"><button class="v3-heart" data-fav="${r.id}" aria-label="${r.favorite?'Usuń z ulubionych':'Dodaj do ulubionych'}">${r.favorite?'♥':'♡'}</button></div>
     <div class="v3-card-body"><div class="v3-card-kicker">${escapeHtml(r.category||'Przepis')} ${r.flag||''}</div><h3>${escapeHtml(r.name)}</h3><div class="v3-card-meta"><span>◷ ${fmt(total)} min</span><span>♟ ${fmt(r.yield||r.servings||0)} ${escapeHtml(r.yieldUnit||'porc.')}</span>${r.traditional?'<span class="v3-gold">★ Klasyczna</span>':''}</div></div>
   </article>`;
 }
@@ -962,7 +955,7 @@ function recipeViewV20(id){
   const r=state.recipes.find(x=>x.id===id); if(!r)return viewRecipes();
   const ingredients=ingredientGroups(r), desc=recipeDescription(r), total=(+r.prep||0)+(+r.cook||0);
   return `<div class="v3-recipe-detail">
-    <section class="v3-detail-hero"><img src="${escapeHtml(recipeImage(r))}" alt="${escapeHtml(r.name)}" onerror="this.onerror=null;this.src='./photo-generic.jpg'"><div class="v3-detail-gradient"></div><div class="v3-detail-top"><button class="v3-round" data-fav="${r.id}">${r.favorite?'♥':'♡'}</button><button class="v3-round" data-edit="${r.id}">⋯</button></div><div class="v3-detail-title"><div class="v3-kicker">${escapeHtml(r.category||'PRZEPIS')} ${r.flag||''} ${r.traditional?' · ★ KLASYCZNA':''}</div><h1>${escapeHtml(r.name)}</h1><p>${escapeHtml(desc)}</p></div></section>
+    <section class="v3-detail-hero"><img src="${escapeHtml(recipeImage(r))}" alt="${escapeHtml(r.name)}" onerror="this.onerror=null;this.src='./photo-generic.webp'"><div class="v3-detail-gradient"></div><div class="v3-detail-top"><button class="v3-round" data-fav="${r.id}">${r.favorite?'♥':'♡'}</button><button class="v3-round" data-edit="${r.id}">⋯</button></div><div class="v3-detail-title"><div class="v3-kicker">${escapeHtml(r.category||'PRZEPIS')} ${r.flag||''} ${r.traditional?' · ★ KLASYCZNA':''}</div><h1>${escapeHtml(r.name)}</h1><p>${escapeHtml(desc)}</p></div></section>
     <div class="v3-stat-row"><div><span>◷</span><b>${fmt(total)} min</b><small>czas</small></div><div><span>♟</span><b>${fmt(r.yield||r.servings||0)} ${escapeHtml(r.yieldUnit||'porc.')}</b><small>wydajność</small></div><div><span>🍽️</span><b>${escapeHtml(r.servingType||'Na ciepło')}</b><small>podanie</small></div></div>
     <div class="v3-detail-actions"><button class="v3-primary-action" data-cook="${r.id}">👨‍🍳 GOTUJĘ</button><button data-shop-recipe="${r.id}">🛒 Zakupy</button><button data-scale="${r.id}">⚖ Przelicz</button></div>
     <section class="v3-content-section"><div class="v3-section-head"><div><span class="v3-kicker">RECEPTURA</span><h2>Składniki</h2></div><span class="v3-count">${ingredients.length}</span></div>${(r.sections||[]).map(s=>`<div class="v3-ingredient-group">${(r.sections||[]).length>1?`<div class="v3-group-title">${escapeHtml(s.name)}</div>`:''}${(s.ingredients||[]).map(i=>`<button class="v3-ingredient" data-recipe-ing="${i.id}"><span class="v3-ing-icon">•</span><span>${escapeHtml(i.name)}</span><strong>${fmt(i.qty??0)} ${escapeHtml(i.unit||'g')}</strong></button>`).join('')}</div>`).join('')}</section>
@@ -982,19 +975,19 @@ function viewShoppingV20(){
 }
 function viewTraditionalV14(){
  const cuisines=[
-  ['Włochy','Klasyka makaronu, pizzy i risotto','🇮🇹','./photo-carbonara.jpg'],
-  ['Polska','Domowe smaki i tradycyjne dania','🇵🇱','./photo-tomato.jpg'],
-  ['Azjatycka','Wok, makarony i intensywne aromaty','🌏','./photo-carbonara.jpg'],
-  ['Meksykańska','Tacos, salsa i kuchnia uliczna','🇲🇽','./photo-pizza.jpg'],
-  ['Francuska','Technika, sosy i klasyka','🇫🇷','./photo-tomato.jpg'],
-  ['Hiszpańska','Tapas, ryż i wyraziste smaki','🇪🇸','./photo-pizza.jpg'],
-  ['Bliski Wschód','Przyprawy, grill i mezze','🌙','./photo-tomato.jpg'],
-  ['Amerykańska','Comfort food i kuchnia nowoczesna','🇺🇸','./photo-pizza.jpg']
+  ['Włochy','Klasyka makaronu, pizzy i risotto','🇮🇹','./photo-carbonara.webp'],
+  ['Polska','Domowe smaki i tradycyjne dania','🇵🇱','./photo-tomato.webp'],
+  ['Azjatycka','Wok, makarony i intensywne aromaty','🌏','./photo-carbonara.webp'],
+  ['Meksykańska','Tacos, salsa i kuchnia uliczna','🇲🇽','./photo-pizza.webp'],
+  ['Francuska','Technika, sosy i klasyka','🇫🇷','./photo-tomato.webp'],
+  ['Hiszpańska','Tapas, ryż i wyraziste smaki','🇪🇸','./photo-pizza.webp'],
+  ['Bliski Wschód','Przyprawy, grill i mezze','🌙','./photo-tomato.webp'],
+  ['Amerykańska','Comfort food i kuchnia nowoczesna','🇺🇸','./photo-pizza.webp']
  ];
  const q=String(state.traditionalQueryV14||'').toLowerCase();
  const shown=cuisines.filter(c=>!q||(c[0]+' '+c[1]).toLowerCase().includes(q));
  const selected=state.tradCatV14&&state.tradCatV14!=="Wszystkie"?state.recipes.filter(r=>r.traditional&&((r.cuisine||'').toLowerCase()===String(state.tradCatV14).toLowerCase()||(r.cuisine||'').toLowerCase().includes(String(state.tradCatV14).toLowerCase().replace('azjatycka','azja')))):[];
- return `<div class="v3-world"><div class="v3-page-head"><div><span class="v3-kicker">INSPIRACJE</span><h1>Kuchnie świata</h1><p>Odkrywaj klasyczne kierunki kulinarne i przechodź prosto do pasujących receptur.</p></div></div><div class="v3-search v3-world-search"><span>⌕</span><input id="traditionalSearchV14" placeholder="Szukaj kuchni lub regionu…" value="${escapeHtml(state.traditionalQueryV14||'')}"></div><div class="v3-world-grid">${shown.map(c=>`<button class="v3-world-card" data-world-cuisine="${escapeHtml(c[0])}"><img src="${c[3]}" alt="${escapeHtml(c[0])}" onerror="this.src='./photo-generic.jpg'"><div class="v3-world-copy"><b>${c[2]} ${escapeHtml(c[0])}</b><span>${escapeHtml(c[1])}</span></div></button>`).join('')}</div>${selected.length?`<section class="v3-world-results"><div class="v3-section-head"><div><span class="v3-kicker">${escapeHtml(state.tradCatV14)}</span><h2>Receptury</h2></div><button class="v3-link" data-world-clear>Wszystkie</button></div><div class="v3-recipe-list">${selected.map(r=>v3RecipeCard(r,true)).join('')}</div></section>`:`<section class="v3-world-feature"><span>🍽️</span><div><b>Masz ochotę na konkretną kuchnię?</b><p>Wybierz kraj lub region powyżej. Kucharzyna pokaże zapisane klasyczne receptury z tego kierunku.</p></div></section>`}</div>`;
+ return `<div class="v3-world"><div class="v3-page-head"><div><span class="v3-kicker">INSPIRACJE</span><h1>Kuchnie świata</h1><p>Odkrywaj klasyczne kierunki kulinarne i przechodź prosto do pasujących receptur.</p></div></div><div class="v3-search v3-world-search"><span>⌕</span><input id="traditionalSearchV14" placeholder="Szukaj kuchni lub regionu…" value="${escapeHtml(state.traditionalQueryV14||'')}"></div><div class="v3-world-grid">${shown.map(c=>`<button class="v3-world-card" data-world-cuisine="${escapeHtml(c[0])}"><img src="${c[3]}" alt="${escapeHtml(c[0])}" onerror="this.src='./photo-generic.webp'"><div class="v3-world-copy"><b>${c[2]} ${escapeHtml(c[0])}</b><span>${escapeHtml(c[1])}</span></div></button>`).join('')}</div>${selected.length?`<section class="v3-world-results"><div class="v3-section-head"><div><span class="v3-kicker">${escapeHtml(state.tradCatV14)}</span><h2>Receptury</h2></div><button class="v3-link" data-world-clear>Wszystkie</button></div><div class="v3-recipe-list">${selected.map(r=>v3RecipeCard(r,true)).join('')}</div></section>`:`<section class="v3-world-feature"><span>🍽️</span><div><b>Masz ochotę na konkretną kuchnię?</b><p>Wybierz kraj lub region powyżej. Kucharzyna pokaże zapisane klasyczne receptury z tego kierunku.</p></div></section>`}</div>`;
 }
 
 function viewCalculatorsV20(){
@@ -1049,20 +1042,20 @@ function k3GoogleRecipeSearch(){
 
 /* Premium world-cuisine screen. */
 const K3_WORLD=[
-  ['Włochy','Pasta, pizza i klasyka','🇮🇹','./photo-carbonara.jpg'],
-  ['Polska','Domowe i regionalne','🇵🇱','./photo-generic.jpg'],
-  ['Japonia','Umami i precyzja','🇯🇵','./photo-generic.jpg'],
-  ['Meksyk','Ogień, kukurydza i limonka','🇲🇽','./photo-tomato.jpg'],
-  ['Tajlandia','Kwaśne, ostre i aromatyczne','🇹🇭','./photo-generic.jpg'],
-  ['Francja','Technika i sosy','🇫🇷','./photo-generic.jpg'],
-  ['Hiszpania','Tapas i kuchnia śródziemnomorska','🇪🇸','./photo-pizza.jpg'],
-  ['Bliski Wschód','Przyprawy, zioła i grill','🌍','./photo-tomato.jpg']
+  ['Włochy','Pasta, pizza i klasyka','🇮🇹','./photo-carbonara.webp'],
+  ['Polska','Domowe i regionalne','🇵🇱','./photo-generic.webp'],
+  ['Japonia','Umami i precyzja','🇯🇵','./photo-generic.webp'],
+  ['Meksyk','Ogień, kukurydza i limonka','🇲🇽','./photo-tomato.webp'],
+  ['Tajlandia','Kwaśne, ostre i aromatyczne','🇹🇭','./photo-generic.webp'],
+  ['Francja','Technika i sosy','🇫🇷','./photo-generic.webp'],
+  ['Hiszpania','Tapas i kuchnia śródziemnomorska','🇪🇸','./photo-pizza.webp'],
+  ['Bliski Wschód','Przyprawy, zioła i grill','🌍','./photo-tomato.webp']
 ];
 function viewWorldPremium(){
   const q=(state.worldQuery||'').toLowerCase();
   const list=K3_WORLD.filter(x=>!q||(x[0]+' '+x[1]).toLowerCase().includes(q));
   const selected=state.worldCuisine?state.recipes.filter(r=>r.traditional&&String(r.cuisine||'').toLowerCase().includes(String(state.worldCuisine).toLowerCase())):[];
-  return `<div class="v3-world"><div class="v3-page-head"><div><span class="v3-kicker">INSPIRACJE</span><h1>Kuchnie świata</h1><p>Odkrywaj charakterystyczne smaki, techniki i dania z różnych regionów.</p></div></div><div class="v3-search v3-world-search"><span>⌕</span><input id="worldSearch" placeholder="Szukaj kraju lub kuchni…" value="${escapeHtml(state.worldQuery||'')}"></div><div class="v3-world-grid">${list.map(x=>`<button class="v3-world-card ${state.worldCuisine===x[0]?'active':''}" data-world-cat="${escapeHtml(x[0])}"><img src="${x[3]}" alt="${escapeHtml(x[0])}" loading="lazy" onerror="this.src='./photo-generic.jpg'"><div class="v3-world-copy"><b>${x[2]} ${escapeHtml(x[0])}</b><span>${escapeHtml(x[1])}</span></div></button>`).join('')}</div>${state.worldCuisine?`<section class="v3-world-results"><div class="v3-section-head"><div><span class="v3-kicker">${escapeHtml(state.worldCuisine)}</span><h2>Receptury</h2></div><button class="v3-link" data-world-clear>Wyczyść</button></div>${selected.length?`<div class="v3-recipe-list">${selected.map(r=>v3RecipeCard(r,true)).join('')}</div>`:`<div class="v3-empty"><span>🍽️</span><b>Jeszcze nie masz receptury z tej kuchni</b><p>Możesz dodać własną albo wyszukać inspirację w Google.</p><button class="btn primary" data-google="1">Szukaj w Google</button></div>`}</section>`:`<section class="v3-world-feature"><div class="v3-section-head"><div><span class="v3-kicker">WYBIERZ KIERUNEK</span><h2>Co znajdziesz?</h2></div></div><div class="v3-world-pills"><span>🍝 Techniki</span><span>🌶️ Składniki</span><span>🔥 Obróbka</span><span>📖 Tradycje</span></div></section>`}</div>`;
+  return `<div class="v3-world"><div class="v3-page-head"><div><span class="v3-kicker">INSPIRACJE</span><h1>Kuchnie świata</h1><p>Odkrywaj charakterystyczne smaki, techniki i dania z różnych regionów.</p></div></div><div class="v3-search v3-world-search"><span>⌕</span><input id="worldSearch" placeholder="Szukaj kraju lub kuchni…" value="${escapeHtml(state.worldQuery||'')}"></div><div class="v3-world-grid">${list.map(x=>`<button class="v3-world-card ${state.worldCuisine===x[0]?'active':''}" data-world-cat="${escapeHtml(x[0])}"><img src="${x[3]}" alt="${escapeHtml(x[0])}" loading="lazy" decoding="async" onerror="this.src='./photo-generic.webp'"><div class="v3-world-copy"><b>${x[2]} ${escapeHtml(x[0])}</b><span>${escapeHtml(x[1])}</span></div></button>`).join('')}</div>${state.worldCuisine?`<section class="v3-world-results"><div class="v3-section-head"><div><span class="v3-kicker">${escapeHtml(state.worldCuisine)}</span><h2>Receptury</h2></div><button class="v3-link" data-world-clear>Wyczyść</button></div>${selected.length?`<div class="v3-recipe-list">${selected.map(r=>v3RecipeCard(r,true)).join('')}</div>`:`<div class="v3-empty"><span>🍽️</span><b>Jeszcze nie masz receptury z tej kuchni</b><p>Możesz dodać własną albo wyszukać inspirację w Google.</p><button class="btn primary" data-google="1">Szukaj w Google</button></div>`}</section>`:`<section class="v3-world-feature"><div class="v3-section-head"><div><span class="v3-kicker">WYBIERZ KIERUNEK</span><h2>Co znajdziesz?</h2></div></div><div class="v3-world-pills"><span>🍝 Techniki</span><span>🌶️ Składniki</span><span>🔥 Obróbka</span><span>📖 Tradycje</span></div></section>`}</div>`;
 }
 viewTraditionalV14=viewWorldPremium;
 
@@ -1107,12 +1100,12 @@ viewRecipes=function(){
 /* Extra local visual fallbacks by dish family. */
 const _k3RecipeImage=recipeImage;
 recipeImage=function(r){
-  const direct=_k3RecipeImage(r); if(direct && direct!=='./photo-generic.jpg') return direct;
+  const direct=_k3RecipeImage(r); if(direct && direct!=='./photo-generic.webp') return direct;
   const c=String(r?.category||'').toLowerCase(), n=String(r?.name||'').toLowerCase();
-  if(/deser|ciasto|słod/.test(c+' '+n)) return './photo-generic.jpg';
-  if(/mięso|woł|wieprz|kurcz|drób/.test(c+' '+n)) return './photo-tomato.jpg';
-  if(/ryb|owoc.*morza|krewet/.test(c+' '+n)) return './photo-generic.jpg';
-  if(/sałat/.test(c+' '+n)) return './photo-tomato.jpg';
+  if(/deser|ciasto|słod/.test(c+' '+n)) return './photo-generic.webp';
+  if(/mięso|woł|wieprz|kurcz|drób/.test(c+' '+n)) return './photo-tomato.webp';
+  if(/ryb|owoc.*morza|krewet/.test(c+' '+n)) return './photo-generic.webp';
+  if(/sałat/.test(c+' '+n)) return './photo-tomato.webp';
   return direct;
 };
 
@@ -1135,9 +1128,51 @@ function k32RecipeFamily(r){
   return 'dish';
 }
 const K32_FAMILY_LABEL={pizza:'Pizza / pieczywo',pasta:'Pasta / ryż',dessert:'Desery',seafood:'Ryby / owoce morza',meat:'Mięso',salad:'Sałatki',soup:'Zupy',sauce:'Sosy',dish:'Danie'};
+const K32_ING_ATLAS={
+  'mąka':[0,0],'maka':[0,0],'woda':[1,0],'sól':[2,0],'sol':[2,0],'cukier':[3,0],'drożdże':[4,0],'drozdze':[4,0],
+  'pomidory':[5,0],'pomidor':[5,0],'pomidory san marzano':[6,0],'czosnek':[7,0],'cebula':[8,0],'czerwona cebula':[9,0],
+  'por':[10,0],'marchew':[11,0],'seler':[12,0],'pietruszka':[13,0],'ziemniaki':[14,0],'bazylia':[15,0],'rozmaryn':[16,0],
+  'rozmanek':[17,0],'tymianek':[18,0],'oregano':[19,0],'kolendra':[20,0],
+  'mozzarella':[0,1],'parmigiano':[1,1],'parmezan':[1,1],'ricotta':[2,1],'pecorino':[3,1],'pecorino romano':[3,1],
+  'gorgonzola':[4,1],'masło':[5,1],'maslo':[5,1],'śmietana':[6,1],'śmietanka':[6,1],'mleko':[7,1],'jaja':[8,1],'jajka':[8,1],'żółtka':[8,1],'zoltka':[8,1],
+  'guanciale':[9,1],'pancetta':[10,1],'szynka':[11,1],'salami':[12,1],'chorizo':[13,1],'krewetki':[14,1],'tuńczyk':[15,1],'losos':[17,1],'łosoś':[16,1],'dorsz':[18,1],'kurczak':[19,1],'wołowina':[20,1],
+  'pieczarki':[0,2],'cukinia':[1,2],'bakłażan':[2,2],'baklazan':[2,2],'papryka':[3,2],'papryczka chili':[4,2],'chili':[4,2],
+  'szpinak':[5,2],'rukola':[6,2],'sałata':[7,2],'karczochy':[8,2],'oliwki':[9,2],'kapary':[10,2],'cytryna':[11,2],'sok z cytryny':[11,2],
+  'limonka':[12,2],'sok z limonki':[12,2],'natka pietruszki':[13,2],'szczypiorek':[14,2],'kukurydza':[15,2],'fasola':[16,2],'fasolka':[16,2],
+  'soczewica':[17,2],'ryż':[18,2],'ryz':[18,2],'makaron':[19,2],'spaghetti':[19,2],'passata':[20,2],'ocet':[21,2],'ocet ryżowy':[21,2],
+  'ocet winny':[22,2],'wino':[22,2],'czerwone wino':[22,2],'miód':[23,2],'miod':[23,2]
+};
+function k32IngredientIcon(name=''){
+  const raw=String(name).trim().toLowerCase();
+  const exact=K32_ING_ATLAS[raw];
+  if(exact)return exact;
+  const key=Object.keys(K32_ING_ATLAS).find(k=>raw.includes(k)||k.includes(raw));
+  if(key)return K32_ING_ATLAS[key];
+  const rules=[
+    [/mąk|maka|flour/,'mąka'],[/drożd|drozd/,'drożdże'],[/pomidor/,'pomidory'],[/czosnek/,'czosnek'],[/cebula/,'cebula'],[/bazyl/,'bazylia'],
+    [/pieprz|pepper/,'sól'],[/olej|tłuszcz|ghee/,'oliwa'],[/ser|cheese/,'mozzarella'],[/jogurt|kefir/,'mleko'],[/śmiet|cream/,'śmietana'],
+    [/mięso|wieprz|boczek|kiełbasa|baran|jagnię|królik/,'wołowina'],[/ryb|fish/,'dorsz'],[/owoce morza|ośmior|krewet/,'krewetki'],
+    [/orzech|migdał|sezam/,'miód'],[/ciecierzy|hummus/,'fasola'],[/kapust/,'sałata'],[/imbir|galangal/,'szczypiorek'],[/cytr/,'cytryna'],[/lima/,'limonka']
+  ];
+  for(const [re,target] of rules){if(re.test(raw))return K32_ING_ATLAS[target]||null}
+  return null;
+}
+function k32IngredientIconMarkup(name){const p=k32IngredientIcon(name);return p?`<span class="k32-ing-thumb" style="--ix:${p[0]};--iy:${p[1]}" aria-hidden="true"></span>`:`<span class="k32-ing-thumb k32-ing-thumb-fallback" aria-hidden="true">•</span>`}
+
+function k32ShortDescription(r){
+  const names=ingredientGroupsSafe(r).map(i=>String(i.name||'').trim()).filter(Boolean);
+  const unique=[];
+  for(const n of names){ if(!unique.some(x=>x.toLowerCase()===n.toLowerCase())) unique.push(n); if(unique.length>=4) break; }
+  if(unique.length) return `W środku: ${unique.join(', ')}.`;
+  const direct=String(r?.description||'').replace(/\s+/g,' ').trim().replace(/^Klasyczne danie[^.]*\.\s*/i,'');
+  if(direct.length<=74) return direct || 'Przejrzysta receptura krok po kroku.';
+  const cut=direct.slice(0,74);
+  const last=Math.max(cut.lastIndexOf('. '),cut.lastIndexOf(', '),cut.lastIndexOf(' '));
+  return (last>30?cut.slice(0,last):cut).trim()+ '…';
+}
 function k32RecipeCard(r){
   const src=recipeImage(r),family=k32RecipeFamily(r),meta=[r.category||'Inne',r.yield?`${fmt(r.yield)} ${r.yieldUnit||''}`:'',r.cook?`${fmt(r.cook)} min`:'' ].filter(Boolean).join(' · ');
-  return `<article class="k32-recipe-card" data-open="${escapeHtml(r.id)}"><div class="k32-card-photo"><img src="${escapeHtml(src)}" alt="${escapeHtml(r.name)}" loading="lazy" onerror="this.onerror=null;this.src='./photo-generic.jpg'"><div class="k32-photo-badge">${escapeHtml(K32_FAMILY_LABEL[family])}</div><button class="k32-heart" data-fav="${escapeHtml(r.id)}" aria-label="Ulubiona">${r.favorite?'♥':'♡'}</button></div><div class="k32-card-body"><div class="k32-card-top"><span>${r.traditional?'★ Klasyczna':'Własna receptura'}</span><span>${r.lastUsedAt?'Ostatnio używana':''}</span></div><h3>${escapeHtml(r.name)}</h3><p>${escapeHtml(recipeDescription(r).slice(0,125))}${recipeDescription(r).length>125?'…':''}</p><div class="k32-card-meta"><span>${escapeHtml(meta)}</span><b>›</b></div></div></article>`;
+  return `<article class="k32-recipe-card" data-open="${escapeHtml(r.id)}"><div class="k32-card-photo photo-ambient"><img class="photo-ambient-blur" src="${escapeHtml(src)}" aria-hidden="true" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='./photo-generic.webp'"><img class="photo-ambient-main" src="${escapeHtml(src)}" alt="${escapeHtml(r.name)}" loading="lazy" decoding="async" decoding="async" onerror="this.onerror=null;this.src='./photo-generic.webp'"><div class="k32-photo-badge">${escapeHtml(K32_FAMILY_LABEL[family])}</div><button class="k32-heart" data-fav="${escapeHtml(r.id)}" aria-label="Ulubiona">${r.favorite?'♥':'♡'}</button></div><div class="k32-card-body"><div class="k32-card-top"><span>${r.traditional?'★ Klasyczna':'Własna receptura'}</span><span>${r.lastUsedAt?'Ostatnio używana':''}</span></div><h3>${escapeHtml(r.name)}</h3><p class="k32-card-description">${escapeHtml(k32ShortDescription(r))}</p><div class="k32-card-meta"><span>${escapeHtml(meta)}</span><b>›</b></div></div></article>`;
 }
 
 /* Rich recipe library replaces the older plain list. */
@@ -1160,7 +1195,7 @@ recipeViewV20=function(id){
   const r=state.recipes.find(x=>x.id===id); if(!r)return viewRecipes();
   const ingredients=ingredientGroups(r),desc=recipeDescription(r),family=k32RecipeFamily(r),timer=state.cook[r.id]?.timer;
   const img=recipeImage(r);
-  return `<div class="k32-detail"><section class="k32-detail-hero"><img src="${escapeHtml(img)}" alt="${escapeHtml(r.name)}" onerror="this.onerror=null;this.src='./photo-generic.jpg'"><div class="k32-detail-gradient"></div><div class="k32-detail-actions-top"><button class="k32-round" data-photo-change="${escapeHtml(r.id)}" aria-label="Zmień zdjęcie">⌘</button><button class="k32-round" data-fav="${escapeHtml(r.id)}">${r.favorite?'♥':'♡'}</button></div><div class="k32-detail-copy"><span>${escapeHtml(K32_FAMILY_LABEL[family])} ${r.flag||''} ${r.traditional?'· ★ KLASYCZNA':''}</span><h1>${escapeHtml(r.name)}</h1><p>${escapeHtml(desc)}</p></div></section><div class="k32-stats"><div><b>${fmt(r.yield||0)} ${escapeHtml(r.yieldUnit||'')}</b><span>wydajność</span></div><div><b>${fmt(r.prep||0)} + ${fmt(r.cook||0)} min</b><span>praca / gotowanie</span></div><div><b>${ingredients.length}</b><span>składników</span></div><div><b>${(r.steps||[]).length}</b><span>kroków</span></div></div><div class="k32-actions"><button class="btn primary" data-cook="${r.id}">▶ GOTUJĘ</button><button class="btn" data-scale="${r.id}">⇄ Przelicz</button><button class="btn" data-edit="${r.id}">✎ Edytuj</button><button class="btn" data-shop-recipe="${r.id}">＋ Zakupy</button></div>${timer?.running?`<div class="k32-live-note">⏱️ Ten przepis ma aktywny timer — wrócisz do niego w trybie GOTUJĘ.</div>`:''}<section class="k32-section"><div class="k32-section-head"><div><span class="kicker">SKŁADNIKI</span><h2>Co potrzebujesz</h2></div><span class="k32-count">${ingredients.length}</span></div>${(r.sections||[]).map(s=>`<div class="k32-ing-group"><div class="k32-group-title"><b>${escapeHtml(s.name)}</b><span>${(s.ingredients||[]).length} poz.</span></div>${(s.ingredients||[]).map(i=>`<button class="k32-ing" data-recipe-ing="${escapeHtml(i.id)}"><span>${escapeHtml(i.name)}</span><strong>${fmt(i.qty)} ${escapeHtml(i.unit||'')}</strong></button>`).join('')}</div>`).join('')}</section><section class="k32-section"><div class="k32-section-head"><div><span class="kicker">WYKONANIE</span><h2>Krok po kroku</h2></div><span class="k32-count">${(r.steps||[]).length}</span></div><div class="k32-steps">${(r.steps||[]).map((s,i)=>`<article><span>${i+1}</span><div><b>Krok ${i+1}</b><p>${escapeHtml(s.text)}</p></div></article>`).join('')}</div></section><section class="k32-info-grid"><div class="k32-info"><span>🍽️ Sposób podania</span><b>${escapeHtml(k32ServingTypeFor(r))}</b></div><div class="k32-info"><span>⏱️ Fermentacja</span><b>${r.ferment?`${fmt(r.ferment)} h`:'—'}</b></div><div class="k32-info"><span>📝 Źródło</span><b>${escapeHtml(r.source||'Własna receptura')}</b></div></section><section class="k32-notes"><span>WŁASNE UWAGI</span><p>${escapeHtml(r.notes||'Brak własnych uwag. Dodaj je przez „Edytuj”, a Kucharzyna zapamięta je razem z recepturą.')}</p></section><div class="k32-bottom-actions"><button class="btn" data-history="${r.id}">Historia</button><button class="btn danger" data-delete="${r.id}">Usuń recepturę</button></div></div>`;
+  return `<div class="k32-detail"><section class="k32-detail-hero photo-ambient"><img class="photo-ambient-blur" src="${escapeHtml(img)}" aria-hidden="true" loading="eager" decoding="async" decoding="async" onerror="this.onerror=null;this.src='./photo-generic.webp'"><img class="photo-ambient-main" src="${escapeHtml(img)}" alt="${escapeHtml(r.name)}" loading="eager" decoding="async" decoding="async" fetchpriority="high" onerror="this.onerror=null;this.src='./photo-generic.webp'"><div class="k32-detail-gradient"></div><div class="k32-detail-actions-top"><button class="k32-round" data-photo-change="${escapeHtml(r.id)}" aria-label="Zmień zdjęcie">⌘</button><button class="k32-round" data-fav="${escapeHtml(r.id)}">${r.favorite?'♥':'♡'}</button></div><div class="k32-detail-copy"><span>${escapeHtml(K32_FAMILY_LABEL[family])} ${r.flag||''} ${r.traditional?'· ★ KLASYCZNA':''}</span><h1>${escapeHtml(r.name)}</h1><p>${escapeHtml(desc)}</p></div></section><div class="k32-stats"><div><b>${fmt(r.yield||0)} ${escapeHtml(r.yieldUnit||'')}</b><span>wydajność</span></div><div><b>${fmt(r.prep||0)} + ${fmt(r.cook||0)} min</b><span>praca / gotowanie</span></div><div><b>${ingredients.length}</b><span>składników</span></div><div><b>${(r.steps||[]).length}</b><span>kroków</span></div></div><div class="k32-actions"><button class="btn primary" data-cook="${r.id}">▶ GOTUJĘ</button><button class="btn" data-scale="${r.id}">⇄ Przelicz</button><button class="btn" data-edit="${r.id}">✎ Edytuj</button><button class="btn" data-shop-recipe="${r.id}">＋ Zakupy</button></div>${timer?.running?`<div class="k32-live-note">⏱️ Ten przepis ma aktywny timer — wrócisz do niego w trybie GOTUJĘ.</div>`:''}<section class="k32-section"><div class="k32-section-head"><div><span class="kicker">SKŁADNIKI</span><h2>Co potrzebujesz</h2></div><span class="k32-count">${ingredients.length}</span></div>${(r.sections||[]).map(s=>`<div class="k32-ing-group"><div class="k32-group-title"><b>${escapeHtml(s.name)}</b><span>${(s.ingredients||[]).length} poz.</span></div>${(s.ingredients||[]).map(i=>`<button class="k32-ing" data-recipe-ing="${escapeHtml(i.id)}">${k32IngredientIconMarkup(i.name)}<span class="k32-ing-name">${escapeHtml(i.name)}</span><strong>${fmt(i.qty)} ${escapeHtml(i.unit||'')}</strong></button>`).join('')}</div>`).join('')}</section><section class="k32-section"><div class="k32-section-head"><div><span class="kicker">WYKONANIE</span><h2>Krok po kroku</h2></div><span class="k32-count">${(r.steps||[]).length}</span></div><div class="k32-steps">${(r.steps||[]).map((s,i)=>`<article><span>${i+1}</span><div><b>Krok ${i+1}</b><p>${escapeHtml(s.text)}</p></div></article>`).join('')}</div></section><section class="k32-info-grid"><div class="k32-info"><span>🍽️ Sposób podania</span><b>${escapeHtml(k32ServingTypeFor(r))}</b></div><div class="k32-info"><span>⏱️ Fermentacja</span><b>${r.ferment?`${fmt(r.ferment)} h`:'—'}</b></div><div class="k32-info"><span>📝 Źródło</span><b>${escapeHtml(r.source||'Własna receptura')}</b></div></section><section class="k32-notes"><span>WŁASNE UWAGI</span><p>${escapeHtml(r.notes||'Brak własnych uwag. Dodaj je przez „Edytuj”, a Kucharzyna zapamięta je razem z recepturą.')}</p></section><div class="k32-bottom-actions"><button class="btn" data-history="${r.id}">Historia</button><button class="btn danger" data-delete="${r.id}">Usuń recepturę</button></div></div>`;
 };
 
 function k32TimerData(r){
@@ -1175,7 +1210,7 @@ function viewCookV20(){
   const st=cookStateFor(r),steps=r.steps||[],ingredients=ingredientGroups(r),doneSteps=steps.filter(s=>st.steps[s.id]).length,pct=steps.length?Math.round(doneSteps/steps.length*100):0;
   if(st.completed)return `<div class="k32-cook"><div class="k32-cook-top"><button class="btn ghost" data-back="recipe">← Receptura</button><span>100%</span></div>${photoMarkup(r,'k32-cook-photo')}<div class="k32-complete"><div>✓</div><span class="kicker">GOTOWANIE ZAKOŃCZONE</span><h1>${escapeHtml(r.name)}</h1><p>Wszystkie kroki zostały wykonane. Timer i postęp zostały zachowane na urządzeniu.</p><div class="row" style="justify-content:center"><button class="btn primary" id="cook-back-recipe">Wróć do receptury</button><button class="btn" id="cook-reset-v20">Gotuj ponownie</button></div></div></div>`;
   const active=Math.min(Math.max(+st.activeStep||0,0),Math.max(steps.length-1,0)),step=steps[active];
-  return `<div class="k32-cook"><div class="k32-cook-top"><button class="btn ghost" data-back="recipe">← Receptura</button><div><b>${pct}%</b><small>postępu</small></div></div><div class="k32-cook-hero"><div class="kicker">GOTUJĘ TERAZ</div><h1>${escapeHtml(r.name)}</h1><p>${escapeHtml(r.category||'Receptura')} · ${escapeHtml(k32ServingTypeFor(r))}${r.cook?` · ${fmt(r.cook)} min`:''}</p></div><div class="k32-progress"><span style="width:${pct}%"></span></div>${k32TimerMarkup(r)}<section class="k32-focus"><span class="kicker">KROK ${steps.length?active+1:0} / ${steps.length}</span><h2>${step?escapeHtml(step.text):'Brak kroków w tej recepturze.'}</h2><div class="k32-focus-actions"><button class="btn" id="cook-prev" ${active<=0?'disabled':''}>← Poprzedni</button><button class="btn primary" id="cook-done">${step&&st.steps[step.id]?'✓ Cofnij':'✓ Ukończ krok'}</button><button class="btn" id="cook-next" ${active>=steps.length-1?'disabled':''}>Następny →</button></div></section><section class="k32-cook-section"><div class="k32-section-head"><div><span class="kicker">MISE EN PLACE</span><h2>Składniki</h2></div><span class="k32-count">${ingredients.length}</span></div>${ingredients.map(i=>`<label class="k32-cook-ing ${st.ingredients[i.id]?'done':''}"><input type="checkbox" data-cook-ing-v20="${escapeHtml(i.id)}" ${st.ingredients[i.id]?'checked':''}><span>${escapeHtml(i.name)}</span><strong>${fmt(i.qty)} ${escapeHtml(i.unit||'')}</strong></label>`).join('')}</section><section class="k32-cook-section"><div class="k32-section-head"><div><span class="kicker">POSTĘP</span><h2>Wszystkie kroki</h2></div></div>${steps.map((s,i)=>`<button class="k32-step-row ${st.steps[s.id]?'done':''} ${i===active?'active':''}" data-cook-step-v20="${escapeHtml(s.id)}" data-step-index="${i}"><span>${i+1}</span><div>${escapeHtml(s.text)}</div><b>${st.steps[s.id]?'✓':''}</b></button>`).join('')}</section>${r.notes?`<section class="k32-cook-note"><b>📝 Twoja uwaga</b><p>${escapeHtml(r.notes)}</p></section>`:''}<button class="btn danger" id="cook-reset-v20">Resetuj postęp</button></div>`;
+  return `<div class="k32-cook"><div class="k32-cook-top"><button class="btn ghost" data-back="recipe">← Receptura</button><div><b>${pct}%</b><small>postępu</small></div></div><div class="k32-cook-hero"><div class="kicker">GOTUJĘ TERAZ</div><h1>${escapeHtml(r.name)}</h1><p>${escapeHtml(r.category||'Receptura')} · ${escapeHtml(k32ServingTypeFor(r))}${r.cook?` · ${fmt(r.cook)} min`:''}</p></div><div class="k32-progress"><span style="width:${pct}%"></span></div>${k32TimerMarkup(r)}<section class="k32-focus"><span class="kicker">KROK ${steps.length?active+1:0} / ${steps.length}</span><h2>${step?escapeHtml(step.text):'Brak kroków w tej recepturze.'}</h2><div class="k32-focus-actions"><button class="btn" id="cook-prev" ${active<=0?'disabled':''}>← Poprzedni</button><button class="btn primary" id="cook-done">${step&&st.steps[step.id]?'✓ Cofnij':'✓ Ukończ krok'}</button><button class="btn" id="cook-next" ${active>=steps.length-1?'disabled':''}>Następny →</button></div></section><section class="k32-cook-section"><div class="k32-section-head"><div><span class="kicker">MISE EN PLACE</span><h2>Składniki</h2></div><span class="k32-count">${ingredients.length}</span></div>${ingredients.map(i=>`<label class="k32-cook-ing ${st.ingredients[i.id]?'done':''}"><input type="checkbox" data-cook-ing-v20="${escapeHtml(i.id)}" ${st.ingredients[i.id]?'checked':''}>${k32IngredientIconMarkup(i.name)}<span class="k32-cook-ing-name">${escapeHtml(i.name)}</span><strong>${fmt(i.qty)} ${escapeHtml(i.unit||'')}</strong></label>`).join('')}</section><section class="k32-cook-section"><div class="k32-section-head"><div><span class="kicker">POSTĘP</span><h2>Wszystkie kroki</h2></div></div>${steps.map((s,i)=>`<button class="k32-step-row ${st.steps[s.id]?'done':''} ${i===active?'active':''}" data-cook-step-v20="${escapeHtml(s.id)}" data-step-index="${i}"><span>${i+1}</span><div>${escapeHtml(s.text)}</div><b>${st.steps[s.id]?'✓':''}</b></button>`).join('')}</section>${r.notes?`<section class="k32-cook-note"><b>📝 Twoja uwaga</b><p>${escapeHtml(r.notes)}</p></section>`:''}<button class="btn danger" id="cook-reset-v20">Resetuj postęp</button></div>`;
 }
 
 function k32ShoppingGroups(){
@@ -1218,22 +1253,22 @@ bindV20=function(){
    World cuisine drill-down · Favorites filter · Shopping redesign · Diagnostics
    ============================================================ */
 const K33_WORLD=[
-  ['Włochy','🇮🇹','Klasyka pizzy, makaronu i risotto','Włochy','./photo-pizza.jpg'],
-  ['Polska','🇵🇱','Domowe i regionalne smaki','Polska','./photo-pierogi-ruskie.jpg'],
-  ['Japonia','🇯🇵','Umami, ramen i kuchnia precyzji','Japonia','./photo-ramen-shoyu.jpg'],
-  ['Tajlandia','🇹🇭','Ostre, kwaśne i aromatyczne','Tajlandia','./photo-pad-thai.jpg'],
-  ['Francja','🇫🇷','Sosy, technika i klasyka','Francja','./photo-coq-au-vin.jpg'],
-  ['Hiszpania','🇪🇸','Tapas, ryż i śródziemnomorski charakter','Hiszpania','./photo-paella-valenciana.jpg'],
-  ['Grecja','🇬🇷','Feta, zioła i kuchnia Morza Egejskiego','Grecja','./photo-tzatziki.jpg'],
-  ['Turcja','🇹🇷','Grill, przyprawy i słodkości','Turcja','./photo-adana-kebab.jpg'],
-  ['Meksyk','🇲🇽','Chili, kukurydza i limonka','Meksyk','./photo-tacos-al-pastor.jpg'],
-  ['Peru','🇵🇪','Ceviche i kuchnia Pacyfiku','Peru','./photo-ceviche.jpg'],
-  ['Maroko','🇲🇦','Tagine, cytryna i przyprawy','Maroko','./photo-tagine-z-kurczakiem-i-cytryna.jpg'],
-  ['Korea','🇰🇷','Kimchi, grill i fermentacja','Korea','./photo-bulgogi.jpg'],
-  ['Węgry','🇭🇺','Papryka, gulasze i domowe dania','Węgry','./photo-goulash.jpg'],
-  ['Brazylia','🇧🇷','Fasola, owoce morza i tropikalne smaki','Brazylia','./photo-feijoada.jpg'],
-  ['Liban','🇱🇧','Mezze, tahini i świeże zioła','Liban','./photo-hummus.jpg'],
-  ['Wielka Brytania','🇬🇧','Comfort food i klasyczne dania','Wielka Brytania','./photo-fish-and-chips.jpg']
+  ['Włochy','🇮🇹','Klasyka pizzy, makaronu i risotto','Włochy','./photo-pizza.webp'],
+  ['Polska','🇵🇱','Domowe i regionalne smaki','Polska','./photo-pierogi-ruskie.webp'],
+  ['Japonia','🇯🇵','Umami, ramen i kuchnia precyzji','Japonia','./photo-ramen-shoyu.webp'],
+  ['Tajlandia','🇹🇭','Ostre, kwaśne i aromatyczne','Tajlandia','./photo-pad-thai.webp'],
+  ['Francja','🇫🇷','Sosy, technika i klasyka','Francja','./photo-coq-au-vin.webp'],
+  ['Hiszpania','🇪🇸','Tapas, ryż i śródziemnomorski charakter','Hiszpania','./photo-paella-valenciana.webp'],
+  ['Grecja','🇬🇷','Feta, zioła i kuchnia Morza Egejskiego','Grecja','./photo-tzatziki.webp'],
+  ['Turcja','🇹🇷','Grill, przyprawy i słodkości','Turcja','./photo-adana-kebab.webp'],
+  ['Meksyk','🇲🇽','Chili, kukurydza i limonka','Meksyk','./photo-tacos-al-pastor.webp'],
+  ['Peru','🇵🇪','Ceviche i kuchnia Pacyfiku','Peru','./photo-ceviche.webp'],
+  ['Maroko','🇲🇦','Tagine, cytryna i przyprawy','Maroko','./photo-tagine-z-kurczakiem-i-cytryna.webp'],
+  ['Korea','🇰🇷','Kimchi, grill i fermentacja','Korea','./photo-bulgogi.webp'],
+  ['Węgry','🇭🇺','Papryka, gulasze i domowe dania','Węgry','./photo-goulash.webp'],
+  ['Brazylia','🇧🇷','Fasola, owoce morza i tropikalne smaki','Brazylia','./photo-feijoada.webp'],
+  ['Liban','🇱🇧','Mezze, tahini i świeże zioła','Liban','./photo-hummus.webp'],
+  ['Wielka Brytania','🇬🇧','Comfort food i klasyczne dania','Wielka Brytania','./photo-fish-and-chips.webp']
 ];
 function k33WorldRecipes(cuisine){
   const c=String(cuisine||'').toLowerCase();
@@ -1248,7 +1283,7 @@ function k33WorldView(){
     if(q)rs=rs.filter(r=>(`${r.name||''} ${r.description||''} ${(r.tags||[]).join(' ')}`).toLowerCase().includes(q));
     return `<div class="k33-world-detail">
       <button class="k33-back-button" data-world-menu>‹ Wszystkie kuchnie</button>
-      <section class="k33-world-hero"><img src="${escapeHtml(meta[4])}" alt="${escapeHtml(meta[0])}" onerror="this.src='./photo-generic.jpg'"><div class="k33-world-hero-overlay"></div><div class="k33-world-hero-copy"><span>${meta[1]}</span><small>KUCHNIA ŚWIATA</small><h1>${escapeHtml(meta[0])}</h1><p>${escapeHtml(meta[2])}</p></div></section>
+      <section class="k33-world-hero photo-ambient"><img class="photo-ambient-blur" src="${escapeHtml(meta[4])}" aria-hidden="true" loading="eager" decoding="async" decoding="async" onerror="this.onerror=null;this.src='./photo-generic.webp'"><img class="photo-ambient-main" src="${escapeHtml(meta[4])}" alt="${escapeHtml(meta[0])}" loading="eager" decoding="async" decoding="async" fetchpriority="high" onerror="this.onerror=null;this.src='./photo-generic.webp'"><div class="k33-world-hero-overlay"></div><div class="k33-world-hero-copy"><span>${meta[1]}</span><small>KUCHNIA ŚWIATA</small><h1>${escapeHtml(meta[0])}</h1><p>${escapeHtml(meta[2])}</p></div></section>
       <div class="k33-world-title"><div><span class="kicker">MENU</span><h2>Dania kuchni ${escapeHtml(meta[0])}</h2><p>${rs.length} ${rs.length===1?'danie':'dań'} w Kucharzynie</p></div></div>
       <div class="k33-search"><span>⌕</span><input id="k33-world-dish-search" placeholder="Szukaj dania…" value="${escapeHtml(state.worldDishQuery||'')}"></div>
       ${rs.length?`<div class="k33-world-recipe-grid">${rs.map(r=>k33WorldRecipeCard(r)).join('')}</div>`:`<div class="k33-empty"><div>🍽️</div><h3>Brak wyników</h3><p>Ta kuchnia nie ma jeszcze dania pasującego do wyszukiwania.</p><button class="btn" data-world-menu>Wróć do kuchni</button></div>`}
@@ -1256,11 +1291,11 @@ function k33WorldView(){
   }
   const q=String(state.worldCuisineQuery||'').toLowerCase();
   const shown=K33_WORLD.filter(x=>!q||(x[0]+' '+x[2]).toLowerCase().includes(q));
-  return `<div class="k33-world-menu"><div class="k33-page-intro"><span class="kicker">INSPIRACJE</span><h1>Kuchnie świata</h1><p>Wybierz kraj. Dopiero po wejściu zobaczysz osobne menu jego dań.</p></div><div class="k33-search"><span>⌕</span><input id="k33-world-search" placeholder="Szukaj kraju lub kuchni…" value="${escapeHtml(state.worldCuisineQuery||'')}"></div><div class="k33-cuisine-grid">${shown.map(x=>`<button class="k33-cuisine-card" data-k33-world-cuisine="${escapeHtml(x[0])}"><div class="k33-cuisine-photo"><img src="${escapeHtml(x[4])}" alt="${escapeHtml(x[0])}" loading="lazy" onerror="this.src='./photo-generic.jpg'"><span>${x[1]}</span></div><div class="k33-cuisine-copy"><b>${escapeHtml(x[0])}</b><small>${escapeHtml(x[2])}</small><em>${k33WorldRecipes(x[3]).length} dań <strong>›</strong></em></div></button>`).join('')}</div></div>`;
+  return `<div class="k33-world-menu"><div class="k33-page-intro"><span class="kicker">INSPIRACJE</span><h1>Kuchnie świata</h1><p>Wybierz kraj. Dopiero po wejściu zobaczysz osobne menu jego dań.</p></div><div class="k33-search"><span>⌕</span><input id="k33-world-search" placeholder="Szukaj kraju lub kuchni…" value="${escapeHtml(state.worldCuisineQuery||'')}"></div><div class="k33-cuisine-grid">${shown.map(x=>`<button class="k33-cuisine-card" data-k33-world-cuisine="${escapeHtml(x[0])}"><div class="k33-cuisine-photo photo-ambient"><img class="photo-ambient-blur" src="${escapeHtml(x[4])}" aria-hidden="true" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='./photo-generic.webp'"><img class="photo-ambient-main" src="${escapeHtml(x[4])}" alt="${escapeHtml(x[0])}" loading="lazy" decoding="async" decoding="async" onerror="this.onerror=null;this.src='./photo-generic.webp'"><span>${x[1]}</span></div><div class="k33-cuisine-copy"><b>${escapeHtml(x[0])}</b><small>${escapeHtml(x[2])}</small><em>${k33WorldRecipes(x[3]).length} dań <strong>›</strong></em></div></button>`).join('')}</div></div>`;
 }
 function k33WorldRecipeCard(r){
   const img=recipeImage(r); const type=k32ServingTypeFor(r);
-  return `<article class="k33-dish-card" data-open="${escapeHtml(r.id)}"><div class="k33-dish-photo"><img src="${escapeHtml(img)}" alt="${escapeHtml(r.name)}" loading="lazy" onerror="this.src='./photo-generic.jpg'"><button class="k33-dish-heart" data-fav="${escapeHtml(r.id)}">${r.favorite?'♥':'♡'}</button><span>${type==='Na zimno'?'❄️':type==='Przekąska'?'🍽️':'🔥'} ${escapeHtml(type)}</span></div><div class="k33-dish-body"><small>${escapeHtml(r.category||'Danie')}</small><h3>${escapeHtml(r.name)}</h3><p>${escapeHtml(recipeDescription(r).slice(0,90))}</p></div></article>`;
+  return `<article class="k33-dish-card" data-open="${escapeHtml(r.id)}"><div class="k33-dish-photo photo-ambient"><img class="photo-ambient-blur" src="${escapeHtml(img)}" aria-hidden="true" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='./photo-generic.webp'"><img class="photo-ambient-main" src="${escapeHtml(img)}" alt="${escapeHtml(r.name)}" loading="lazy" decoding="async" decoding="async" onerror="this.onerror=null;this.src='./photo-generic.webp'"><button class="k33-dish-heart" data-fav="${escapeHtml(r.id)}">${r.favorite?'♥':'♡'}</button><span>${type==='Na zimno'?'❄️':type==='Przekąska'?'🍽️':'🔥'} ${escapeHtml(type)}</span></div><div class="k33-dish-body"><small>${escapeHtml(r.category||'Danie')}</small><h3>${escapeHtml(r.name)}</h3><p>${escapeHtml(k32ShortDescription(r))}</p></div></article>`;
 }
 viewTraditionalV14=k33WorldView;
 
@@ -1292,7 +1327,7 @@ function k33ShoppingView(){
   const filter=state.shoppingFilter||'all';
   const visible=list.filter(x=>filter==='all'||(filter==='todo'&&!x.done)||(filter==='done'&&x.done));
   return `<div class="k33-shopping">
-    <section class="k33-shopping-hero"><div class="k33-shopping-photo"><img src="./photo-pizza.jpg" alt="Kuchnia"><img src="./photo-spaghetti-alla-carbonara.jpg" alt="Makaron"><img src="./photo-tomato.jpg" alt="Sos"></div><div class="k33-shopping-hero-copy"><span class="kicker">PLANOWANIE KUCHNI</span><h1>Zakupy</h1><p>${list.length?`${list.length} pozycji · ${list.length-done} do kupienia`:'Lista jest pusta'}</p></div></section>
+    <section class="k33-shopping-hero photo-ambient"><img class="photo-ambient-blur" src="./photo-spaghetti-alla-carbonara.webp" aria-hidden="true" loading="eager" decoding="async"><img class="photo-ambient-main" src="./photo-spaghetti-alla-carbonara.webp" alt="Zakupy" loading="eager" decoding="async" fetchpriority="high"><div class="k33-shopping-hero-overlay"></div><div class="k33-shopping-hero-copy"><span class="kicker">PLANOWANIE KUCHNI</span><h1>Zakupy</h1><p>${list.length?`${list.length} pozycji · ${list.length-done} do kupienia`:'Lista jest pusta'}</p></div></section>
     <section class="k33-shopping-add"><div><b>Dodaj produkt</b><span>Wpisz rzecz, ilość i jednostkę. Zapisz bez wyskakującego okna.</span></div><button id="k33-toggle-shop-form" class="btn primary">＋ Dodaj</button></section>
     <form id="k33-shop-form" class="k33-shop-form" hidden><label>Nazwa produktu<input id="k33-shop-name" autocomplete="off" placeholder="np. Mozzarella"></label><div class="k33-shop-form-grid"><label>Ilość<input id="k33-shop-qty" type="number" inputmode="decimal" step="any" value="1"></label><label>Jednostka<select id="k33-shop-unit"><option>szt.</option><option>g</option><option>kg</option><option>ml</option><option>l</option><option>opak.</option><option>but.</option></select></label></div><div class="k33-shop-form-actions"><button type="button" class="btn" id="k33-cancel-shop">Anuluj</button><button type="submit" class="btn primary">Zapisz produkt</button></div></form>
     <div class="k33-shopping-tabs" role="tablist"><button class="${filter==='all'?'active':''}" data-shop-filter="all">Wszystkie <b>${list.length}</b></button><button class="${filter==='todo'?'active':''}" data-shop-filter="todo">Do kupienia <b>${list.length-done}</b></button><button class="${filter==='done'?'active':''}" data-shop-filter="done">Kupione <b>${done}</b></button></div>
@@ -1383,7 +1418,7 @@ function k34CategoryRecipes(category){
 }
 function k34CategoryImage(category){
   const r=k34CategoryRecipes(category)[0];
-  return r?recipeImage(r):'./photo-generic.jpg';
+  return r?recipeImage(r):'./photo-generic.webp';
 }
 function k34RecipeCategoryView(){
   const category=String(state.recipeCategoryView||'').trim();
@@ -1398,7 +1433,7 @@ function k34RecipeCategoryView(){
   const img=k34CategoryImage(category);
   return `<div class="k34-category-page">
     <button class="k33-back-button" data-k34-category-back>‹ Wszystkie kategorie</button>
-    <section class="k34-category-hero"><img src="${escapeHtml(img)}" alt="${escapeHtml(category)}" onerror="this.onerror=null;this.src='./photo-generic.jpg'"><div class="k34-category-overlay"></div><div class="k34-category-copy"><span class="kicker">KATEGORIA PRZEPISÓW</span><h1>${escapeHtml(category)}</h1><p>${total} ${total===1?'receptura':'receptur'} w tej kategorii</p></div></section>
+    <section class="k34-category-hero photo-ambient"><img class="photo-ambient-blur" src="${escapeHtml(img)}" aria-hidden="true" loading="eager" decoding="async" decoding="async" onerror="this.onerror=null;this.src='./photo-generic.webp'"><img class="photo-ambient-main" src="${escapeHtml(img)}" alt="${escapeHtml(category)}" loading="eager" decoding="async" decoding="async" fetchpriority="high" onerror="this.onerror=null;this.src='./photo-generic.webp'"><div class="k34-category-overlay"></div><div class="k34-category-copy"><span class="kicker">KATEGORIA PRZEPISÓW</span><h1>${escapeHtml(category)}</h1><p>${total} ${total===1?'receptura':'receptur'} w tej kategorii</p></div></section>
     <div class="k34-category-head"><div><span class="kicker">MENU</span><h2>Dania: ${escapeHtml(category)}</h2></div><button class="btn" data-k34-category-back>‹ Kategorie</button></div>
     <div class="k32-search"><span>⌕</span><input id="k34-category-search" placeholder="Szukaj w tej kategorii…" value="${escapeHtml(state.categoryQuery||'')}"><button id="k34-category-clear" aria-label="Wyczyść" ${q?'':'hidden'}>×</button></div>
     <div class="k34-category-tools"><button class="chip ${state.sort==='recent'?'active':''}" data-k34-sort="recent">Ostatnio używane</button><button class="chip ${state.sort==='name'?'active':''}" data-k34-sort="name">Nazwa A–Z</button><button class="chip ${state.sort==='fav'?'active':''}" data-k34-sort="fav">Ulubione</button></div>

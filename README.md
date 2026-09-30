@@ -60,3 +60,11 @@ Po publikacji nowej wersji Service Worker ma nowy numer cache. Jeśli iPhone pok
 - IndexedDB odrzuca błędy transakcji w kontrolowany sposób.
 - Service Worker cache'uje assety pojedynczo, więc brak jednego pliku nie blokuje instalacji SW.
 - Obrazy lokalne zwalniają tymczasowe Object URL po kompresji.
+
+
+## Obrazy
+Biblioteka zdjęć potraw jest dostarczana lokalnie jako WebP 900×760, zoptymalizowane pod iPhone/Safari. Service Worker cache’uje komplet 67 assetów zdjęciowych offline.
+
+
+## Ingredient Atlas 1.0
+Kucharzyna 3.2.4 uses one compact `ingredient-atlas.webp` sprite for small ingredient thumbnails beside recipe ingredients. This keeps the visual density high while avoiding dozens of individual image requests.
