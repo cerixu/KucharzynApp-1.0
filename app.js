@@ -2866,3 +2866,17 @@ document.head.appendChild(s)})();
     requestAnimationFrame(()=>{addCategoryIcon();});
   };
 })();
+
+
+/* Kucharzyna v5.2.6 — iPhone navigation/render unification */
+(function k526NavigationFix(){
+  const k526Nav = function(route){
+    state.route = route;
+    if (typeof applyTheme === 'function') applyTheme();
+    if (typeof renderV20 === 'function') renderV20();
+    else if (typeof render === 'function') render();
+    requestAnimationFrame(()=>document.querySelector('.main-scroll')?.scrollTo({top:0,left:0,behavior:'auto'}));
+  };
+  window.nav = k526Nav;
+  nav = k526Nav;
+})();
