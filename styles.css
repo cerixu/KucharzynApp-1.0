@@ -581,3 +581,17 @@ html.light .v3-primary-action,html.light .v3-add-btn{color:#241707!important}
 }
 
 .k32-ing-emoji{display:grid!important;place-items:center!important;background:color-mix(in srgb,var(--surface2,#202226) 72%,transparent)!important;font-size:22px!important;line-height:1!important;border:1px solid color-mix(in srgb,var(--text) 8%,transparent)!important;border-radius:10px!important}
+
+/* K39: system theme + Liquid Glass start screen + recipe origin labels */
+.v3-regional{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:999px;font-size:9px;line-height:1;font-weight:850;letter-spacing:.55px;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent)}
+.v3-card-meta .v3-regional,.v3-card-meta .v3-gold{margin-left:2px}
+.k39-liquid-home{position:relative;isolation:isolate;min-height:calc(100dvh - 150px);padding:10px 0 32px;overflow:hidden}
+.k39-home-ambient{position:fixed;z-index:-3;inset:0;background-image:var(--home-photo);background-size:cover;background-position:center;filter:blur(42px) saturate(1.12);transform:scale(1.14);opacity:.24;pointer-events:none}
+.k39-liquid-home:after{content:"";position:fixed;z-index:-2;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 48%,transparent),color-mix(in srgb,var(--bg) 88%,transparent) 72%,var(--bg));pointer-events:none}
+.k39-hero-glass{border:1px solid rgba(255,255,255,.22)!important;box-shadow:0 24px 70px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.18)!important;background:rgba(255,255,255,.07);backdrop-filter:blur(10px) saturate(1.15);-webkit-backdrop-filter:blur(10px) saturate(1.15)}
+.k39-menu-glass .v3-menu-card{background:color-mix(in srgb,var(--surface) 54%,transparent);border-color:color-mix(in srgb,var(--text) 12%,transparent);box-shadow:0 12px 35px rgba(0,0,0,.09),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(22px) saturate(1.18);-webkit-backdrop-filter:blur(22px) saturate(1.18)}
+.k39-glass-section{background:color-mix(in srgb,var(--surface) 48%,transparent);border:1px solid color-mix(in srgb,var(--text) 10%,transparent);border-radius:24px;padding:16px;margin-top:18px;box-shadow:0 16px 45px rgba(0,0,0,.07);backdrop-filter:blur(24px) saturate(1.15);-webkit-backdrop-filter:blur(24px) saturate(1.15)}
+html.light .k39-home-ambient{opacity:.18}
+html.dark .k39-home-ambient{opacity:.30}
+@supports not (backdrop-filter:blur(1px)){.k39-menu-glass .v3-menu-card,.k39-glass-section{background:var(--surface)} }
+@media(max-width:430px){.k39-liquid-home{padding-top:4px}.k39-home-ambient{filter:blur(34px) saturate(1.08);opacity:.22}.k39-hero-glass{border-radius:26px}.k39-menu-glass .v3-menu-card{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}}

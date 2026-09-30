@@ -115,3 +115,10 @@ Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut
 - Ingredient icons now use exact/common food glyphs for flour, tomato, garlic, onion, dairy, eggs, meats, seafood, pasta, rice, vegetables, herbs, spices, fruits and sauces.
 - Unknown ingredients fall back to a neutral food icon instead of an unrelated atlas tile.
 - OpenMoji is licensed CC BY-SA 4.0: https://openmoji.org/
+
+## v3.9 — Motyw systemowy, regionalność, ikony składników, Liquid Glass
+- Naprawiono reakcję trybu Automatyczny na zmianę jasnego/ciemnego motywu systemu iOS.
+- Polskie receptury nie są już automatycznie oznaczane jako „tradycyjne”; oznaczenie jest nadawane tylko wybranym klasykom.
+- Dodano etykietę REGIONALNE oraz region pochodzenia dla dań, dla których region jest określony.
+- Rozszerzono mapowanie ikon składników, w tym Bułka pszenna, pieczywo, bulion, mąki, mięsa i warzywa; nieznane składniki nie dostają już talerza ze sztućcami.
+- Start otrzymał ambientowe tło z aktualnego zdjęcia hero oraz warstwy Liquid Glass.

@@ -1,7 +1,7 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const uid=()=>crypto.randomUUID?crypto.randomUUID():"id-"+Date.now()+"-"+Math.random().toString(16).slice(2);
 const now=()=>new Date().toISOString();
-let state={route:"start",recipes:[],categories:[],shopping:[],settings:{theme:"dark",profile:"pro"},history:[],cook:{},pizzaProfiles:[],activePizzaProfileId:null,selectedCat:"Wszystkie",query:"",sort:"recent",googleQuery:""};
+let state={route:"start",recipes:[],categories:[],shopping:[],settings:{theme:"system",profile:"pro"},history:[],cook:{},pizzaProfiles:[],activePizzaProfileId:null,selectedCat:"Wszystkie",query:"",sort:"recent",googleQuery:""};
 const baseCats=["Pizza","Pasta","Sosy","Mięso","Ryby","Owoce morza","Warzywa","Desery","Pieczywo","Zupy","Sałatki","Cocktaile","Prep","Sosy bazowe","Inne"];
 
 const seed=[
@@ -104,17 +104,30 @@ async function init(){
  state.cook=Object.fromEntries((await getAll("cookState")).map(x=>[x.id,x]));
  if(!state.categories.length){for(const name of baseCats)await put("categories",{id:uid(),name});state.categories=await getAll("categories")}
  if(!state.recipes.length){for(const x of seed){const r=makeRecipe(x);await put("recipes",r)}state.recipes=await getAll("recipes")}
- applyTheme(); setupSW();
+ applyTheme(); k39BindSystemTheme(); setupSW();
 }
 function makeRecipe(x){const r={id:uid(),createdAt:now(),updatedAt:now(),favorite:false,lastUsedAt:null,sections:[{id:uid(),name:"Główna",ingredients:x.ingredients.map(a=>({id:uid(),name:a[0],qty:a[1],unit:a[2],percent:a[3]??"",price:"",packQty:"",packUnit:a[2]}))}],steps:x.steps.map((text,i)=>({id:uid(),text})),...x};delete r.ingredients;return r}
-function resolvedTheme(){const t=state.settings.theme;return t==="system"?(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):t}
-function applyTheme(){const root=document.documentElement;const t=resolvedTheme();root.classList.toggle("dark",t==="dark");root.classList.toggle("light",t==="light");root.dataset.theme=t;root.dataset.themePreference=state.settings.theme;document.body.classList.toggle("amateur",state.settings.profile==="amateur");document.body.dataset.profile=state.settings.profile;document.querySelector("#themeBtn")?.setAttribute("aria-label",`Motyw: ${state.settings.theme}`)}
+function resolvedTheme(){const t=state.settings.theme;return t==="system"?(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):t}
+function applyTheme(){const root=document.documentElement;const t=resolvedTheme();root.classList.toggle("dark",t==="dark");root.classList.toggle("light",t==="light");root.dataset.theme=t;root.dataset.themePreference=state.settings.theme;document.body.classList.toggle("amateur",state.settings.profile==="amateur");document.body.dataset.profile=state.settings.profile;document.querySelector("#themeBtn")?.setAttribute("aria-label",`Motyw: ${state.settings.theme}`);document.querySelector("#theme")?.setAttribute("aria-label",`Motyw: ${state.settings.theme}`)}
+let __k39ThemeMedia=null;let __k39ThemeHandler=null;function k39BindSystemTheme(){if(!window.matchMedia)return;if(!__k39ThemeMedia)__k39ThemeMedia=window.matchMedia("(prefers-color-scheme: dark)");if(!__k39ThemeHandler)__k39ThemeHandler=()=>{if(state.settings.theme==="system")applyTheme()};try{__k39ThemeMedia.removeEventListener("change",__k39ThemeHandler)}catch(e){};try{__k39ThemeMedia.addEventListener("change",__k39ThemeHandler)}catch(e){try{__k39ThemeMedia.addListener(__k39ThemeHandler)}catch(_){}}}
 function setupSW(){if(!("serviceWorker" in navigator))return;navigator.serviceWorker.register("./service-worker.js").then(reg=>{reg.addEventListener("updatefound",()=>{const w=reg.installing;if(w)w.addEventListener("statechange",()=>{if(w.state==="installed"&&navigator.serviceWorker.controller)toast("Nowa wersja Kucharzyny jest dostępna — Odśwież",true)})})}).catch(()=>{})}
 function toast(msg,action=false){const t=$("#toast");t.textContent=action?msg+"  → Odśwież":msg;t.classList.add("show");if(action)t.onclick=()=>location.reload();setTimeout(()=>t.classList.remove("show"),3500)}
 function nav(route){state.route=route;render();$(".main-scroll").scrollTop=0}
 function saveSetting(){put("settings",{id:"settings",...state.settings})}
 function fmt(n){return Number.isInteger(Number(n))?String(n):Number(n).toFixed(2).replace(/\.?0+$/,"")}
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+const K39_TRADITIONAL_POLISH=new Set([
+  "Pierogi ruskie","Kotlet schabowy","Placki ziemniaczane","Gołąbki z mięsem i ryżem","Kopytka","Barszcz czerwony","Bigos","Żurek","Biały barszcz","Kotlet mielony","Flaki po warszawsku","Krupnik","Kluski śląskie","Pyzy z mięsem","Sernik","Makowiec","Golonka po polsku"
+]);
+const K39_REGIONAL_POLISH={
+  "Kluski śląskie":"Śląsk",
+  "Pyzy z mięsem":"Wielkopolska",
+  "Flaki po warszawsku":"Mazowsze",
+  "Rogal świętomarciński":"Wielkopolska",
+  "Kaczka z jabłkami":"Wielkopolska"
+};
+function k39PolishMetadata(r){const name=String(r?.name||'');if(String(r?.cuisine||'').toLowerCase()!=="polska")return r;const region=K39_REGIONAL_POLISH[name]||r.region||"";const traditional=K39_TRADITIONAL_POLISH.has(name);return {...r,traditional,regional:!!region,region};}
+function k39RecipeMeta(r){const x=k39PolishMetadata(r);return `${x.regional?`<span class="v3-regional">REGIONALNE · ${escapeHtml(x.region)}</span>`:''}${x.traditional?'<span class="v3-gold">★ Tradycyjna</span>':''}`;}
 function recipeCard(r){const src=recipeImage(r);return `<article class="card recipe-card" data-open="${r.id}"><div class="recipe-thumb">${src?`<img src="${escapeHtml(src)}" loading="lazy" decoding="async" alt="${escapeHtml(r.name)}" onerror="this.remove();this.parentElement.classList.add('image-missing');if(!this.parentElement.querySelector('.img-fallback'))this.parentElement.insertAdjacentHTML('beforeend','<span class=\"img-fallback\" aria-hidden=\"true\">🍽️</span>')">`:'<span class="img-fallback" aria-hidden="true">🍽️</span>'}</div><div class="grow"><div class="row between"><h3>${escapeHtml(r.name)} ${r.traditional?`<span class="star">★</span>`:""} ${r.flag||""}</h3><button class="icon-btn small fav" data-fav="${r.id}" aria-label="Ulubione">${r.favorite?"★":"☆"}</button></div><div class="recipe-meta">${escapeHtml(r.category||"Inne")} · ${r.yield?fmt(r.yield)+" "+escapeHtml(r.yieldUnit||""):""} ${r.lastUsedAt?"· ostatnio używana":""}</div></div></article>`}
 function render(){
  $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.route===state.route));
@@ -253,7 +266,7 @@ function bind(){
  $$("#main [data-shop-del]").forEach(x=>x.onclick=async()=>{await del("shoppingItems",x.dataset.shopDel);state.shopping=await getAll("shoppingItems");render();toast("Usunięto")});
  if($("#clear-done"))$("#clear-done").onclick=async()=>{for(const x of state.shopping.filter(a=>a.done))await del("shoppingItems",x.id);state.shopping=await getAll("shoppingItems");render();toast("Usunięto ukończone")};
  if($("#clear-all-shop"))$("#clear-all-shop").onclick=()=>confirmGeneric("Wyczyścić całą listę zakupów?",async()=>{await clearStore("shoppingItems");state.shopping=[];render();toast("Lista wyczyszczona")});
- if($("#theme")){$("#theme").value=state.settings.theme;$("#theme").onchange=()=>{state.settings.theme=$("#theme").value;saveSetting();applyTheme()}};
+ if($("#theme")){$("#theme").value=state.settings.theme;$("#theme").onchange=()=>{state.settings.theme=$("#theme").value;saveSetting();k39BindSystemTheme();applyTheme()}};
  if($("#profile")){$("#profile").value=state.settings.profile;$("#profile").onchange=()=>{state.settings.profile=$("#profile").value;saveSetting();applyTheme();renderV20();toast(state.settings.profile==="amateur"?"Tryb Amator włączony":"Tryb Profesjonalny włączony")}};
  $("#export")?.addEventListener("click",exportBackup);$("#importBackup")?.addEventListener("click",()=>backupInput());
  $("#addCategory")?.addEventListener("click",()=>{openModal(`<h2>Nowa kategoria</h2><input id="cat-name" placeholder="Np. Fermenty"><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-close>Anuluj</button><button class="btn primary" id="cat-ok">Dodaj</button></div>`);$("#cat-ok").onclick=async()=>{const name=$("#cat-name").value.trim();if(!name)return;if(state.categories.some(c=>c.name.toLowerCase()===name.toLowerCase())){toast("Taka kategoria już istnieje");return}await put("categories",{id:uid(),name});state.categories=await getAll("categories");closeModal();render();toast("Dodano kategorię")}});$("#openImporter")?.addEventListener("click",openImporter);
@@ -929,7 +942,7 @@ function updatePizzaProResult(){
 
 function renderV20(){applyTheme();updateTopbar();$$('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));if(state.route==='recipe')$('#main').innerHTML=recipeViewV20(state.selectedId);else if(state.route==='google')$('#main').innerHTML=viewGoogleSearch();else if(state.route==='cook')$('#main').innerHTML=viewCookV20();else if(state.route==='shopping')$('#main').innerHTML=viewShoppingV20();else if(state.route==='calculators')$('#main').innerHTML=viewCalculatorsV20();else if(state.route==='edit')$('#main').innerHTML=editorV14(state.editId);else {const views={start:viewStart,recipes:viewRecipes,traditional:viewTraditionalV14,settings:viewSettings};$('#main').innerHTML=(views[state.route]||viewStart)()}bindV20()}
 function backRoute(){const r=state.route;let target='start';if(r==='cook')target='recipe';else if(r==='edit'){target=state.editId?'recipe':'start';if(state.editId)state.selectedId=state.editId;}else if(r==='recipe')target=state.returnRoute||'recipes';else if(r==='google')target='recipes';else if(r==='recipes'||r==='traditional'||r==='calculators'||r==='shopping'||r==='settings')target='start';state.route=target;applyTheme();renderV20();requestAnimationFrame(()=>document.querySelector('.main-scroll')?.scrollTo({top:0,left:0,behavior:'auto'}))}
-function recipeViewV20(id){const r=state.recipes.find(x=>x.id===id);if(!r)return viewRecipes();const ingredients=ingredientGroups(r),desc=recipeDescription(r);return `<div class="recipe20">${photoMarkup(r,'global-photo')}<div class="recipe20-title"><div class="kicker">${escapeHtml(r.category||'Inne')} ${r.flag||''} ${r.traditional?'<span class="star">★ TRADYCYJNA</span>':''}</div><h1>${escapeHtml(r.name)}</h1><p>${escapeHtml(desc)}</p></div><div class="recipe20-intro"><b>Na co zwrócić uwagę</b><div>${escapeHtml(r.notes||'Zanim zaczniesz, przygotuj wszystkie składniki, sprawdź temperaturę i zaplanuj kolejność pracy. Własne uwagi możesz później zapisać przy tej recepturze.')}</div></div><div class="recipe20-actions"><button class="btn primary" data-cook="${r.id}">▶ GOTUJĘ</button><button class="btn" data-edit="${r.id}">✎ EDYTUJ</button><button class="btn" data-shop-recipe="${r.id}">＋ ZAKUPY</button></div><section><div class="section-title-row"><h2>Składniki</h2><span class="kicker">${ingredients.length}</span></div>${(r.sections||[]).map(s=>`<div class="ingredient-section"><h3>${escapeHtml(s.name)}</h3>${(s.ingredients||[]).map(i=>`<button class="ingredient20" data-recipe-ing="${i.id}"><span>${escapeHtml(i.name)}</span><strong>${fmt(i.qty)} ${escapeHtml(i.unit)}</strong></button>`).join('')}</div>`).join('')}</section><section><div class="section-title-row"><h2>Wykonanie</h2><span class="kicker">${(r.steps||[]).length} kroków</span></div><div class="steps20">${(r.steps||[]).map((s,i)=>`<article class="step20"><div>${i+1}</div><p>${escapeHtml(s.text)}</p></article>`).join('')}</div></section><section class="recipe20-meta"><div><span>Przygotowanie</span><b>${fmt(r.prep||0)} min</b></div><div><span>Gotowanie</span><b>${fmt(r.cook||0)} min</b></div><div><span>Fermentacja</span><b>${fmt(r.ferment||0)} h</b></div>${r.servingType?`<div><span>Sposób podania</span><b>${escapeHtml(r.servingType)}</b></div>`:''}</section>${r.imageCredit?`<p class="photo-credit">${escapeHtml(r.imageCredit)}</p>`:''}</div>`}
+function recipeViewV20(id){const r=state.recipes.find(x=>x.id===id);if(!r)return viewRecipes();const ingredients=ingredientGroups(r),desc=recipeDescription(r);return `<div class="recipe20">${photoMarkup(r,'global-photo')}<div class="recipe20-title"><div class="kicker">${escapeHtml(r.category||'Inne')} ${r.flag||''} ${k39RecipeMeta(r)}</div><h1>${escapeHtml(r.name)}</h1><p>${escapeHtml(desc)}</p></div><div class="recipe20-intro"><b>Na co zwrócić uwagę</b><div>${escapeHtml(r.notes||'Zanim zaczniesz, przygotuj wszystkie składniki, sprawdź temperaturę i zaplanuj kolejność pracy. Własne uwagi możesz później zapisać przy tej recepturze.')}</div></div><div class="recipe20-actions"><button class="btn primary" data-cook="${r.id}">▶ GOTUJĘ</button><button class="btn" data-edit="${r.id}">✎ EDYTUJ</button><button class="btn" data-shop-recipe="${r.id}">＋ ZAKUPY</button></div><section><div class="section-title-row"><h2>Składniki</h2><span class="kicker">${ingredients.length}</span></div>${(r.sections||[]).map(s=>`<div class="ingredient-section"><h3>${escapeHtml(s.name)}</h3>${(s.ingredients||[]).map(i=>`<button class="ingredient20" data-recipe-ing="${i.id}"><span>${escapeHtml(i.name)}</span><strong>${fmt(i.qty)} ${escapeHtml(i.unit)}</strong></button>`).join('')}</div>`).join('')}</section><section><div class="section-title-row"><h2>Wykonanie</h2><span class="kicker">${(r.steps||[]).length} kroków</span></div><div class="steps20">${(r.steps||[]).map((s,i)=>`<article class="step20"><div>${i+1}</div><p>${escapeHtml(s.text)}</p></article>`).join('')}</div></section><section class="recipe20-meta"><div><span>Przygotowanie</span><b>${fmt(r.prep||0)} min</b></div><div><span>Gotowanie</span><b>${fmt(r.cook||0)} min</b></div><div><span>Fermentacja</span><b>${fmt(r.ferment||0)} h</b></div>${r.servingType?`<div><span>Sposób podania</span><b>${escapeHtml(r.servingType)}</b></div>`:''}</section>${r.imageCredit?`<p class="photo-credit">${escapeHtml(r.imageCredit)}</p>`:''}</div>`}
 
 function initKucharzyna20(){nav=function(route){if(route===state.route && route==='start'){document.querySelector('.main-scroll')?.scrollTo(0,0);return}state.route=route;applyTheme();renderV20();requestAnimationFrame(()=>document.querySelector('.main-scroll')?.scrollTo({top:0,left:0,behavior:'auto'}))};window.renderV20=renderV20}
 initKucharzyna20();
@@ -945,30 +958,33 @@ function v3RecipeCard(r,wide=false){
   const src=recipeImage(r); const total=(+r.prep||0)+(+r.cook||0);
   return `<article class="v3-recipe-card ${wide?'v3-wide':''}" data-open="${r.id}">
     <div class="v3-card-photo"><img src="${escapeHtml(src)}" loading="lazy" decoding="async" alt="${escapeHtml(r.name)}" onerror="this.onerror=null;this.src='./photo-generic.webp'"><button class="v3-heart" data-fav="${r.id}" aria-label="${r.favorite?'Usuń z ulubionych':'Dodaj do ulubionych'}">${r.favorite?'♥':'♡'}</button></div>
-    <div class="v3-card-body"><div class="v3-card-kicker">${escapeHtml(r.category||'Przepis')} ${r.flag||''}</div><h3>${escapeHtml(r.name)}</h3><div class="v3-card-meta"><span>◷ ${fmt(total)} min</span><span>♟ ${fmt(r.yield||r.servings||0)} ${escapeHtml(r.yieldUnit||'porc.')}</span>${r.traditional?'<span class="v3-gold">★ Klasyczna</span>':''}</div></div>
+    <div class="v3-card-body"><div class="v3-card-kicker">${escapeHtml(r.category||'Przepis')} ${r.flag||''}</div><h3>${escapeHtml(r.name)}</h3><div class="v3-card-meta"><span>◷ ${fmt(total)} min</span><span>♟ ${fmt(r.yield||r.servings||0)} ${escapeHtml(r.yieldUnit||'porc.')}</span>${k39RecipeMeta(r)}</div></div>
   </article>`;
 }
 function viewStart(){
   const recent=[...state.recipes].filter(r=>r.lastUsedAt).sort((a,b)=>(b.lastUsedAt||'').localeCompare(a.lastUsedAt||'')).slice(0,3);
   const fav=state.recipes.filter(r=>r.favorite).slice(0,3);
   const hero=state.recipes.find(r=>r.name==='Carbonara')||state.recipes[0];
-  return `<div class="v3-home">
-    <section class="v3-home-hero">
-      <div class="v3-hero-image">${hero?`<img src="${escapeHtml(recipeImage(hero))}" alt="${escapeHtml(hero.name)}">`:''}<div class="v3-hero-overlay"></div>
+  const heroImg=hero?recipeImage(hero):'./photo-generic.webp';
+  return `<div class="v3-home k39-liquid-home" style="--home-photo:url('${escapeHtml(heroImg)}')">
+    <div class="k39-home-ambient" aria-hidden="true"></div>
+    <section class="v3-home-hero k39-hero-glass">
+      <div class="v3-hero-image">${hero?`<img src="${escapeHtml(heroImg)}" alt="${escapeHtml(hero.name)}">`:''}<div class="v3-hero-overlay"></div>
         <div class="v3-hero-copy"><div class="v3-brand-mark">👨‍🍳</div><div class="v3-kicker">TWOJA KUCHNIA · TWOJE ZASADY</div><h1>Kucharzyna</h1><p>Twoje receptury, kalkulatory i kuchenny workflow. Wszystko pod ręką.</p></div>
         <button class="v3-hero-settings" data-action="settings" aria-label="Ustawienia">⚙</button>
       </div>
     </section>
-    <section class="v3-menu-grid">
+    <section class="v3-menu-grid k39-menu-glass">
       <button class="v3-menu-card v3-menu-recipes" data-action="recipes"><span class="v3-menu-icon">${v3SvgIcon('book')}</span><b>Przepisy</b><small>Twoja książka kucharska</small></button>
-      <button class="v3-menu-card v3-menu-world" data-route2="traditional"><span class="v3-menu-icon">${v3SvgIcon('globe')}</span><b>Kuchnie świata</b><small>Tradycyjne smaki</small></button>
+      <button class="v3-menu-card v3-menu-world" data-route2="traditional"><span class="v3-menu-icon">${v3SvgIcon('globe')}</span><b>Kuchnie świata</b><small>Smaki z różnych regionów</small></button>
       <button class="v3-menu-card v3-menu-shop" data-action="shopping"><span class="v3-menu-icon">${v3SvgIcon('cart')}</span><b>Zakupy</b><small>Lista i planowanie</small></button>
       <button class="v3-menu-card v3-menu-calc" data-action="calculators"><span class="v3-menu-icon">${v3SvgIcon('calc')}</span><b>Kalkulatory</b><small>Pizza, ciasto i więcej</small></button>
       <button class="v3-menu-card v3-menu-fav" data-action="fav"><span class="v3-menu-icon">${v3SvgIcon('heart')}</span><b>Ulubione</b><small>Twoje najlepsze</small></button>
-      <button class="v3-menu-card v3-menu-settings" data-action="settings"><span class="v3-menu-icon">${v3SvgIcon('gear')}</span><b>Ustawienia</b><small>Motyw, profil, backup</small></button><button class="v3-menu-card v3-menu-google" data-google="1"><span class="v3-menu-icon">G</span><b>Szukaj w Google</b><small>Przepisy z internetu</small></button>
+      <button class="v3-menu-card v3-menu-settings" data-action="settings"><span class="v3-menu-icon">${v3SvgIcon('gear')}</span><b>Ustawienia</b><small>Motyw, profil, backup</small></button>
+      <button class="v3-menu-card v3-menu-google" data-google="1"><span class="v3-menu-icon">G</span><b>Szukaj w Google</b><small>Przepisy z internetu</small></button>
     </section>
-    ${recent.length?`<section class="v3-section"><div class="v3-section-head"><div><span class="v3-kicker">WRACAJ DO GOTOWANIA</span><h2>Ostatnio używane</h2></div><button class="v3-link" data-route2="recipes">Wszystkie →</button></div><div class="v3-horizontal">${recent.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
-    ${fav.length?`<section class="v3-section"><div class="v3-section-head"><div><span class="v3-kicker">TWOJE PEWNIAKI</span><h2>Ulubione</h2></div></div><div class="v3-horizontal">${fav.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
+    ${recent.length?`<section class="v3-section k39-glass-section"><div class="v3-section-head"><div><span class="v3-kicker">WRACAJ DO GOTOWANIA</span><h2>Ostatnio używane</h2></div><button class="v3-link" data-route2="recipes">Wszystkie →</button></div><div class="v3-horizontal">${recent.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
+    ${fav.length?`<section class="v3-section k39-glass-section"><div class="v3-section-head"><div><span class="v3-kicker">TWOJE PEWNIAKI</span><h2>Ulubione</h2></div></div><div class="v3-horizontal">${fav.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
   </div>`;
 }
 function viewRecipes(){
@@ -1923,7 +1939,18 @@ function k32InstallIngredientAtlasV2(){
 const _kAtlasBind=bindV20;
 bindV20=function(){_kAtlasBind();k32InstallIngredientAtlasV2()};
 
-setTimeout(async()=>{await k32EnsurePierogiRuskie();await k33EnsurePolishRecipes();renderV20()},950);
+async function k39RepairPolishMetadata(){
+  try{
+    let changed=false;
+    for(const r of state.recipes){
+      if(String(r.cuisine||'').toLowerCase()!=='polska')continue;
+      const x=k39PolishMetadata(r);
+      if(r.traditional!==x.traditional||r.regional!==x.regional||r.region!==x.region){Object.assign(r,{traditional:x.traditional,regional:x.regional,region:x.region,updatedAt:now()});await put('recipes',r);changed=true;}
+    }
+    if(changed)state.recipes=await getAll('recipes');
+  }catch(e){console.error('Polish metadata repair failed',e)}
+}
+setTimeout(async()=>{await k32EnsurePierogiRuskie();await k33EnsurePolishRecipes();await k39RepairPolishMetadata();renderV20()},950);
 
 /* K35 SEARCH FIX: all category searches are live and NEVER rerender on each keystroke.
    Re-rendering the whole view was causing iOS Safari to dismiss the keyboard after every character. */
@@ -1994,7 +2021,7 @@ if(!window.__k35SearchCaptureBound){
 (function k38InstallIngredientIcons(){
   const C='https://cdn.jsdelivr.net/npm/openmoji@15.1.0/color/svg/';
   const M={
-    'mąka':'1F33E','woda':'1F4A7','sól':'1F9C2','cukier':'1F36C','drożdże':'1F35E',
+    'mąka':'1F33E','mąka pszenna':'1F33E','mąka pszenna typ 450/550':'1F33E','mąka ziemniaczana':'1F33E','bułka':'1F35E','bułka pszenna':'1F35E','bułka tarta':'1F35E','bagietka':'1F956','chleb':'1F35E','woda':'1F4A7','sól':'1F9C2','cukier':'1F36C','drożdże':'1F35E',
     'oliwa':'1FAD2','olej':'1FAD2','masło':'1F9C8','mleko':'1F95B','śmietana':'1F95B','śmietanka':'1F95B','jogurt':'1F95B',
     'jajka':'1F95A','jajko':'1F95A','żółtka':'1F95A','żółtko':'1F95A',
     'mozzarella':'1F9C0','twaróg':'1F9C0','ricotta':'1F9C0','parmesan':'1F9C0','parmigiano':'1F9C0','pecorino':'1F9C0','gorgonzola':'1F9C0','ser pleśniowy':'1F9C0','ser żółty':'1F9C0','ser':'1F9C0','feta':'1F9C0','mascarpone':'1F9C0',
@@ -2003,14 +2030,48 @@ if(!window.__k35SearchCaptureBound){
     'pomidor':'1F345','pomidory':'1F345','pomidory san marzano':'1F345','pomidory san marzano pelati':'1F345','passata':'1F345','koncentrat pomidorowy':'1F345',
     'papryka':'1F336','papryka świeża':'1F336','papryczka chili':'1F336','chili':'1F336','ancho chili':'1F336','suszone chili':'1F336','jalapeño':'1F336','cukinia':'1F952','bakłażan':'1F346','ogórek':'1F952',
     'ziemniaki':'1F954','pieczarki':'1F344','grzyby':'1F344','borowiki':'1F344','trufle':'1F344','szpinak':'1F96C','rukola':'1F96C','sałata':'1F96C','karczochy':'1F966','oliwki':'1FAD2','kapary':'1F96C',
-    'wołowina':'1F969','wołowina mielona':'1F969','wieprzowina':'1F969','wieprzowina mielona':'1F969','kurczak':'1F357','udka z kurczaka':'1F357','baranina mielona':'1F969','jagnięcina':'1F969','królik':'1F407','boczek':'1F953','pancetta':'1F953','guanciale':'1F953','szynka':'1F953','prosciutto':'1F953','salami':'1F953','kiełbasa':'1F32D','chorizo':'1F32D','biała kiełbasa':'1F32D','wędzonka':'1F953',
+    'wołowina':'1F969','bulion':'1F963','bulion wołowy':'1F963','gotowana łopatka wieprzowa':'1F969','łopatka wieprzowa':'1F969','golonka wieprzowa':'1F969','flaki wołowe oczyszczone':'1F969','wołowina mielona':'1F969','wieprzowina':'1F969','wieprzowina mielona':'1F969','kurczak':'1F357','udka z kurczaka':'1F357','baranina mielona':'1F969','jagnięcina':'1F969','królik':'1F407','boczek':'1F953','pancetta':'1F953','guanciale':'1F953','szynka':'1F953','prosciutto':'1F953','salami':'1F953','kiełbasa':'1F32D','chorizo':'1F32D','biała kiełbasa':'1F32D','wędzonka':'1F953',
     'krewetki':'1F990','krewetka':'1F990','małże':'1F41A','mule':'1F41A','ośmiornica':'1F991','ośmiornica gotowana':'1F991','ryba':'1F41F','biała ryba':'1F41F','dorsz':'1F41F','łosoś':'1F41F','tuńczyk':'1F41F','anchois':'1F41F',
     'spaghetti':'1F35D','makaron':'1F35D','makaron ryżowy':'1F35D','makaron ramen':'1F35C','tonnarelli':'1F35D','ciasto filo':'1F95F','tortille':'1FAD3',
     'ryż':'1F35A','ryż arborio':'1F35A','ryż risotto':'1F35A','ryż ugotowany':'1F35A','kasza':'1F33E','groszek':'1FAD9','fasolka':'1FAD8','fasola':'1FAD8','czarna fasola':'1FAD8','ciecierzyca':'1FAD8','sucha ciecierzyca':'1FAD8','soczewica':'1FAD8',
     'orzechy':'1F330','orzeszki':'1F95C','migdały':'1F330','pistacje':'1F95C','sezam':'1F330','miód':'1F36F','musztarda':'1FAD9','majonez':'1F95A','ketchup':'1F345','sos pomidorowy':'1F345','sos sojowy':'1FAD9','sos rybny':'1F41F','ocet':'1FAD9','ocet ryżowy':'1FAD9','ocet winny':'1FAD9','espresso':'2615','kakao':'1F36B','cytryna':'1F34B','sok z cytryny':'1F34B','sok z limonki':'1F34B','limonka':'1F34B','pomarańcza':'1F34A','szafran':'1F33C','pieprz':'1F336','pieprz czarny':'1F336','pieprz syczuański':'1F336','kumin':'1F33F','kminek':'1F33F','garam masala':'1F33F','five spice':'1F33F','anyż':'1F33F','cynamon':'1F33F','wanilia':'1F33F',
     'awokado':'1F951','ananas':'1F34D','gruszka':'1F350','śliwki suszone':'1F95D','mleko kokosowe':'1F965','tofu':'1FAD1','tahini':'1FAD9','pasta tamaryndowa':'1FAD9','pasta massaman':'1F336','pasta gochujang':'1F336','gochujang':'1F336','miso':'1FAD9','dashi':'1FAD9','mirin':'1FAD9','hoisin':'1FAD9','doubanjiang':'1F336','liście kaffiru':'1F33F','nori':'1F96C','wakame':'1F96C','achiote':'1F33F'
   };
-  function codeFor(name){const raw=String(name||'').trim().toLowerCase(); if(M[raw])return M[raw]; const k=Object.keys(M).find(x=>raw.includes(x)||x.includes(raw)); return k?M[k]:null;}
+  function codeFor(name){
+    const raw=String(name||'').trim().toLowerCase();
+    if(M[raw])return M[raw];
+    const k=Object.keys(M).find(x=>raw.includes(x)||x.includes(raw));
+    if(k)return M[k];
+    if(/bułk|bagiet|chleb|pieczyw/.test(raw))return '1F35E';
+    if(/bulion|barszcz|zupa/.test(raw))return '1F963';
+    if(/mąk|kasz|skrobi|płatk/.test(raw))return '1F33E';
+    if(/mięso|łopatk|schab|golonk|flak|pasztet/.test(raw))return '1F969';
+    if(/kiełbas|chorizo|wędzon|szynk/.test(raw))return '1F32D';
+    if(/ryż|risotto/.test(raw))return '1F35A';
+    if(/makaron|spaghetti|ramen|tonnarelli/.test(raw))return '1F35D';
+    if(/jajk|żółtk/.test(raw))return '1F95A';
+    if(/ser|twaróg|paneer/.test(raw))return '1F9C0';
+    if(/mleko|śmietan|jogurt/.test(raw))return '1F95B';
+    if(/masło|ghee/.test(raw))return '1F9C8';
+    if(/olej|oliw/.test(raw))return '1FAD2';
+    if(/ziemniak/.test(raw))return '1F954';
+    if(/pomidor/.test(raw))return '1F345';
+    if(/jabłk/.test(raw))return '1F34E';
+    if(/grusz/.test(raw))return '1F350';
+    if(/kapust/.test(raw))return '1F96C';
+    if(/ogórk/.test(raw))return '1F952';
+    if(/papryk|chili|jalape/.test(raw))return '1F336';
+    if(/cytryn/.test(raw))return '1F34B';
+    if(/pomarańcz/.test(raw))return '1F34A';
+    if(/orzech|migdał|pistacj/.test(raw))return '1F330';
+    if(/cukier/.test(raw))return '1F36C';
+    if(/miód/.test(raw))return '1F36F';
+    if(/sól/.test(raw))return '1F9C2';
+    if(/wod/.test(raw))return '1F4A7';
+    if(/piwo|wino|ocet/.test(raw))return '1F37E';
+    if(/zioł|bazyl|oregano|tymian|majeran|pietrusz|koperek|kolendr|szczypior|kminek|kumin|wanil|cynam|imbir|szafran|gałk/.test(raw))return '1F33F';
+    return '1FAD9';
+  }
   window.k38IngredientIconMarkup=function(name){const code=codeFor(name); if(!code)return `<span class="k38-ing-fallback" aria-hidden="true">🍽️</span>`; return `<img class="k38-ing-icon" src="${C}${code}.svg" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">`;};
   window.k32IngredientIconMarkup=window.k38IngredientIconMarkup;
   window.k32IngredientIconMarkupV2=window.k38IngredientIconMarkup;
