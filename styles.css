@@ -569,7 +569,7 @@ html.light .v3-primary-action,html.light .v3-add-btn{color:#241707!important}
    One compact WebP atlas, tiny visual tokens beside ingredients.
    ============================================================ */
 .k32-ing,.k32-cook-ing{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:10px}
-.k32-ing-thumb{width:34px;height:34px;display:block;flex:0 0 34px;border-radius:11px;background-image:url('./ingredient-atlas.webp');background-repeat:no-repeat;background-size:1536px 180px;background-position:calc(var(--ix,0) * -64px) calc(var(--iy,0) * -60px);background-color:rgba(255,255,255,.035);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 4px 12px rgba(0,0,0,.08);overflow:hidden}
+.k32-ing-thumb{width:34px;height:34px;display:block;flex:0 0 34px;border-radius:11px;background-image:url('./ingredient-atlas.webp');background-repeat:no-repeat;background-size:1536px 180px;background-position:calc(var(--ix,0) * -48px) calc(var(--iy,0) * -60px);background-color:transparent;box-shadow:none;overflow:hidden}
 .k32-ing-thumb-fallback{display:grid;place-items:center;color:var(--muted);font-size:18px;font-weight:900;background:var(--surface2)}
 .k32-ing-name,.k32-cook-ing-name{min-width:0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .k32-ing strong,.k32-cook-ing strong{white-space:nowrap}

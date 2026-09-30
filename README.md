@@ -67,4 +67,4 @@ Biblioteka zdjęć potraw jest dostarczana lokalnie jako WebP 900×760, zoptymal
 
 
 ## Ingredient Atlas 1.0
-Kucharzyna 3.2.4 uses one compact `ingredient-atlas.webp` sprite for small ingredient thumbnails beside recipe ingredients. This keeps the visual density high while avoiding dozens of individual image requests.
+Kucharzyna 3.2.4 uses one transparent `ingredient-atlas.webp` sprite with 96 cut-out ingredient assets for small thumbnails beside recipe ingredients. The atlas uses alpha transparency and a compact 32×3 grid, so the UI avoids dozens of individual image requests while keeping ingredient icons crisp and lightweight.
