@@ -53,7 +53,7 @@ test('main navigation works on iPhone-sized viewport', async ({ page }) => {
 
 test('recipe creation workflow saves a local recipe', async ({ page }) => {
   await page.locator('[data-route="recipes"]').click();
-  await expect(page.locator('#main')).toContainText('Przepisy');
+  await expect(page.locator('#main')).toContainText('Receptury');
   await page.locator('[data-action="new"]').first().click();
 
   await expect(page.locator('#v14-name')).toBeVisible();
@@ -68,7 +68,7 @@ test('recipe creation workflow saves a local recipe', async ({ page }) => {
 
 test('shopping list can add and complete an item', async ({ page }) => {
   await page.locator('[data-route="shopping"]').click();
-  await expect(page.locator('#main')).toContainText('Co kupić?');
+  await expect(page.locator('#main')).toContainText('Zakupy');
   await page.locator('#add-shopping').click();
 
   await expect(page.locator('#shop-name')).toBeVisible();
@@ -107,6 +107,19 @@ test('settings theme switch keeps the app shell intact', async ({ page }) => {
 
   await theme.selectOption('light');
   await expect(page.locator('html')).toHaveClass(/light/);
+});
+
+test('standalone viewport keeps top and bottom UI inside the viewport', async ({ page }) => {
+  const layout = await page.evaluate(() => {
+    const top = document.querySelector('.topbar').getBoundingClientRect();
+    const nav = document.querySelector('.bottom-nav').getBoundingClientRect();
+    return { innerHeight: window.innerHeight, topBottom: top.bottom, navTop: nav.top, navBottom: nav.bottom, navHeight: nav.height };
+  });
+  expect(layout.topBottom).toBeGreaterThan(0);
+  expect(layout.topBottom).toBeLessThanOrEqual(layout.innerHeight + 1);
+  expect(layout.navBottom).toBeGreaterThanOrEqual(layout.innerHeight - 1);
+  expect(layout.navTop).toBeLessThan(layout.navBottom);
+  expect(layout.navHeight).toBeGreaterThan(100);
 });
 
 test('PWA assets and safe-area CSS are present', async ({ page }) => {

@@ -1511,3 +1511,38 @@ html.dark .k423-hero{background:transparent!important;box-shadow:none!important}
 /* Kucharzyna v5.2 — inteligentne składniki */
 .v52-mapper{max-width:760px}.v52-mapper h2{margin:.2rem 0 .45rem}.v52-map-list{display:grid;gap:10px;max-height:min(58vh,620px);overflow:auto;padding:4px 2px}.v52-map-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,42%);gap:12px;align-items:center;padding:13px 14px;border:1px solid var(--line,#e5e7eb);border-radius:16px;background:var(--card,#fff)}.v52-map-main{min-width:0}.v52-map-main b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v52-map-main small{display:block;margin-top:4px;color:var(--muted,#6b7280)}.v52-confidence{color:var(--accent,#b45309);font-weight:700}.v52-map-select{width:100%;min-width:0}.v52-mapper .muted{line-height:1.45;margin-bottom:12px}@media(max-width:620px){.v52-map-row{grid-template-columns:1fr}.v52-map-select{min-height:44px}.v52-map-list{max-height:55vh}}
 .v52-linked{display:inline-flex;align-items:center;gap:5px;margin-left:7px;padding:3px 7px;border-radius:999px;background:color-mix(in srgb,var(--accent,#b45309) 10%,transparent);color:var(--accent,#b45309);font-size:11px;font-weight:700;vertical-align:middle}
+
+
+/* Kucharzyna v5.2.5 — iOS standalone viewport correction */
+@media (max-width:430px) and (orientation:portrait){
+  html,body{width:100%;height:100%;min-height:100%;overflow:hidden!important}
+  body{position:relative!important;inset:auto!important}
+  .app-shell{
+    height:100lvh!important;
+    min-height:100lvh!important;
+    max-height:none!important;
+    padding:0!important;
+  }
+  .topbar{
+    min-height:calc(64px + max(28px,env(safe-area-inset-top)))!important;
+    height:auto!important;
+    padding-top:max(28px,env(safe-area-inset-top))!important;
+    padding-bottom:10px!important;
+  }
+  .main-scroll{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    padding-bottom:calc(146px + max(12px,env(safe-area-inset-bottom)))!important;
+    scroll-padding-bottom:calc(146px + max(12px,env(safe-area-inset-bottom)))!important;
+  }
+  .bottom-nav{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    height:calc(82px + 64px)!important;
+    min-height:calc(82px + 64px)!important;
+    padding:8px 7px max(8px,env(safe-area-inset-bottom))!important;
+    z-index:1000!important;
+  }
+}
