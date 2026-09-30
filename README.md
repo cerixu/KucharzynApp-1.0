@@ -1,6 +1,34 @@
-# Kucharzyna v3.3 Core — GitHub Pages ROOT
+# Kucharzyna — darmowa PWA dla kuchni
 
-PWA Kucharzyna przygotowana do publikacji jako statyczna strona na GitHub Pages.
+**Kucharzyna** to darmowa, instalowalna aplikacja PWA dla iPhone'a, która łączy książkę receptur z codzienną pracą w kuchni. Działa lokalnie i offline, bez reklam, kont, analityki i wysyłania prywatnych danych na serwer.
+
+### Co potrafi
+- 📖 **Receptury** — własne dania, sekcje składników, instrukcje, zdjęcia, uwagi i historię zmian.
+- 👨‍🍳 **GOTUJĘ** — duży tryb pracy krok po kroku, postęp, timer i zapis stanu.
+- 🌍 **Kuchnie świata** — osobne menu kuchni i receptur według regionów.
+- 🧮 **Kalkulatory** — pizza/ciasto, przeliczanie receptur i kalkulatory kuchenne.
+- 🛒 **Zakupy** — lista zakupów, składniki z receptur i ręczne pozycje.
+- 📦 **Magazyn / Lodówka** — stan składników, progi alarmowe i potwierdzane zużycie po gotowaniu.
+- ⚠️ **Brakuje do przepisu** — sprawdza stan magazynu i pokazuje, czego brakuje.
+- 💰 **Food Cost** — narzędzia kosztowe dla profilu profesjonalnego.
+- 🔎 **Wyszukiwanie** — lokalna wyszukiwarka oraz przejście do Google po inspiracje.
+- 💾 **Backup** — eksport i import danych w JSON.
+- 📱 **PWA na iOS** — Safe Area, Dynamic Island, ekran startowy i działanie offline.
+
+### Profile
+- **Pro / profesjonalny** — narzędzia restauracyjne, magazyn i Food Cost.
+- **Amator** — prostszy interfejs i funkcje domowej kuchni; Food Cost jest ukryty.
+
+### Prywatność
+Receptury, notatki, zdjęcia, zakupy i magazyn są przechowywane lokalnie w IndexedDB. Aplikacja nie wymaga konta i nie używa reklam ani trackerów.
+
+## v4.2.1 — Start final audit
+- Start przebudowany na czysty układ iOS bez ambientowego blur.
+- Zdjęcie Carbonary jest osobnym, ostrym elementem wizualnym, a nie tłem całego ekranu.
+- Menu Start ma sześć równych kart: Przepisy, Kuchnie świata, Magazyn/Lodówka, Zakupy, Kalkulatory i Ulubione.
+- Ustawienia pozostają w topbarze, bez duplikowania ich jako karty Start.
+- Google jest osobną, lekką akcją pod menu.
+- Ikona PWA została uproszczona do samej czapki kucharskiej.
 
 ## v3.3 — Core / zdjęcia / wyszukiwanie / składniki
 - Stały przycisk `←` w lewym górnym rogu na każdym ekranie.
@@ -16,7 +44,7 @@ PWA Kucharzyna przygotowana do publikacji jako statyczna strona na GitHub Pages.
 - Brak podkatalogów — wszystkie pliki pozostają w katalogu głównym GitHub Pages.
 - Wyszukiwanie przepisów przez Google otwiera wyniki wyszukiwania w osobnej karcie Safari; Kucharzyna nie osadza zewnętrznych wyników w iframe.
 - Service Worker podbity do wersji v3.2.2 i precache'uje całą lokalną bibliotekę zdjęć.
-- Każda z 66 bazowych receptur ma przypisane osobne zdjęcie.
+- Biblioteka zawiera 67 lokalnych zdjęć potraw, przypisanych do receptur i ekranów kuchni świata.
 - W recepturach temperatura została zastąpiona polem `Na ciepło / Na zimno / Przekąska`; temperatura technologiczna pozostaje tylko w kalkulatorze pizzy.
 - Wyszukiwarka lokalna nie renderuje ekranu podczas wpisywania, więc Safari nie traci fokusu klawiatury.
 - Ingredient Atlas używa transparentnego WebP oraz fallbacków emoji dla składników bez osobnego zdjęcia.
@@ -169,3 +197,11 @@ Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut
 - Usunięto blur z całego hero Start, który wcześniej rozmywał fotografię przez `backdrop-filter`.
 - Uporządkowano Liquid Glass kart menu: mniej przezroczystości, czytelniejszy tekst, delikatny blur tylko na kartach.
 - Zachowano obsługę safe-area i trybu jasnego/ciemnego.
+
+## v4.2 — Start Clean
+
+- Przebudowany ekran Start bez ambientowego blur i bez `backdrop-filter` na hero.
+- Ostre, lokalne zdjęcie receptury jako osobny element wizualny.
+- Spokojny układ editorial/iOS zamiast pomarańczowej warstwy szkła.
+- Menu Start na pełnych kartach powierzchniowych, bez agresywnej przezroczystości.
+- Zachowane funkcje receptur, magazynu/lodówki, zakupów, kalkulatorów, kuchni świata i ustawień.

@@ -135,13 +135,33 @@ function render(){
  $("#main").innerHTML=(views[state.route]||viewStart)();
  bind();
 }
-function viewStart(){const recent=[...state.recipes].filter(r=>r.lastUsedAt).sort((a,b)=>b.lastUsedAt.localeCompare(a.lastUsedAt)).slice(0,4);const fav=state.recipes.filter(r=>r.favorite).slice(0,4);
-return `<section class="hero"><div class="kicker">DOBRY WIECZÓR, KUCHARZU</div><h1>No elo, Kucharzyno 👨‍🍳</h1><p>Twoje centrum pracy z recepturami: planowanie, przeliczanie, gotowanie krok po kroku, zakupy i narzędzia dla kuchni. Dane zostają na urządzeniu, a receptury możesz rozwijać po swojemu.</p></section>
-<section class="section"><h2>Szybkie akcje</h2><div class="grid">
-${[["＋","Nowa receptura","new"],["▤","Moje receptury","recipes"],["↺","Ostatnio używane","recent"],["★","Ulubione","fav"],["∑","Kalkulatory","calculators"],["✓","Lista zakupów","shopping"],["⚙","Ustawienia","settings"]].map(x=>`<button class="action-card" data-action="${x[2]}"><span>${x[0]}</span><b>${x[1]}</b></button>`).join("")}</div></section>
-${recent.length?`<section class="section"><div class="row between"><h2>Ostatnio używane</h2><button class="btn small ghost" data-route2="recipes">Wszystkie</button></div>${recent.map(recipeCard).join("")}</section>`:""}
-${fav.length?`<section class="section"><h2>Ulubione</h2>${fav.map(recipeCard).join("")}</section>`:""}`}
-
+function viewStart(){
+  const recent=[...state.recipes].filter(r=>r.lastUsedAt).sort((a,b)=>(b.lastUsedAt||'').localeCompare(a.lastUsedAt||'')).slice(0,3);
+  const fav=state.recipes.filter(r=>r.favorite).slice(0,3);
+  const hero=state.recipes.find(r=>r.name==='Carbonara')||state.recipes[0];
+  const heroImg=hero?recipeImage(hero):'./photo-generic.webp';
+  return `<div class="k42-home">
+    <section class="k42-hero">
+      <div class="k42-hero-copy">
+        <div class="k42-kicker">TWOJA KUCHNIA · TWOJE ZASADY</div>
+        <h1>Kucharzyna</h1>
+        <p>Receptury, kalkulatory i kuchenny workflow. Wszystko pod ręką.</p>
+      </div>
+      <div class="k42-hero-photo" aria-hidden="true"><img src="${escapeHtml(heroImg)}" alt="" onerror="this.onerror=null;this.src='./photo-generic.webp'"><span></span></div>
+    </section>
+    <section class="k42-menu" aria-label="Szybki dostęp">
+      <button class="k42-card" data-action="recipes"><span class="k42-icon">${v3SvgIcon('book')}</span><b>Przepisy</b><small>Twoja książka kucharska</small></button>
+      <button class="k42-card" data-route2="traditional"><span class="k42-icon">${v3SvgIcon('globe')}</span><b>Kuchnie świata</b><small>Smaki z różnych regionów</small></button>
+      <button class="k42-card" data-action="shopping"><span class="k42-icon">${v3SvgIcon('cart')}</span><b>Zakupy</b><small>Lista i planowanie</small></button>
+      <button class="k42-card" data-action="calculators"><span class="k42-icon">${v3SvgIcon('calc')}</span><b>Kalkulatory</b><small>Pizza, ciasto i więcej</small></button>
+      <button class="k42-card" data-action="fav"><span class="k42-icon">${v3SvgIcon('heart')}</span><b>Ulubione</b><small>Twoje najlepsze</small></button>
+      <button class="k42-card" data-action="settings"><span class="k42-icon">${v3SvgIcon('gear')}</span><b>Ustawienia</b><small>Motyw, profil, backup</small></button>
+      <button class="k42-card k42-google" data-google="1"><span class="k42-icon k42-g">G</span><b>Szukaj w Google</b><small>Przepisy z internetu</small></button>
+    </section>
+    ${recent.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">WRACAJ DO GOTOWANIA</span><h2>Ostatnio używane</h2></div><button class="v3-link" data-route2="recipes">Wszystkie →</button></div><div class="v3-horizontal">${recent.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
+    ${fav.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">TWOJE PEWNIAKI</span><h2>Ulubione</h2></div></div><div class="v3-horizontal">${fav.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
+  </div>`;
+}
 function viewRecipes(){let rs=[...state.recipes];if(state.query)rs=rs.filter(r=>(r.name+" "+r.description+" "+r.tags.join(" ")).toLowerCase().includes(state.query.toLowerCase()));if(state.selectedCat!=="Wszystkie")rs=rs.filter(r=>r.category===state.selectedCat);if(state.sort==="name")rs.sort((a,b)=>a.name.localeCompare(b.name));else if(state.sort==="fav")rs.sort((a,b)=>Number(b.favorite)-Number(a.favorite));else rs.sort((a,b)=>(b.lastUsedAt||b.updatedAt).localeCompare(a.lastUsedAt||a.updatedAt));
 return `<div class="row between"><div><div class="kicker">BAZA KUCHNI</div><h1>Receptury</h1></div><button class="btn primary" data-action="new">＋ Nowa</button></div>
 <input class="search" id="recipeSearch" placeholder="Szukaj receptury…" value="${escapeHtml(state.query)}">
@@ -954,7 +974,7 @@ initKucharzyna20();
    Visual layer only: existing data/actions remain compatible.
    ============================================================ */
 function v3Icon(icon, label){return `<span class="v3-icon" aria-hidden="true">${icon}</span><span>${label}</span>`}
-function v3SvgIcon(name){const paths={book:'<path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H20v17H8.5A3.5 3.5 0 0 0 5 22z"/><path d="M5 5.5V22"/><path d="M8.5 19H20"/>',globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.4 2.5 3.5 5.5 3.5 9S14.4 18.5 12 21M12 3C9.6 5.5 8.5 8.5 8.5 12S9.6 18.5 12 21"/>',cart:'<circle cx="9" cy="20" r="1.5"/><circle cx="19" cy="20" r="1.5"/><path d="M3 4h2l2.2 11.5h11.3L21 8H6"/>',calc:'<rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8 6h8M8 10h2M14 10h2M8 14h2M14 14h2M8 18h2M14 18h2"/>',heart:'<path d="M20.8 8.8c0 5.4-8.8 10.2-8.8 10.2S3.2 14.2 3.2 8.8A4.8 4.8 0 0 1 12 6a4.8 4.8 0 0 1 8.8 2.8Z"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .4 2l.1.1-1.8 1.8-.1-.1a1.8 1.8 0 0 0-2-.4 1.8 1.8 0 0 0-1.1 1.7v.2h-2.6v-.2a1.8 1.8 0 0 0-1.1-1.7 1.8 1.8 0 0 0-2 .4l-.1.1-1.8-1.8.1-.1a1.8 1.8 0 0 0 .4-2 1.8 1.8 0 0 0-1.7-1.1H6v-2.6h.2a1.8 1.8 0 0 0 1.7-1.1 1.8 1.8 0 0 0-.4-2l-.1-.1 1.8-1.8.1.1a1.8 1.8 0 0 0 2 .4A1.8 1.8 0 0 0 12.4 5v-.2H15V5a1.8 1.8 0 0 0 1.1 1.7 1.8 1.8 0 0 0 2-.4l.1-.1L20 8l-.1.1a1.8 1.8 0 0 0-.4 2 1.8 1.8 0 0 0 1.7 1.1h.2v2.6h-.2a1.8 1.8 0 0 0-1.8 1.2Z"/>'};return `<span class="v3-svg-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths[name]||paths.book}</svg></span>`}
+function v3SvgIcon(name){const paths={book:'<path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H20v17H8.5A3.5 3.5 0 0 0 5 22z"/><path d="M5 5.5V22"/><path d="M8.5 19H20"/>',globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.4 2.5 3.5 5.5 3.5 9S14.4 18.5 12 21M12 3C9.6 5.5 8.5 8.5 8.5 12S9.6 18.5 12 21"/>',cart:'<circle cx="9" cy="20" r="1.5"/><circle cx="19" cy="20" r="1.5"/><path d="M3 4h2l2.2 11.5h11.3L21 8H6"/>',calc:'<rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8 6h8M8 10h2M14 10h2M8 14h2M14 14h2M8 18h2M14 18h2"/>',heart:'<path d="M20.8 8.8c0 5.4-8.8 10.2-8.8 10.2S3.2 14.2 3.2 8.8A4.8 4.8 0 0 1 12 6a4.8 4.8 0 0 1 8.8 2.8Z"/>',box:'<path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .4 2l.1.1-1.8 1.8-.1-.1a1.8 1.8 0 0 0-2-.4 1.8 1.8 0 0 0-1.1 1.7v.2h-2.6v-.2a1.8 1.8 0 0 0-1.1-1.7 1.8 1.8 0 0 0-2 .4l-.1.1-1.8-1.8.1-.1a1.8 1.8 0 0 0 .4-2 1.8 1.8 0 0 0-1.7-1.1H6v-2.6h.2a1.8 1.8 0 0 0 1.7-1.1 1.8 1.8 0 0 0-.4-2l-.1-.1 1.8-1.8.1.1a1.8 1.8 0 0 0 2 .4A1.8 1.8 0 0 0 12.4 5v-.2H15V5a1.8 1.8 0 0 0 1.1 1.7 1.8 1.8 0 0 0 2-.4l.1-.1L20 8l-.1.1a1.8 1.8 0 0 0-.4 2 1.8 1.8 0 0 0 1.7 1.1h.2v2.6h-.2a1.8 1.8 0 0 0-1.8 1.2Z"/>'};return `<span class="v3-svg-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths[name]||paths.book}</svg></span>`}
 function v3RecipeCard(r,wide=false){
   const src=recipeImage(r); const total=(+r.prep||0)+(+r.cook||0);
   return `<article class="v3-recipe-card ${wide?'v3-wide':''}" data-open="${r.id}">
@@ -967,24 +987,26 @@ function viewStart(){
   const fav=state.recipes.filter(r=>r.favorite).slice(0,3);
   const hero=state.recipes.find(r=>r.name==='Carbonara')||state.recipes[0];
   const heroImg=hero?recipeImage(hero):'./photo-generic.webp';
-  return `<div class="v3-home k39-liquid-home" style="--home-photo:url('${escapeHtml(heroImg)}')">
-    <div class="k39-home-ambient" aria-hidden="true"></div>
-    <div class="k39-home-photo" aria-hidden="true"></div>
-    <section class="v3-home-hero k39-hero-glass">
-      <div class="v3-hero-copy"><div class="v3-brand-mark">👨‍🍳</div><div class="v3-kicker">TWOJA KUCHNIA · TWOJE ZASADY</div><h1>Kucharzyna</h1><p>Twoje receptury, kalkulatory i kuchenny workflow. Wszystko pod ręką.</p></div>
-      <button class="v3-hero-settings" data-action="settings" aria-label="Ustawienia">⚙</button>
+  return `<div class="k42-home">
+    <section class="k42-hero">
+      <div class="k42-hero-copy">
+        <div class="k42-kicker">TWOJA KUCHNIA · TWOJE ZASADY</div>
+        <h1>Kucharzyna</h1>
+        <p>Receptury, kalkulatory i kuchenny workflow. Wszystko pod ręką.</p>
+      </div>
+      <div class="k42-hero-photo" aria-hidden="true"><img src="${escapeHtml(heroImg)}" alt="" onerror="this.onerror=null;this.src='./photo-generic.webp'"><span></span></div>
     </section>
-    <section class="v3-menu-grid k39-menu-glass">
-      <button class="v3-menu-card v3-menu-recipes" data-action="recipes"><span class="v3-menu-icon">${v3SvgIcon('book')}</span><b>Przepisy</b><small>Twoja książka kucharska</small></button>
-      <button class="v3-menu-card v3-menu-world" data-route2="traditional"><span class="v3-menu-icon">${v3SvgIcon('globe')}</span><b>Kuchnie świata</b><small>Smaki z różnych regionów</small></button>
-      <button class="v3-menu-card v3-menu-shop" data-action="shopping"><span class="v3-menu-icon">${v3SvgIcon('cart')}</span><b>Zakupy</b><small>Lista i planowanie</small></button>
-      <button class="v3-menu-card v3-menu-calc" data-action="calculators"><span class="v3-menu-icon">${v3SvgIcon('calc')}</span><b>Kalkulatory</b><small>Pizza, ciasto i więcej</small></button>
-      <button class="v3-menu-card v3-menu-fav" data-action="fav"><span class="v3-menu-icon">${v3SvgIcon('heart')}</span><b>Ulubione</b><small>Twoje najlepsze</small></button>
-      <button class="v3-menu-card v3-menu-settings" data-action="settings"><span class="v3-menu-icon">${v3SvgIcon('gear')}</span><b>Ustawienia</b><small>Motyw, profil, backup</small></button>
-      <button class="v3-menu-card v3-menu-google" data-google="1"><span class="v3-menu-icon">G</span><b>Szukaj w Google</b><small>Przepisy z internetu</small></button>
+    <section class="k42-menu" aria-label="Szybki dostęp">
+      <button class="k42-card" data-action="recipes"><span class="k42-icon">${v3SvgIcon('book')}</span><b>Przepisy</b><small>Twoja książka kucharska</small></button>
+      <button class="k42-card" data-route2="traditional"><span class="k42-icon">${v3SvgIcon('globe')}</span><b>Kuchnie świata</b><small>Smaki z różnych regionów</small></button>
+      <button class="k42-card" data-action="shopping"><span class="k42-icon">${v3SvgIcon('cart')}</span><b>Zakupy</b><small>Lista i planowanie</small></button>
+      <button class="k42-card" data-action="calculators"><span class="k42-icon">${v3SvgIcon('calc')}</span><b>Kalkulatory</b><small>Pizza, ciasto i więcej</small></button>
+      <button class="k42-card" data-action="fav"><span class="k42-icon">${v3SvgIcon('heart')}</span><b>Ulubione</b><small>Twoje najlepsze</small></button>
+      <button class="k42-card" data-action="settings"><span class="k42-icon">${v3SvgIcon('gear')}</span><b>Ustawienia</b><small>Motyw, profil, backup</small></button>
+      <button class="k42-card k42-google" data-google="1"><span class="k42-icon k42-g">G</span><b>Szukaj w Google</b><small>Przepisy z internetu</small></button>
     </section>
-    ${recent.length?`<section class="v3-section k39-glass-section"><div class="v3-section-head"><div><span class="v3-kicker">WRACAJ DO GOTOWANIA</span><h2>Ostatnio używane</h2></div><button class="v3-link" data-route2="recipes">Wszystkie →</button></div><div class="v3-horizontal">${recent.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
-    ${fav.length?`<section class="v3-section k39-glass-section"><div class="v3-section-head"><div><span class="v3-kicker">TWOJE PEWNIAKI</span><h2>Ulubione</h2></div></div><div class="v3-horizontal">${fav.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
+    ${recent.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">WRACAJ DO GOTOWANIA</span><h2>Ostatnio używane</h2></div><button class="v3-link" data-route2="recipes">Wszystkie →</button></div><div class="v3-horizontal">${recent.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
+    ${fav.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">TWOJE PEWNIAKI</span><h2>Ulubione</h2></div></div><div class="v3-horizontal">${fav.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
   </div>`;
 }
 function viewRecipes(){
@@ -2315,3 +2337,39 @@ document.head.appendChild(s)})();
 /* Service-worker cache version for inventory schema/UI. */
 
 /* Kucharzyna v4.1 START rebuild marker. Visual overrides live in styles.css. */
+
+/* ============================================================
+   Kucharzyna v4.2.1 — FINAL START AUDIT
+   Clean Start: no redundant settings card, explicit inventory entry,
+   balanced 2-column menu and a single secondary Google action.
+   ============================================================ */
+(function k421FinalStart(){
+  viewStart=function(){
+    const recent=[...state.recipes].filter(r=>r.lastUsedAt).sort((a,b)=>(b.lastUsedAt||'').localeCompare(a.lastUsedAt||'')).slice(0,3);
+    const fav=state.recipes.filter(r=>r.favorite).slice(0,3);
+    const hero=state.recipes.find(r=>r.name==='Carbonara')||state.recipes[0];
+    const heroImg=hero?recipeImage(hero):'./photo-generic.webp';
+    const stockLabel=state.settings.profile==='amateur'?'Lodówka':'Magazyn';
+    return `<div class="k42-home k421-home">
+      <section class="k42-hero k421-hero">
+        <div class="k42-hero-copy">
+          <div class="k42-kicker">TWOJA KUCHNIA · TWOJE ZASADY</div>
+          <h1>Kucharzyna</h1>
+          <p>Receptury, kalkulatory i kuchenny workflow. Wszystko pod ręką.</p>
+        </div>
+        <div class="k42-hero-photo" aria-hidden="true"><img src="${escapeHtml(heroImg)}" alt="" onerror="this.onerror=null;this.src='./photo-generic.webp'"><span></span></div>
+      </section>
+      <section class="k42-menu k421-menu" aria-label="Szybki dostęp">
+        <button class="k42-card" data-action="recipes"><span class="k42-icon">${v3SvgIcon('book')}</span><b>Przepisy</b><small>Twoja książka kucharska</small></button>
+        <button class="k42-card" data-route2="traditional"><span class="k42-icon">${v3SvgIcon('globe')}</span><b>Kuchnie świata</b><small>Smaki z różnych regionów</small></button>
+        <button class="k42-card" data-action="inventory"><span class="k42-icon">${v3SvgIcon('box')}</span><b>${stockLabel}</b><small>Stan składników i alerty</small></button>
+        <button class="k42-card" data-action="shopping"><span class="k42-icon">${v3SvgIcon('cart')}</span><b>Zakupy</b><small>Lista i planowanie</small></button>
+        <button class="k42-card" data-action="calculators"><span class="k42-icon">${v3SvgIcon('calc')}</span><b>Kalkulatory</b><small>Pizza, ciasto i więcej</small></button>
+        <button class="k42-card" data-action="fav"><span class="k42-icon">${v3SvgIcon('heart')}</span><b>Ulubione</b><small>Twoje najlepsze</small></button>
+      </section>
+      <button class="k421-google" data-google="1"><span>G</span><div><b>Szukaj przepisu w Google</b><small>Inspiracje i źródła z internetu</small></div><strong>›</strong></button>
+      ${recent.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">WRACAJ DO GOTOWANIA</span><h2>Ostatnio używane</h2></div><button class="v3-link" data-route2="recipes">Wszystkie →</button></div><div class="v3-horizontal">${recent.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
+      ${fav.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">TWOJE PEWNIAKI</span><h2>Ulubione</h2></div></div><div class="v3-horizontal">${fav.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
+    </div>`;
+  };
+})();

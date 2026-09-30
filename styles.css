@@ -998,3 +998,150 @@ html.dark .k39-menu-glass .v3-menu-card small{color:rgba(255,255,255,.62)!import
   .k39-menu-glass .v3-menu-card{min-height:122px!important;border-radius:23px!important}
 }
 @media(prefers-reduced-motion:reduce){.k39-home-photo{transition:none!important}}
+
+/* ============================================================
+   Kucharzyna v4.2 — START VISUAL RESET
+   No ambient photo, no glass blur. Editorial iOS layout.
+   ============================================================ */
+.k42-home{
+  min-height:calc(100dvh - 150px)!important;
+  padding:18px 16px 52px!important;
+  background:var(--bg)!important;
+  color:var(--text)!important;
+}
+.k42-hero{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 142px!important;
+  gap:16px!important;
+  align-items:center!important;
+  min-height:218px!important;
+  padding:12px 4px 22px!important;
+}
+.k42-hero-copy{min-width:0!important;padding-left:2px!important}
+.k42-kicker{
+  margin:0 0 9px!important;
+  font-size:10px!important;
+  line-height:1.25!important;
+  font-weight:800!important;
+  letter-spacing:1.65px!important;
+  color:var(--accent)!important;
+}
+.k42-hero-copy h1{
+  margin:0 0 10px!important;
+  font-size:clamp(38px,10vw,48px)!important;
+  line-height:.96!important;
+  letter-spacing:-2.2px!important;
+  font-weight:850!important;
+}
+.k42-hero-copy p{
+  margin:0!important;
+  max-width:235px!important;
+  font-size:15px!important;
+  line-height:1.42!important;
+  color:color-mix(in srgb,var(--text) 66%,transparent)!important;
+}
+.k42-hero-photo{
+  position:relative!important;
+  width:142px!important;
+  height:178px!important;
+  overflow:hidden!important;
+  border-radius:42px 42px 42px 18px!important;
+  background:var(--surface2)!important;
+  box-shadow:0 16px 32px rgba(45,31,18,.13)!important;
+  transform:rotate(2deg)!important;
+}
+.k42-hero-photo img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  filter:none!important;
+  opacity:1!important;
+  transform:none!important;
+  -webkit-backface-visibility:hidden!important;
+  backface-visibility:hidden!important;
+}
+.k42-hero-photo span{
+  position:absolute!important;
+  inset:0!important;
+  pointer-events:none!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),transparent 48%,rgba(20,12,5,.12))!important;
+}
+.k42-menu{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+  margin:0!important;
+  padding:0!important;
+}
+.k42-card{
+  position:relative!important;
+  min-height:128px!important;
+  padding:18px 16px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:flex-end!important;
+  gap:0!important;
+  text-align:left!important;
+  border:1px solid color-mix(in srgb,var(--text) 8%,transparent)!important;
+  border-radius:22px!important;
+  background:var(--surface)!important;
+  box-shadow:0 7px 20px rgba(40,30,20,.055),inset 0 1px 0 rgba(255,255,255,.55)!important;
+  color:var(--text)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  transition:transform .16s ease,box-shadow .16s ease!important;
+}
+.k42-card:active{transform:scale(.985)!important;box-shadow:0 3px 10px rgba(40,30,20,.05)!important}
+.k42-card b{display:block!important;margin-top:auto!important;font-size:18px!important;line-height:1.12!important;letter-spacing:-.3px!important}
+.k42-card small{display:block!important;margin-top:5px!important;font-size:12px!important;line-height:1.28!important;color:color-mix(in srgb,var(--text) 57%,transparent)!important}
+.k42-icon{
+  position:absolute!important;
+  top:15px!important;
+  right:15px!important;
+  width:38px!important;
+  height:38px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:13px!important;
+  background:color-mix(in srgb,var(--accent) 9%,var(--surface))!important;
+  color:var(--accent)!important;
+}
+.k42-icon .v3-svg-icon{width:20px!important;height:20px!important}
+.k42-icon .v3-svg-icon svg{width:20px!important;height:20px!important}
+.k42-g{font-weight:800!important;font-size:20px!important}
+.k42-section{
+  margin-top:22px!important;
+  padding:17px!important;
+  border-radius:22px!important;
+  background:var(--surface)!important;
+  border:1px solid color-mix(in srgb,var(--text) 8%,transparent)!important;
+  box-shadow:0 7px 20px rgba(40,30,20,.045)!important;
+}
+html.dark .k42-card,html.dark .k42-section{box-shadow:0 8px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.035)!important}
+html.dark .k42-hero-photo{box-shadow:0 18px 34px rgba(0,0,0,.3)!important}
+@media(max-width:390px){
+  .k42-home{padding-left:14px!important;padding-right:14px!important}
+  .k42-hero{grid-template-columns:minmax(0,1fr) 122px!important;gap:12px!important}
+  .k42-hero-photo{width:122px!important;height:162px!important;border-radius:36px 36px 36px 16px!important}
+  .k42-hero-copy h1{font-size:36px!important}
+  .k42-hero-copy p{font-size:14px!important}
+  .k42-card{min-height:122px!important;padding:16px 14px!important}
+}
+@media(prefers-reduced-motion:reduce){.k42-card{transition:none!important}}
+
+/* Kucharzyna v4.2.1 — Start final polish */
+.k421-home{padding-top:14px!important;padding-bottom:48px!important}
+.k421-hero{min-height:202px!important;grid-template-columns:minmax(0,1fr) 132px!important;gap:14px!important;padding:10px 4px 22px!important}
+.k421-hero .k42-hero-photo{width:132px!important;height:168px!important;border-radius:38px 38px 38px 16px!important;transform:rotate(1.2deg)!important;box-shadow:0 14px 28px rgba(35,27,20,.10)!important}
+.k421-menu{gap:10px!important}
+.k421-menu .k42-card{min-height:116px!important;padding:17px 15px!important;border-radius:21px!important;box-shadow:0 6px 18px rgba(35,27,20,.045),inset 0 1px 0 rgba(255,255,255,.55)!important}
+.k421-menu .k42-icon{top:14px!important;right:14px!important;width:36px!important;height:36px!important;border-radius:12px!important}
+.k421-google{width:100%!important;min-height:62px!important;margin-top:11px!important;padding:12px 14px!important;display:flex!important;align-items:center!important;gap:12px!important;text-align:left!important;border:1px solid color-mix(in srgb,var(--text) 8%,transparent)!important;border-radius:18px!important;background:var(--surface2)!important;color:var(--text)!important;box-shadow:none!important}
+.k421-google>span{width:34px!important;height:34px!important;display:grid!important;place-items:center!important;border-radius:10px!important;background:var(--surface)!important;color:var(--text)!important;font-weight:900!important;font-size:17px!important;flex:0 0 auto!important}
+.k421-google>div{min-width:0!important;flex:1!important}.k421-google b{display:block!important;font-size:14px!important}.k421-google small{display:block!important;margin-top:2px!important;color:var(--muted)!important;font-size:11px!important}.k421-google>strong{font-size:22px!important;color:var(--muted)!important}
+html.dark .k421-menu .k42-card{box-shadow:0 7px 20px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.035)!important}
+@media(max-width:390px){.k421-hero{grid-template-columns:minmax(0,1fr) 116px!important}.k421-hero .k42-hero-photo{width:116px!important;height:154px!important}.k421-menu .k42-card{min-height:112px!important}}
+@media(prefers-reduced-motion:reduce){.k421-hero .k42-hero-photo{transform:none!important}}
