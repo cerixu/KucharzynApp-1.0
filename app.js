@@ -2161,7 +2161,7 @@ if(!window.__k35SearchCaptureBound){
   function label(){return state.settings.profile==='amateur'?'Lodówka':'Magazyn'}
   function icon(){return state.settings.profile==='amateur'?'🧊':'📦'}
   function invSummary(){const arr=state.inventory||[];return arr.reduce((a,x)=>a+(+x.qty||0),0)}
-  function invLowItems(){return (state.inventory||[]).filter(x=>Number.isFinite(+x.alertQty)&&+x.alertQty>0&&(+x.qty||0)<=+x.alertQty)}
+  function invLowItems(){return (state.inventory||[]).filter(x=>x.alertEnabled!==false&&Number.isFinite(+x.alertQty)&&+x.alertQty>0&&(+x.qty||0)<=+x.alertQty)}
 
   window.k312InventoryKey=invKey;
   window.k312ConsumeRecipe=async function(recipeId){
@@ -2187,12 +2187,12 @@ if(!window.__k35SearchCaptureBound){
   window.viewInventoryK312=function(){
     const arr=inventoryRows(), total=(state.inventory||[]).length;
     const low=invLowItems();
-    return `<div class="k312-inventory"><div class="k312-head"><div><span class="v3-kicker">${label().toUpperCase()}</span><h1>${icon()} ${label()}</h1><p>Stan składników na tym urządzeniu. Po każdym gotowaniu Kucharzyna zapyta, czy odjąć zużyte produkty.</p></div><button class="v3-add-btn" id="k312-add">＋<span>Dodaj</span></button></div>${low.length?`<section class="k312-alert"><div class="k312-alert-title">⚠️ Kończy się</div><div class="k312-alert-list">${low.map(x=>`<span>${escapeHtml(x.name)} · ${fmt(x.qty)} ${escapeHtml(x.unit)}</span>`).join('')}</div></section>`:''}<div class="k312-summary"><div><b>${total}</b><span>pozycji</span></div><div><b>${invSummary()}</b><span>łączna ilość</span></div><div><b>${low.length}</b><span>alertów</span></div></div><div class="k312-search"><span>⌕</span><input id="k312-search" value="${escapeHtml(state.inventoryQuery||'')}" placeholder="Szukaj składnika…" autocomplete="off"></div><div class="k312-list">${arr.length?arr.map(x=>`<article class="k312-row ${Number.isFinite(+x.alertQty)&&+x.alertQty>0&&(+x.qty||0)<=+x.alertQty?'is-low':''}"><div class="k312-row-main">${k32IngredientIconMarkup(x.name)}<div><b>${escapeHtml(x.name)}</b><small>stan: <strong>${fmt(x.qty)} ${escapeHtml(x.unit)}</strong>${Number.isFinite(+x.alertQty)&&+x.alertQty>0?` · alert przy ${fmt(x.alertQty)} ${escapeHtml(x.unit)}`:''}</small></div></div><div class="k312-row-actions"><div class="k312-quick"><button data-k312-minus="${escapeHtml(x.id)}" aria-label="Zmniejsz ilość">−</button><span>${escapeHtml(quickStep(x.unit).label)}</span><button data-k312-plus="${escapeHtml(x.id)}" aria-label="Zwiększ ilość">＋</button></div><button data-k312-edit="${escapeHtml(x.id)}" aria-label="Edytuj">✎</button><button data-k312-del="${escapeHtml(x.id)}" aria-label="Usuń">×</button></div></article>`).join(''):`<div class="k312-empty"><span>${icon()}</span><b>Brak składników</b><p>Dodaj pierwszy produkt, który masz w domu lub na kuchni.</p></div>`}</div></div>`;
+    return `<div class="k312-inventory"><div class="k312-head"><div><span class="v3-kicker">${label().toUpperCase()}</span><h1>${icon()} ${label()}</h1><p>Stan składników na tym urządzeniu. Po każdym gotowaniu Kucharzyna zapyta, czy odjąć zużyte produkty.</p></div><button class="v3-add-btn" id="k312-add">＋<span>Dodaj</span></button></div>${low.length?`<section class="k312-alert"><div class="k312-alert-title">⚠️ Kończy się</div><div class="k312-alert-list">${low.map(x=>`<span>${escapeHtml(x.name)} · ${fmt(x.qty)} ${escapeHtml(x.unit)}</span>`).join('')}</div></section>`:''}<div class="k312-summary"><div><b>${total}</b><span>pozycji</span></div><div><b>${invSummary()}</b><span>łączna ilość</span></div><div><b>${low.length}</b><span>aktywnych alertów</span></div></div><div class="k312-search"><span>⌕</span><input id="k312-search" value="${escapeHtml(state.inventoryQuery||'')}" placeholder="Szukaj składnika…" autocomplete="off"></div><div class="k312-list">${arr.length?arr.map(x=>{const alertOn=x.alertEnabled!==false&&Number.isFinite(+x.alertQty)&&+x.alertQty>0;const isLow=alertOn&&(+x.qty||0)<=+x.alertQty;return `<article class="k312-row ${isLow?'is-low':''}"><div class="k312-row-main">${k32IngredientIconMarkup(x.name)}<div><b>${escapeHtml(x.name)}</b><small>stan: <strong>${fmt(x.qty)} ${escapeHtml(x.unit)}</strong>${alertOn?` · alert przy ${fmt(x.alertQty)} ${escapeHtml(x.unit)}`:` · alert wyłączony`}</small></div></div><div class="k312-row-actions"><div class="k312-quick"><button data-k312-minus="${escapeHtml(x.id)}" aria-label="Zmniejsz ilość">−</button><span>${escapeHtml(quickStep(x.unit).label)}</span><button data-k312-plus="${escapeHtml(x.id)}" aria-label="Zwiększ ilość">＋</button></div><button data-k312-edit="${escapeHtml(x.id)}" aria-label="Edytuj">✎</button><button data-k312-del="${escapeHtml(x.id)}" aria-label="Usuń">×</button></div></article>`}).join(''):`<div class="k312-empty"><span>${icon()}</span><b>Brak składników</b><p>Dodaj pierwszy produkt, który masz w domu lub na kuchni.</p></div>`}</div></div>`;
   };
 
   async function saveItem(data,id){
     const name=String(data.name||'').trim();const qty=+data.qty||0;const u=unit(data.unit);const alertQty=Math.max(0,+data.alertQty||0);if(!name||qty<0||alertQty<0){toast('Podaj nazwę i prawidłową ilość');return false;}
-    const item={id:id||uid(),name,qty,unit:u,key:invKey(name),alertQty,updatedAt:now()};await put('inventoryItems',item);state.inventory=await getAll('inventoryItems');return true;
+    const alertEnabled=Boolean(data.alertEnabled)&&alertQty>0;const item={id:id||uid(),name,qty,unit:u,key:invKey(name),alertQty,alertEnabled,updatedAt:now()};await put('inventoryItems',item);state.inventory=await getAll('inventoryItems');return true;
   }
   function quickStep(u){
     u=unit(u);
@@ -2213,8 +2213,13 @@ if(!window.__k35SearchCaptureBound){
   }
   function editItem(id){
     const item=(state.inventory||[]).find(x=>x.id===id)||{name:'',qty:0,unit:'g'};
-    openModal(`<div class="k312-form-modal"><h2>${id?'Edytuj składnik':'Dodaj do '+label().toLowerCase()}</h2><label>Nazwa składnika<input id="k312-name" value="${escapeHtml(item.name)}" placeholder="Np. mąka pszenna"></label><label>Ilość<input id="k312-qty" type="number" inputmode="decimal" min="0" step="0.01" value="${escapeHtml(item.qty)}"></label><label>Jednostka<select id="k312-unit"><option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="l">l</option><option value="szt.">szt.</option><option value="porcja">porcja</option></select></label><label>Alert „kończy się”<input id="k312-alert" type="number" inputmode="decimal" min="0" step="0.01" value="${escapeHtml(item.alertQty||0)}"><small class="muted">0 = bez alertu</small></label><div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-close>Anuluj</button><button class="btn primary" id="k312-save">Zapisz</button></div></div>`);
-    $('#k312-unit').value=unit(item.unit);$('#k312-save').onclick=async()=>{if(await saveItem({name:$('#k312-name').value,qty:$('#k312-qty').value,unit:$('#k312-unit').value,alertQty:$('#k312-alert').value},id)){closeModal();renderV20();toast(`${label()} zaktualizowany ✓`)}};
+    const existingAlertOn=item.alertEnabled!==false&&Number(item.alertQty||0)>0;
+    openModal(`<div class="k312-form-modal"><h2>${id?'Edytuj składnik':'Dodaj do '+label().toLowerCase()}</h2><label>Nazwa składnika<input id="k312-name" value="${escapeHtml(item.name)}" placeholder="Np. mąka pszenna"></label><label>Ilość<input id="k312-qty" type="number" inputmode="decimal" min="0" step="0.01" value="${escapeHtml(item.qty)}"></label><label>Jednostka<select id="k312-unit"><option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="l">l</option><option value="szt.">szt.</option><option value="porcja">porcja</option></select></label><div class="k312-alert-setting"><div><b>Alert końcówki zapasu</b><small>Powiadom, gdy stan spadnie do ustawionego progu.</small></div><input id="k312-alert-enabled" class="k312-toggle" type="checkbox" ${existingAlertOn?'checked':''} aria-label="Włącz alert końcówki zapasu"></div><label id="k312-alert-threshold-wrap">Próg alertu<input id="k312-alert" type="number" inputmode="decimal" min="0" step="0.01" value="${escapeHtml(item.alertQty||0)}"><small class="muted">Np. 500 g. Przy wyłączonym alercie próg zostaje zapamiętany.</small></label><div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-close>Anuluj</button><button class="btn primary" id="k312-save">Zapisz</button></div></div>`);
+    $('#k312-unit').value=unit(item.unit);
+    const alertToggle=$('#k312-alert-enabled'), alertWrap=$('#k312-alert-threshold-wrap');
+    const syncAlertUI=()=>{alertWrap.style.opacity=alertToggle.checked?'1':'.55';alertWrap.querySelector('input').disabled=false;};
+    alertToggle.addEventListener('change',syncAlertUI);syncAlertUI();
+    $('#k312-save').onclick=async()=>{if(await saveItem({name:$('#k312-name').value,qty:$('#k312-qty').value,unit:$('#k312-unit').value,alertQty:$('#k312-alert').value,alertEnabled:alertToggle.checked},id)){closeModal();renderV20();toast(`${label()} zaktualizowany ✓`)}};
   }
   async function removeItem(id){if(!confirm('Usunąć ten składnik z '+label().toLowerCase()+'?'))return;await del('inventoryItems',id);state.inventory=await getAll('inventoryItems');renderV20();}
 
@@ -2362,21 +2367,20 @@ document.head.appendChild(s)})();
    Clean Start: no redundant settings card, explicit inventory entry,
    balanced 2-column menu and a single secondary Google action.
    ============================================================ */
-(function k421FinalStart(){
+(function k423FinalStart(){
   viewStart=function(){
     const recent=[...state.recipes].filter(r=>r.lastUsedAt).sort((a,b)=>(b.lastUsedAt||'').localeCompare(a.lastUsedAt||'')).slice(0,3);
     const fav=state.recipes.filter(r=>r.favorite).slice(0,3);
-    const hero=state.recipes.find(r=>r.name==='Carbonara')||state.recipes[0];
-    const heroImg=hero?recipeImage(hero):'./photo-generic.webp';
     const stockLabel=state.settings.profile==='amateur'?'Lodówka':'Magazyn';
-    return `<div class="k42-home k421-home">
-      <section class="k42-hero k421-hero">
+    return `<div class="k42-home k423-home">
+      <section class="k423-hero" aria-label="Kucharzyna">
+        <div class="k423-hero-glow"></div>
         <div class="k42-hero-copy">
           <div class="k42-kicker">TWOJA KUCHNIA · TWOJE ZASADY</div>
           <h1>Kucharzyna</h1>
           <p>Receptury, kalkulatory i kuchenny workflow. Wszystko pod ręką.</p>
         </div>
-        <div class="k42-hero-photo" aria-hidden="true"><img src="${escapeHtml(heroImg)}" alt="" onerror="this.onerror=null;this.src='./photo-generic.webp'"><span></span></div>
+        <div class="k423-hero-mark" aria-hidden="true"><span>✦</span><i></i><b>KU</b></div>
       </section>
       <section class="k42-menu k421-menu" aria-label="Szybki dostęp">
         <button class="k42-card" data-action="recipes"><span class="k42-icon">${v3SvgIcon('book')}</span><b>Przepisy</b><small>Twoja książka kucharska</small></button>
@@ -2390,5 +2394,111 @@ document.head.appendChild(s)})();
       ${recent.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">WRACAJ DO GOTOWANIA</span><h2>Ostatnio używane</h2></div><button class="v3-link" data-route2="recipes">Wszystkie →</button></div><div class="v3-horizontal">${recent.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
       ${fav.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">TWOJE PEWNIAKI</span><h2>Ulubione</h2></div></div><div class="v3-horizontal">${fav.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
     </div>`;
+  };
+})();
+
+/* ============================================================
+   Kucharzyna v4.4 — MAGAZYN + RECEPTURY + ZAKUPY
+   Unified stock workflow: filters, sorting, refill, missing-to-shopping.
+   ============================================================ */
+(function k44UnifiedStock(){
+  const esc=window.escapeHtml||((s)=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])));
+  const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+  const unit44=u=>{const x=String(u||'g').trim().toLowerCase();return ({gram:'g',gramy:'g',grams:'g',kg:'kg',g:'g',ml:'ml',l:'l','szt':'szt.','szt.':'szt.','sztuk':'szt.','porcja':'porcja'})[x]||x};
+  const compatible44=(a,b)=>{a=unit44(a);b=unit44(b);return (['g','kg'].includes(a)&&['g','kg'].includes(b))||(['ml','l'].includes(a)&&['ml','l'].includes(b))||a===b};
+  const factor44=u=>{u=unit44(u);return u==='kg'||u==='l'?1000:1};
+  const convert44=(q,from,to)=>compatible44(from,to)?q*factor44(from)/factor44(to):null;
+  const key44=n=>window.k312InventoryKey?window.k312InventoryKey(n):norm(n);
+  const keyShop44=(n,u)=>norm(n)+'|'+unit44(u);
+  const stockFor44=(name,u)=> (state.inventory||[]).filter(x=>key44(x.name)===key44(name)&&compatible44(x.unit,u));
+  const available44=(name,u)=>stockFor44(name,u).reduce((sum,x)=>sum+(convert44(Number(x.qty)||0,x.unit,u)||0),0);
+  const ingredientList44=r=>{const out=[];for(const s of r?.sections||[])for(const i of s.ingredients||[]){if(!i.name||!(+i.qty>0))continue;const k=key44(i.name)+'|'+unit44(i.unit);const hit=out.find(x=>x.k===k);if(hit)hit.need+=+i.qty;else out.push({k,name:i.name,need:+i.qty,unit:unit44(i.unit)})}return out};
+  const status44=r=>{const rows=ingredientList44(r).map(x=>({...x,available:available44(x.name,x.unit),missing:Math.max(0,x.need-available44(x.name,x.unit))}));return {rows,missing:rows.filter(x=>x.missing>1e-9),complete:rows.length>0&&rows.every(x=>x.missing<=1e-9),empty:rows.length===0};};
+
+  async function addMissing44(rows){
+    if(!rows?.length)return;
+    const items=await getAll('shoppingItems');
+    const map=new Map(items.map(x=>[keyShop44(x.name,x.unit),x]));
+    for(const m of rows){
+      const k=keyShop44(m.name,m.unit), existing=map.get(k);
+      if(existing){existing.qty=(+existing.qty||0)+m.missing;existing.done=false;await put('shoppingItems',existing)}
+      else {const x={id:uid(),name:m.name,qty:m.missing,unit:m.unit,done:false,source:'magazyn-braki'};await put('shoppingItems',x);map.set(k,x)}
+    }
+    state.shopping=await getAll('shoppingItems');
+    toast(`Dodano ${rows.length} brakujących ${rows.length===1?'pozycję':'pozycji'} do zakupów ✓`);
+  }
+  window.k44AddMissingToShopping=addMissing44;
+  window.k44RecipeStatus=status44;
+
+  function invFiltered44(){
+    const q=String(state.inventoryQuery||'').trim().toLocaleLowerCase('pl');
+    let arr=(state.inventory||[]).filter(x=>!q||String(x.name||'').toLocaleLowerCase('pl').includes(q));
+    const filter=state.inventoryFilter||'all';
+    if(filter==='low')arr=arr.filter(x=>x.alertEnabled!==false&&Number(x.alertQty)>0&&Number(x.qty||0)<=Number(x.alertQty));
+    if(filter==='zero')arr=arr.filter(x=>Number(x.qty||0)<=0);
+    if(filter==='alerts-off')arr=arr.filter(x=>x.alertEnabled===false||!(Number(x.alertQty)>0));
+    const sort=state.inventorySort||'recent';
+    if(sort==='name')arr.sort((a,b)=>String(a.name).localeCompare(String(b.name),'pl'));
+    else if(sort==='qty')arr.sort((a,b)=>(+a.qty||0)-(+b.qty||0));
+    else arr.sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''));
+    return arr;
+  }
+  function low44(x){return x.alertEnabled!==false&&Number(x.alertQty)>0&&Number(x.qty||0)<=Number(x.alertQty)}
+  const quickStep44=u=>{u=unit44(u);if(u==='g'||u==='kg')return {label:'+100 g / −100 g'};if(u==='ml'||u==='l')return {label:'+100 ml / −100 ml'};return {label:'+1 / −1'}};
+  function invView44(){
+    const arr=invFiltered44(), total=(state.inventory||[]).length, low=(state.inventory||[]).filter(low44).length, zero=(state.inventory||[]).filter(x=>(+x.qty||0)<=0).length, off=(state.inventory||[]).filter(x=>x.alertEnabled===false||!(+x.alertQty>0)).length;
+    const f=state.inventoryFilter||'all', s=state.inventorySort||'recent';
+    return `<div class="k44-inventory">
+      <div class="k312-head"><div><span class="v3-kicker">${(state.settings.profile==='amateur'?'LODÓWKA':'MAGAZYN')}</span><h1>${state.settings.profile==='amateur'?'🧊':'📦'} ${state.settings.profile==='amateur'?'Lodówka':'Magazyn'}</h1><p>Stan składników, alerty i szybkie uzupełnianie. Zmiany są zapisywane lokalnie.</p></div><button class="v3-add-btn" id="k312-add">＋<span>Dodaj</span></button></div>
+      ${low?`<section class="k312-alert"><div class="k312-alert-title">⚠️ Kończy się <span>${low}</span></div><div class="k312-alert-list">${(state.inventory||[]).filter(low44).slice(0,12).map(x=>`<span>${esc(x.name)} · ${fmt(x.qty)} ${esc(x.unit)}</span>`).join('')}</div></section>`:''}
+      <div class="k312-summary"><div><b>${total}</b><span>pozycji</span></div><div><b>${low}</b><span>kończą się</span></div><div><b>${zero}</b><span>brak na stanie</span></div></div>
+      <div class="k44-toolbar"><div class="k312-search"><span>⌕</span><input id="k312-search" value="${esc(state.inventoryQuery||'')}" placeholder="Szukaj składnika…" autocomplete="off"></div><select id="k44-sort"><option value="recent" ${s==='recent'?'selected':''}>Ostatnio zmieniane</option><option value="name" ${s==='name'?'selected':''}>Nazwa A–Z</option><option value="qty" ${s==='qty'?'selected':''}>Najmniej na stanie</option></select></div>
+      <div class="k44-filters"><button class="chip ${f==='all'?'active':''}" data-k44-filter="all">Wszystkie <b>${total}</b></button><button class="chip ${f==='low'?'active':''}" data-k44-filter="low">Kończą się <b>${low}</b></button><button class="chip ${f==='zero'?'active':''}" data-k44-filter="zero">Brak <b>${zero}</b></button><button class="chip ${f==='alerts-off'?'active':''}" data-k44-filter="alerts-off">Alert OFF <b>${off}</b></button></div>
+      <div class="k312-list">${arr.length?arr.map(x=>{const isLow=low44(x), off=x.alertEnabled===false||!(+x.alertQty>0);return `<article class="k312-row k44-row ${isLow?'is-low':''}"><div class="k312-row-main">${typeof k32IngredientIconMarkup==='function'?k32IngredientIconMarkup(x.name):'<span>🥬</span>'}<div><b>${esc(x.name)}</b><small>stan: <strong>${fmt(x.qty)} ${esc(x.unit)}</strong>${isLow?` · <em>kończy się</em>`:off?' · alert OFF':` · alert przy ${fmt(x.alertQty)} ${esc(x.unit)}`}</small></div></div><div class="k312-row-actions"><div class="k312-quick"><button data-k312-minus="${esc(x.id)}" aria-label="Zmniejsz ilość">−</button><span>${esc(quickStep44(x.unit).label)}</span><button data-k312-plus="${esc(x.id)}" aria-label="Zwiększ ilość">＋</button></div><button data-k44-refill="${esc(x.id)}" aria-label="Uzupełnij">↥</button><button data-k312-edit="${esc(x.id)}" aria-label="Edytuj">✎</button><button data-k312-del="${esc(x.id)}" aria-label="Usuń">×</button></div></article>`}).join(''):`<div class="k312-empty"><span>${f==='low'?'✅':f==='zero'?'📦':'🔎'}</span><b>${f==='low'?'Nic nie jest poniżej progu':f==='zero'?'Brak produktów z ilością 0':'Brak składników'}</b><p>${f==='all'?'Dodaj pierwszy produkt, który masz na kuchni.':'Zmień filtr albo dodaj/uzupełnij produkt.'}</p></div>`}</div>
+    </div>`;
+  }
+  window.viewInventoryK312=invView44;
+
+  function recipeStock44(){
+    if(state.route!=='recipe')return;
+    const host=document.querySelector('.k32-actions'); if(!host)return;
+    document.querySelector('.k44-recipe-stock')?.remove();
+    const r=state.recipes.find(x=>x.id===state.selectedId);if(!r)return;
+    const st=status44(r), box=document.createElement('section');box.className='k44-recipe-stock '+(st.complete?'complete':'missing');
+    if(st.empty){box.innerHTML='<div class="k44-stock-icon">•</div><div><b>Brak składników do sprawdzenia</b><span>Dodaj składniki do receptury, aby połączyć ją z magazynem.</span></div>'}
+    else if(st.complete){box.innerHTML='<div class="k44-stock-icon">✓</div><div><b>Masz wszystko do tego przepisu</b><span>Magazyn wystarcza na pełną ilość z receptury.</span></div>'}
+    else{box.innerHTML=`<div class="k44-stock-icon">!</div><div class="k44-stock-copy"><b>Brakuje ${st.missing.length} ${st.missing.length===1?'składnika':'składników'}</b><span>${st.missing.slice(0,5).map(x=>`${esc(x.name)} <strong>${fmt(x.missing)} ${esc(x.unit)}</strong>`).join(' · ')}${st.missing.length>5?' · …':''}</span></div><button class="btn small" id="k44-add-missing">＋ Zakupy</button>`;}
+    host.insertAdjacentElement('afterend',box);
+    $('#k44-add-missing')?.addEventListener('click',async()=>{await addMissing44(st.missing);renderV20();});
+  }
+
+  function recipeCardsStatus44(){
+    if(state.route!=='recipes')return;
+    $$('.k32-recipe-card,.v3-recipe-card,.recipe-card').forEach(card=>{
+      if(card.querySelector('.k44-card-stock'))return;
+      const id=card.dataset.open||card.dataset.recipeId||card.dataset.id;if(!id)return;const r=state.recipes.find(x=>x.id===id);if(!r)return;const st=status44(r);if(st.empty)return;
+      const el=document.createElement('div');el.className='k44-card-stock '+(st.complete?'good':'bad');el.textContent=st.complete?'✓ Magazyn OK':`! Braki: ${st.missing.length}`;card.appendChild(el);
+    });
+  }
+
+  const oldRender44=renderV20;
+  renderV20=function(){oldRender44();requestAnimationFrame(()=>{recipeStock44();recipeCardsStatus44()});};
+
+  const oldBind44=bindV20;
+  bindV20=function(){
+    oldBind44();
+    if(state.route==='inventory'){
+      $('#k44-sort')?.addEventListener('change',e=>{state.inventorySort=e.target.value;renderV20()});
+      $$('#main [data-k44-filter]').forEach(b=>b.addEventListener('click',()=>{state.inventoryFilter=b.dataset.k44Filter||'all';renderV20()}));
+      $$('#main [data-k44-refill]').forEach(b=>b.addEventListener('click',()=>{
+        const item=(state.inventory||[]).find(x=>x.id===b.dataset.k44Refill);if(!item)return;
+        openModal(`<div class="k44-refill-modal"><span class="kicker">SZYBKIE UZUPEŁNIENIE</span><h2>${esc(item.name)}</h2><p>Stan teraz: <b>${fmt(item.qty)} ${esc(item.unit)}</b></p><label>Nowy stan<input id="k44-refill-value" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(item.qty)}"></label><div class="k44-refill-presets"><button type="button" data-rf="25">+25%</button><button type="button" data-rf="50">+50%</button><button type="button" data-rf="100">+100%</button><button type="button" data-rf="200">+200%</button></div><div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn" data-close>Anuluj</button><button class="btn primary" id="k44-refill-save">Zapisz stan</button></div></div>`);
+        $$('#modal-root [data-rf]').forEach(p=>p.addEventListener('click',()=>{const base=Number(item.qty)||0;$('#k44-refill-value').value=Math.round((base*(1+Number(p.dataset.rf)/100))*1000)/1000}));
+        $('#k44-refill-save').onclick=async()=>{const v=Math.max(0,Number($('#k44-refill-value').value)||0);item.qty=v;item.updatedAt=now();await put('inventoryItems',item);state.inventory=await getAll('inventoryItems');closeModal();renderV20();toast(`${item.name}: ${fmt(v)} ${item.unit}`)};
+      }));
+    }
+    if(state.route==='recipe'){
+      // The stock panel owns its own missing-to-shopping action.
+    }
   };
 })();

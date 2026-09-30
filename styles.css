@@ -1230,3 +1230,166 @@ html.dark .k421-menu .k42-card{box-shadow:0 7px 20px rgba(0,0,0,.18),inset 0 1px
 .k312-quick span{font-size:9px!important;line-height:1!important;color:var(--muted)!important;min-width:42px!important;text-align:center!important;white-space:nowrap!important}
 @media(max-width:430px){.k312-row{align-items:flex-start!important}.k312-row-actions{width:100%!important;margin-top:8px!important;justify-content:flex-start!important}.k312-quick{margin-right:auto!important}.k312-quick span{font-size:9px!important}}
 html.dark .k312-quick{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.1)!important}html.dark .k312-quick button{background:rgba(255,255,255,.08)!important;box-shadow:none!important}
+
+
+/* ============================================================
+   Kucharzyna v4.3 — START visual refresh + inventory alert switch
+   ============================================================ */
+
+/* Start: no food photo. The hero is now a clean branded surface. */
+.k423-home{
+  position:relative!important;
+  isolation:isolate!important;
+}
+.k423-hero{
+  position:relative!important;
+  min-height:210px!important;
+  margin:0 0 14px!important;
+  padding:30px 22px 28px!important;
+  display:flex!important;
+  align-items:flex-end!important;
+  overflow:hidden!important;
+  border-radius:30px!important;
+  border:1px solid color-mix(in srgb,var(--text) 8%,transparent)!important;
+  background:
+    radial-gradient(circle at 82% 18%,rgba(255,107,53,.28),transparent 32%),
+    radial-gradient(circle at 10% 90%,rgba(124,92,255,.18),transparent 38%),
+    linear-gradient(135deg,
+      color-mix(in srgb,var(--surface) 88%,#ff6b35 12%),
+      color-mix(in srgb,var(--surface) 94%,#7c5cff 6%))!important;
+  box-shadow:0 14px 34px rgba(38,27,18,.07),inset 0 1px 0 rgba(255,255,255,.55)!important;
+}
+.k423-hero .k42-hero-copy{
+  position:relative!important;
+  z-index:2!important;
+  max-width:72%!important;
+  padding:0!important;
+}
+.k423-hero .k42-hero-copy h1{
+  font-size:clamp(40px,11vw,52px)!important;
+  letter-spacing:-2.8px!important;
+}
+.k423-hero .k42-hero-copy p{
+  max-width:300px!important;
+}
+.k423-hero-glow{
+  position:absolute!important;
+  width:180px!important;
+  height:180px!important;
+  right:-58px!important;
+  top:-68px!important;
+  border-radius:50%!important;
+  background:linear-gradient(135deg,rgba(255,107,53,.28),rgba(124,92,255,.16))!important;
+  filter:blur(3px)!important;
+}
+.k423-hero-mark{
+  position:absolute!important;
+  z-index:1!important;
+  right:19px!important;
+  top:23px!important;
+  width:92px!important;
+  height:92px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:30px!important;
+  transform:rotate(8deg)!important;
+  background:color-mix(in srgb,var(--surface) 48%,transparent)!important;
+  border:1px solid rgba(255,255,255,.42)!important;
+  box-shadow:0 15px 32px rgba(57,37,24,.08),inset 0 1px 0 rgba(255,255,255,.6)!important;
+  backdrop-filter:blur(14px)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+}
+.k423-hero-mark b{
+  position:absolute!important;
+  bottom:16px!important;
+  right:15px!important;
+  font-size:11px!important;
+  letter-spacing:1.6px!important;
+  font-weight:900!important;
+  color:color-mix(in srgb,var(--text) 68%,transparent)!important;
+}
+.k423-hero-mark span{
+  position:absolute!important;
+  top:13px!important;
+  left:16px!important;
+  font-size:25px!important;
+  color:var(--accent)!important;
+}
+.k423-hero-mark i{
+  width:36px!important;
+  height:36px!important;
+  border-radius:12px 16px 12px 16px!important;
+  border:3px solid var(--accent)!important;
+  transform:rotate(-14deg)!important;
+  opacity:.78!important;
+}
+html.dark .k423-hero{
+  background:
+    radial-gradient(circle at 82% 18%,rgba(255,107,53,.24),transparent 32%),
+    radial-gradient(circle at 10% 90%,rgba(124,92,255,.20),transparent 38%),
+    linear-gradient(135deg,
+      color-mix(in srgb,var(--surface) 91%,#ff6b35 9%),
+      color-mix(in srgb,var(--surface) 93%,#7c5cff 7%))!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+@media(max-width:390px){
+  .k423-hero{min-height:194px!important;padding:25px 18px 23px!important;border-radius:26px!important}
+  .k423-hero .k42-hero-copy{max-width:78%!important}
+  .k423-hero .k42-hero-copy h1{font-size:38px!important}
+  .k423-hero-mark{width:76px!important;height:76px!important;right:14px!important;top:17px!important;border-radius:24px!important}
+  .k423-hero-mark b{bottom:12px!important;right:11px!important}
+  .k423-hero-mark span{top:9px!important;left:12px!important}
+}
+
+/* Inventory alert: explicit ON/OFF switch. */
+.k312-alert-setting{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:14px!important;
+  margin:4px 0 14px!important;
+  padding:13px 14px!important;
+  border:1px solid var(--line)!important;
+  border-radius:17px!important;
+  background:var(--surface2)!important;
+}
+.k312-alert-setting>div{min-width:0!important;flex:1!important}
+.k312-alert-setting b{display:block!important;font-size:14px!important}
+.k312-alert-setting small{display:block!important;margin-top:3px!important;color:var(--muted)!important;line-height:1.35!important}
+.k312-toggle{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  width:52px!important;
+  height:32px!important;
+  min-height:32px!important;
+  flex:0 0 52px!important;
+  padding:0!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:#b8b8bd!important;
+  position:relative!important;
+  cursor:pointer!important;
+  transition:background .18s ease!important;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.07)!important;
+}
+.k312-toggle::after{
+  content:""!important;
+  position:absolute!important;
+  width:26px!important;
+  height:26px!important;
+  top:3px!important;
+  left:3px!important;
+  border-radius:50%!important;
+  background:#fff!important;
+  box-shadow:0 2px 6px rgba(0,0,0,.22)!important;
+  transition:transform .18s ease!important;
+}
+.k312-toggle:checked{background:var(--accent)!important}
+.k312-toggle:checked::after{transform:translateX(20px)!important}
+.k312-toggle:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 30%,transparent)!important;outline-offset:3px!important}
+.k312-alert-setting:has(.k312-toggle:checked){border-color:color-mix(in srgb,var(--accent) 25%,var(--line))!important}
+
+/* Kucharzyna v4.4 — unified inventory workflow */
+.k44-toolbar{display:grid;grid-template-columns:1fr 190px;gap:9px;margin-bottom:9px;align-items:center}.k44-toolbar .k312-search{margin:0}.k44-toolbar select{width:100%;min-height:52px;border-radius:17px}.k44-filters{display:flex;gap:7px;overflow:auto;padding:2px 0 12px;scrollbar-width:none}.k44-filters::-webkit-scrollbar{display:none}.k44-filters .chip{white-space:nowrap}.k44-filters .chip b{margin-left:4px;opacity:.7}.k44-row{min-height:74px}.k44-row.is-low .k312-row-main small em{font-style:normal;font-weight:800}.k44-recipe-stock{display:flex;align-items:center;gap:12px;margin:12px 0 18px;padding:14px 16px;border-radius:20px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 78%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 30px rgba(0,0,0,.06)}.k44-recipe-stock .k44-stock-icon{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-weight:900;flex:0 0 auto;background:color-mix(in srgb,#ef4444 16%,var(--surface2));color:#dc2626}.k44-recipe-stock.complete .k44-stock-icon{background:color-mix(in srgb,#22c55e 16%,var(--surface2));color:#16a34a}.k44-stock-copy{min-width:0;flex:1}.k44-recipe-stock b{display:block;font-size:14px}.k44-recipe-stock span{display:block;color:var(--muted);font-size:12px;line-height:1.45;margin-top:3px}.k44-recipe-stock span strong{color:var(--text)}.k44-card-stock{font-size:10px;font-weight:850;margin-top:7px;display:inline-flex;padding:5px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}.k44-card-stock.good{color:#15803d;background:color-mix(in srgb,#22c55e 12%,var(--surface2))}.k44-card-stock.bad{color:#b45309;background:color-mix(in srgb,#f59e0b 12%,var(--surface2))}.k44-refill-modal{max-width:480px}.k44-refill-modal h2{margin:5px 0}.k44-refill-modal p{color:var(--muted)}.k44-refill-modal label{display:block;font-size:12px;font-weight:800}.k44-refill-modal input{margin-top:7px;width:100%;min-height:52px}.k44-refill-presets{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:9px}.k44-refill-presets button{border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:12px;padding:10px 4px;font-weight:800}.k44-refill-presets button:active{transform:scale(.96)}
+@media(max-width:600px){.k44-toolbar{grid-template-columns:1fr}.k44-recipe-stock{align-items:flex-start}.k44-recipe-stock .btn{align-self:center}.k44-refill-presets{grid-template-columns:repeat(2,1fr)}}
