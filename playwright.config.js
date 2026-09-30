@@ -28,17 +28,11 @@ module.exports = defineConfig({
       name: 'iphone-17-pro-max',
       use: {
         ...devices['iPhone 15 Pro Max'],
+        browserName: 'webkit',
         viewport: { width: 440, height: 956 },
         deviceScaleFactor: 3,
         isMobile: true,
         hasTouch: true
-      }
-    },
-    {
-      name: 'desktop-smoke',
-      use: {
-        ...devices['Desktop Chrome'],
-        viewport: { width: 1440, height: 1000 }
       }
     }
   ]
