@@ -101,3 +101,10 @@ Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut
 - Naprawiono wyszukiwanie kuchni świata oraz dań w wybranej kuchni.
 - Wyszukiwanie działa na żywo bez ponownego renderowania całego widoku, dzięki czemu klawiatura i fokus na iOS Safari nie znikają po każdej literze.
 - Zmieniono wersję cache Service Workera.
+
+
+## v3.7 — exact dish photos
+- Replaced random/generic Polish dish photos with exact Wikimedia Commons food images.
+- Added a final exact-photo layer so older local fallback mappings cannot override the correct dish image.
+- Recipe metadata stores the Wikimedia source URL, author/credit and license where available.
+- Service Worker cache version bumped to v3.7.

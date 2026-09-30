@@ -1757,6 +1757,155 @@ async function k33EnsurePolishRecipes(){
   }catch(e){console.error('Polish recipe expansion failed',e)}
 }
 
+
+
+/* ============================================================
+   Kucharzyna 3.7 — exact food photos, no random Polish fallbacks
+   ============================================================ */
+const K37_EXACT_PHOTOS={
+  "Pierogi z mięsem":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/7/78/Pierogi_z_mięsem.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Pierogi_z_mięsem.jpg",
+    credit:"Ewkaa / Wikimedia Commons",
+    license:"CC BY-SA 4.0 / GFDL"
+  },
+  "Kotlet schabowy":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/4/40/Kotlet_Schabowy.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Kotlet_Schabowy.jpg",
+    credit:"Dmitry Dzema / Wikimedia Commons",
+    license:"CC BY-SA 4.0"
+  },
+  "Placki ziemniaczane":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/8/86/Polish_potato_pancakes.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Polish_potato_pancakes.jpg",
+    credit:"Kavyass / Wikimedia Commons",
+    license:"CC BY-SA 4.0"
+  },
+  "Gołąbki z mięsem i ryżem":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/c/c2/Gołąbki_-_10.02.2026.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Gołąbki_-_10.02.2026.jpg",
+    credit:"Aw58 / Wikimedia Commons",
+    license:"CC BY 4.0"
+  },
+  "Kopytka":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/b/bd/Kopytka_ze_skwarkami_-_14.08.2026.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Kopytka_ze_skwarkami_-_14.08.2026.jpg",
+    credit:"Aw58 / Wikimedia Commons",
+    license:"CC BY 4.0"
+  },
+  "Naleśniki z twarogiem":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/1/10/Naleśniki_z_serem_-_2023.11.13.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Naleśniki_z_serem_-_2023.11.13.jpg",
+    credit:"Aw58 / Wikimedia Commons",
+    license:"CC BY-SA 4.0"
+  },
+  "Racuchy z jabłkami":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/7/74/Racuchy_z_jabłkami_-_28.08.2026.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Racuchy_z_jabłkami_-_28.08.2026.jpg",
+    credit:"Aw58 / Wikimedia Commons",
+    license:"CC BY 4.0"
+  },
+  "Barszcz czerwony":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/0/0d/Barszcz_czerwony_z_uszkami.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Barszcz_czerwony_z_uszkami.jpg",
+    credit:"Игорь Хмиловский / Wikimedia Commons",
+    license:"CC0 1.0"
+  },
+  "Sałatka jarzynowa":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/6/6f/2023_Sałatka_jarzynowa_%281%29.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:2023_Sałatka_jarzynowa_(1).jpg",
+    credit:"Jacek Halicki / Wikimedia Commons",
+    license:"CC BY-SA 4.0"
+  },
+  "Biały barszcz":{
+    image:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Biały_barszcz_-_25.08.2026.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Biały_barszcz_-_25.08.2026.jpg",
+    credit:"Aw58 / Wikimedia Commons",
+    license:"CC BY 4.0"
+  },
+  "Mizeria":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/7/7d/Mizeria.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Mizeria.jpg",
+    credit:"Mariuszjbie / Wikimedia Commons",
+    license:"CC BY-SA"
+  },
+  "Kotlet mielony":{
+    image:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kotlety_mielone_-_14.03.2026.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Kotlety_mielone_-_14.03.2026.jpg",
+    credit:"Aw58 / Wikimedia Commons",
+    license:"CC BY 4.0"
+  },
+  "Kaczka z jabłkami":{
+    image:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Polish_duck_with_apples.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Polish_duck_with_apples.jpg",
+    credit:"MOs810 / Wikimedia Commons",
+    license:"CC BY-SA 3.0"
+  },
+  "Golonka po polsku":{
+    image:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Nowy_Tomysl_golonka.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Nowy_Tomysl_golonka.jpg",
+    credit:"MOs810 / Wikimedia Commons",
+    license:"CC BY-SA 4.0"
+  },
+  "Flaki po warszawsku":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/7/73/Flaki_Poland_3657.JPG",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Flaki_Poland_3657.JPG",
+    credit:"MOs810 / Wikimedia Commons",
+    license:"CC BY-SA 3.0"
+  },
+  "Krupnik":{
+    image:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Krupnik_soup_Poland.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Krupnik_soup_Poland.jpg",
+    credit:"MOs810 / Wikimedia Commons",
+    license:"CC BY-SA 4.0"
+  },
+  "Kluski śląskie":{
+    image:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Kluski_slaskie_(Poznan).jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Kluski_slaskie_(Poznan).jpg",
+    credit:"MOs810 / Wikimedia Commons",
+    license:"CC BY-SA 4.0"
+  },
+  "Pyzy z mięsem":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/4/49/Pyzy_z_mięsem.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Pyzy_z_mięsem.jpg",
+    credit:"Ewkaa / Wikimedia Commons",
+    license:"CC BY-SA 4.0"
+  },
+  "Sernik":{
+    image:"https://upload.wikimedia.org/wikipedia/commons/9/96/Sernik_-_Pastel_de_queso%2C_Gastronomía_polaca%2C_Gniezno%2C_Polonia1.jpg",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Sernik_-_Pastel_de_queso,_Gastronomía_polaca,_Gniezno,_Polonia1.jpg",
+    credit:"Diego Delso / Wikimedia Commons",
+    license:"CC BY-SA 3.0"
+  },
+  "Makowiec":{
+    image:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Makowiec_1.JPG",
+    sourceUrl:"https://commons.wikimedia.org/wiki/File:Makowiec_1.JPG",
+    credit:"Alina Zienowicz (Ala_z) / Wikimedia Commons",
+    license:"GFDL / CC BY-SA"
+  }
+};
+const _k37RecipeImageBase=recipeImage;
+recipeImage=function(r){return K37_EXACT_PHOTOS[r?.name]?.image||_k37RecipeImageBase(r)};
+async function k37RepairExactPhotos(){
+  try{
+    const all=await getAll('recipes');
+    for(const r of all){
+      const p=K37_EXACT_PHOTOS[r.name];
+      if(!p)continue;
+      r.image=p.image;
+      r.imageUrl=p.sourceUrl;
+      r.sourceUrl=p.sourceUrl;
+      r.imageSource='external-wikimedia-exact';
+      r.imageCredit=p.credit;
+      r.license=p.license;
+      await put('recipes',r);
+    }
+    state.recipes=await getAll('recipes');
+    renderV20();
+  }catch(e){console.error('K37 exact photo repair failed',e)}
+}
+setTimeout(k37RepairExactPhotos,1600);
+
 /* Install the cleaned transparent atlas and update cache references. */
 function k32InstallIngredientAtlasV2(){
   try{
