@@ -214,3 +214,16 @@ Kucharzyna 3.2.5 uses one transparent `ingredient-atlas.webp` sprite with 96 cut
 - Dla płynów: krok 100 ml.
 - Dla sztuk i porcji: krok 1.
 - Zmiany są zapisywane od razu w IndexedDB i aktualizują alerty magazynowe.
+
+
+## Kucharzyna v5.0 — Przepisy z sieci
+
+- Wbudowana wyszukiwarka przepisów TheMealDB.
+- Podgląd receptury bez opuszczania aplikacji.
+- Import wybranego przepisu do lokalnej bazy Kucharzyny.
+- Zaimportowane receptury działają z istniejącymi funkcjami: edycja, przeliczanie, zakupy, gotowanie i magazyn.
+- Źródło przepisu pozostaje zapisane przy recepturze.
+
+
+## v5.1 — Import z linku
+Kucharzyna potrafi odczytać przepis z podanego URL przez Reader API i rozpoznać dane Recipe publikowane w standardzie Schema.org, a następnie otworzyć je jako zwykłą recepturę do sprawdzenia i zapisania.

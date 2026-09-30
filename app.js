@@ -1,7 +1,7 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const uid=()=>crypto.randomUUID?crypto.randomUUID():"id-"+Date.now()+"-"+Math.random().toString(16).slice(2);
 const now=()=>new Date().toISOString();
-let state={route:"start",recipes:[],categories:[],shopping:[],settings:{theme:"system",profile:"pro"},history:[],inventory:[],cook:{},pizzaProfiles:[],activePizzaProfileId:null,selectedCat:"Wszystkie",query:"",sort:"recent",googleQuery:""};
+let state={route:"start",recipes:[],categories:[],shopping:[],settings:{theme:"system",profile:"pro"},history:[],inventory:[],cook:{},pizzaProfiles:[],activePizzaProfileId:null,selectedCat:"Wszystkie",query:"",sort:"recent",googleQuery:"",onlineQuery:"",onlineResults:[],onlineMeal:null,onlineLoading:false,onlineError:"",urlImportLoading:false,urlImportError:""};
 const baseCats=["Pizza","Pasta","Sosy","Mięso","Ryby","Owoce morza","Warzywa","Desery","Pieczywo","Zupy","Sałatki","Cocktaile","Prep","Sosy bazowe","Inne"];
 
 const seed=[
@@ -156,7 +156,7 @@ function viewStart(){
       <button class="k42-card" data-action="calculators"><span class="k42-icon">${v3SvgIcon('calc')}</span><b>Kalkulatory</b><small>Pizza, ciasto i więcej</small></button>
       <button class="k42-card" data-action="fav"><span class="k42-icon">${v3SvgIcon('heart')}</span><b>Ulubione</b><small>Twoje najlepsze</small></button>
       <button class="k42-card" data-action="settings"><span class="k42-icon">${v3SvgIcon('gear')}</span><b>Ustawienia</b><small>Motyw, profil, backup</small></button>
-      <button class="k42-card k42-google" data-google="1"><span class="k42-icon k42-g">G</span><b>Szukaj w Google</b><small>Przepisy z internetu</small></button>
+      <button class="k42-card k42-online" data-route2="online"><span class="k42-icon">🌐</span><b>Przepisy z sieci</b><small>Szukaj i zapisuj przepisy</small></button>
     </section>
     ${recent.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">WRACAJ DO GOTOWANIA</span><h2>Ostatnio używane</h2></div><button class="v3-link" data-route2="recipes">Wszystkie →</button></div><div class="v3-horizontal">${recent.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
     ${fav.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">TWOJE PEWNIAKI</span><h2>Ulubione</h2></div></div><div class="v3-horizontal">${fav.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
@@ -339,6 +339,104 @@ function viewCook(){
    <div class="detail-stat"><div class="kicker">FERM.</div><b>${r.ferment||0} h</b></div>
  </div><p style="white-space:pre-wrap">${escapeHtml(r.notes||"Brak własnych uwag.")}</p></div></section>`;
 }
+function openUrlImporter(){
+  openModal(`<div class="url-import-modal"><div class="v3-kicker">IMPORT Z INTERNETU</div><h2>Wklej link do przepisu</h2><p class="muted">Kucharzyna spróbuje odczytać dane receptury ze strony. Najlepiej działają strony, które publikują przepis w standardzie Schema.org Recipe.</p><div class="url-import-field"><span>↗</span><input id="url-import-input" inputmode="url" autocomplete="url" placeholder="https://…" aria-label="Link do przepisu"></div><div id="url-import-status" class="url-import-status"></div><div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-close>Anuluj</button><button class="btn primary" id="url-import-go">Importuj przepis</button></div></div>`);
+  requestAnimationFrame(()=>$('#url-import-input')?.focus());
+}
+function normalizeRecipeUrl(raw){
+  let s=String(raw||'').trim();
+  if(!s)return null;
+  if(!/^https?:\/\//i.test(s))s='https://'+s;
+  try{const u=new URL(s);if(!['http:','https:'].includes(u.protocol))return null;return u.href}catch{return null}
+}
+function parseDurationMinutes(v){
+  const s=String(v||'').trim();if(!s)return 0;
+  if(/^\d+(?:[.,]\d+)?$/.test(s))return Math.round(Number(s.replace(',','.')));
+  const m=s.match(/P(?:\d+Y)?(?:\d+M)?(?:\d+D)?T?(?:(\d+)H)?(?:(\d+)M)?/i);
+  if(!m)return 0;return (Number(m[1]||0)*60)+Number(m[2]||0)
+}
+function flattenRecipeInstructions(v,out=[]){
+  if(!v)return out;
+  if(typeof v==='string'){v.split(/\r?\n+/).map(x=>x.trim()).filter(Boolean).forEach(x=>out.push(x));return out}
+  if(Array.isArray(v)){v.forEach(x=>flattenRecipeInstructions(x,out));return out}
+  if(typeof v==='object'){
+    if(v.text)out.push(String(v.text).trim());
+    if(v.itemListElement)flattenRecipeInstructions(v.itemListElement,out);
+    if(v.hasPart)flattenRecipeInstructions(v.hasPart,out);
+  }
+  return out.filter(Boolean)
+}
+function recipeJsonLdCandidates(obj,out=[]){
+  if(!obj)return out;
+  if(Array.isArray(obj)){obj.forEach(x=>recipeJsonLdCandidates(x,out));return out}
+  if(typeof obj!=='object')return out;
+  const t=obj['@type'];
+  if(t==='Recipe'||(Array.isArray(t)&&t.includes('Recipe')))out.push(obj);
+  if(obj['@graph'])recipeJsonLdCandidates(obj['@graph'],out);
+  for(const k of Object.keys(obj)){if(k!=='@graph'&&k!=='@context'&&typeof obj[k]==='object')recipeJsonLdCandidates(obj[k],out)}
+  return out
+}
+function extractJsonLdFromText(text){
+  const found=[];
+  const blocks=[...String(text||'').matchAll(/```(?:json|jsonld|javascript)?\s*([\s\S]*?)```/gi)].map(m=>m[1]);
+  for(const b of blocks){try{recipeJsonLdCandidates(JSON.parse(b),found)}catch{}}
+  const raw=String(text||'');
+  for(const m of raw.matchAll(/\{[\s\S]*?"@type"\s*:\s*(?:"Recipe"|\[[^\]]*Recipe[^\]]*\])[\s\S]*?\}/g)){
+    try{recipeJsonLdCandidates(JSON.parse(m[0]),found)}catch{}
+  }
+  return found[0]||null
+}
+function parseIngredientText(line){
+  let s=String(line||'').replace(/^[-•*·]+\s*/,'').replace(/^\d+[.)]\s*/,'').trim();if(!s)return null;
+  const m=s.match(/^(?:(\d+(?:[.,]\d+)?|\d+\/\d+|½|⅓|⅔|¼|¾)\s*)?(kg|g|mg|ml|l|cl|dl|oz|lb|cups?|cup|tbsp|tablespoons?|tsp|teaspoons?|łyż(?:ka|eczka)|łyżki|szkl(?:anka|anki)|szt\.?|pcs?|cloves?|ząb(?:ek|ki)|pęczek|opak(?:owanie)?|porcja|pinch|szczypta)\b\s*(?:of\s*)?(.*)$/i);
+  if(m){let q=m[1]?fractionToNumber(m[1]):1;let unit=normalizeImportUnit(m[2]);let name=(m[3]||'').trim();if(!name)name=s.replace(m[1]||'','').trim();return {name,qty:q,unit,originalMeasure:s}}
+  const m2=s.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);if(m2)return {name:m2[2].trim(),qty:Number(m2[1].replace(',','.'))||1,unit:'szt.',originalMeasure:s};
+  return {name:s,qty:1,unit:'szt.',originalMeasure:s}
+}
+function fractionToNumber(x){const f={'½':.5,'⅓':1/3,'⅔':2/3,'¼':.25,'¾':.75};if(f[x]!=null)return f[x];if(String(x).includes('/')){const [a,b]=String(x).split('/').map(Number);return b?a/b:1}return Number(String(x).replace(',','.'))||1}
+function normalizeImportUnit(u){const s=String(u||'').toLowerCase();if(/kg/.test(s))return'kg';if(/^g|gram/.test(s))return'g';if(/mg/.test(s))return'mg';if(/^ml/.test(s))return'ml';if(/^l$|liter|litr/.test(s))return'l';if(/cl/.test(s))return'cl';if(/dl/.test(s))return'dl';if(/oz/.test(s))return'oz';if(/lb/.test(s))return'lb';if(/cup|szkl/.test(s))return'szkl.';if(/tbsp|tablespoon|łyżka/.test(s))return'łyżka';if(/tsp|teaspoon|łyżeczka/.test(s))return'łyżeczka';if(/clove|ząb/.test(s))return'szt.';if(/bunch|pęcz/.test(s))return'pęczek';if(/pinch|szczy/.test(s))return'szczypta';if(/pack|opak/.test(s))return'opak.';if(/portion|porcj/.test(s))return'porcja';return'szt.'}
+function normalizeRecipeImage(v,base){const x=Array.isArray(v)?v[0]:v;if(typeof x==='object'&&x?.url)return x.url;if(typeof x==='string'){try{return new URL(x,base).href}catch{return x}}return''}
+function parseRecipeYield(v){const s=Array.isArray(v)?v[0]:String(v||'');const m=s.match(/(\d+(?:[.,]\d+)?)/);return {qty:m?Number(m[1].replace(',','.')):1,unit:s.trim()||'porcja'}}
+function recipeFromStructuredData(r,url){
+  const rawIng=Array.isArray(r.recipeIngredient)?r.recipeIngredient:[];
+  const ingredients=rawIng.map(x=>{if(typeof x==='object'&&x){const name=String(x.name||'').trim();const value=x.value!=null?String(x.value):'';const unit=x.unitText||x.unitCode||'';const parsed=parseIngredientText([value,unit,name].filter(Boolean).join(' '));return parsed||{name:name||value,qty:1,unit:'szt.'}}return parseIngredientText(String(x))}).filter(Boolean);
+  const steps=flattenRecipeInstructions(r.recipeInstructions).map(x=>x.replace(/^\d+[.)]\s*/,'').trim()).filter(Boolean);
+  const y=parseRecipeYield(r.recipeYield);
+  const host=new URL(url).hostname.replace(/^www\./,'');
+  return makeRecipe({name:String(r.name||'Importowany przepis').trim(),category:String(r.recipeCategory||'Inne').split(',')[0].trim()||'Inne',cuisine:String(r.recipeCuisine||''),description:String(r.description||`Zaimportowano z ${host}.`).trim(),yield:y.qty,yieldUnit:y.unit,servings:y.qty,prep:parseDurationMinutes(r.prepTime),cook:parseDurationMinutes(r.cookTime),ferment:0,temp:0,tags:Array.isArray(r.keywords)?r.keywords.map(String):String(r.keywords||'').split(',').map(x=>x.trim()).filter(Boolean),traditional:false,flag:'',ingredients:ingredients.map(i=>[i.name,i.qty,i.unit,'']),steps:steps.length?steps:['Uzupełnij instrukcję po imporcie.'],notes:`Zaimportowano z ${host}. Sprawdź składniki, jednostki i instrukcję przed zapisaniem.`,source:host,sourceUrl:url,image:normalizeRecipeImage(r.image,url),imageUrl:normalizeRecipeImage(r.image,url),imageSource:host,imageCredit:host,onlineSourceId:''});
+}
+function parseReaderRecipe(text,url){
+  const structured=extractJsonLdFromText(text);if(structured)return recipeFromStructuredData(structured,url);
+  const lines=String(text||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const title=(lines.find(x=>/^#\s+/.test(x))||lines[0]||'Importowany przepis').replace(/^#+\s*/,'').trim();
+  let mode='none',ings=[],steps=[];
+  for(const line of lines){
+    if(/^(składniki|ingredients|skladniki)\b/i.test(line)){mode='ing';continue}
+    if(/^(przygotowanie|instructions|method|directions|sposób przygotowania)\b/i.test(line)){mode='steps';continue}
+    if(mode==='ing' && /^[-•*\d]/.test(line)){const i=parseIngredientText(line);if(i)ings.push(i);continue}
+    if(mode==='steps' && (/^[-•*\d]/.test(line)||line.length>35))steps.push(line.replace(/^[-•*\d.)]+\s*/,''));
+  }
+  if(!ings.length)return null;
+  const host=new URL(url).hostname.replace(/^www\./,'');
+  return makeRecipe({name:title,category:'Inne',cuisine:'',description:`Zaimportowano z ${host}.`,yield:1,yieldUnit:'porcja',servings:1,prep:0,cook:0,ferment:0,temp:0,tags:['import','internet'],traditional:false,flag:'',ingredients:ings.map(i=>[i.name,i.qty,i.unit,'']),steps:steps.length?steps:['Uzupełnij instrukcję po imporcie.'],notes:`Zaimportowano z ${host}. Sprawdź dane przed zapisaniem.`,source:host,sourceUrl:url,image:'',imageUrl:'',imageSource:host,imageCredit:host,onlineSourceId:''});
+}
+async function importRecipeFromUrl(){
+  const input=$('#url-import-input');const status=$('#url-import-status');const url=normalizeRecipeUrl(input?.value);
+  if(!url){if(status)status.innerHTML='<span class="url-import-error">Podaj prawidłowy link zaczynający się od http:// lub https://.</span>';return}
+  if(status)status.innerHTML='<span class="url-import-loading">🌐 Czytam stronę i szukam danych receptury…</span>';
+  state.urlImportLoading=true;state.urlImportError='';
+  try{
+    const endpoint='https://r.jina.ai/'+url;
+    const res=await fetch(endpoint,{headers:{Accept:'text/plain'}});
+    if(!res.ok)throw new Error(`HTTP ${res.status}`);
+    const text=await res.text();
+    const recipe=parseReaderRecipe(text,url);
+    if(!recipe)throw new Error('Nie znaleziono danych receptury');
+    closeModal();state.editTemp=recipe;state.editId=null;state.route='edit';renderV20();toast('Przepis odczytany — sprawdź dane i zapisz');
+  }catch(e){console.error('URL recipe import failed',e);state.urlImportError=e?.message||'Błąd';if(status)status.innerHTML='<span class="url-import-error">Nie udało się rozpoznać receptury z tego linku. Spróbuj innej strony albo użyj importu z tekstu.</span>';}
+  finally{state.urlImportLoading=false}
+}
+
 function openImporter(){openModal(`<h2>Importuj recepturę</h2><p class="muted">Wklej tekst przepisu. Parser rozpozna popularne ilości/jednostki i sekcję składników. Nic nie jest wysyłane na serwer.</p><textarea id="import-text" style="min-height:260px" placeholder="Nazwa przepisu\n\nSkładniki:\n500 g mąki\n325 g wody\n10 g soli\n\nPrzygotowanie:\n..."></textarea><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-close>Anuluj</button><button class="btn primary" id="parse-import">Rozpoznaj</button></div>`);$("#parse-import").onclick=()=>parseImport($("#import-text").value)}
 function parseImport(text){const lines=text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);const ing=[];let mode="ing";const steps=[];for(const line of lines.slice(1)){if(/^(składniki|ingredients)\s*:?\s*$/i.test(line)){mode="ing";continue}if(/^(przygotowanie|instructions?|method)\s*:?\s*$/i.test(line)){mode="steps";continue}if(mode==="ing"){const m=line.match(/^(.+?)\s+([\d.,]+)\s*(g|kg|ml|l|szt\.?|łyżeczka|łyżka|szczypta|porcja|%)\b/i);if(m)ing.push([m[1].replace(/^[-•*]\s*/,""),parseFloat(m[2].replace(",",".")),m[3], ""])}else steps.push(line.replace(/^[-•*\d.)\s]+/,""))}const temp=text.match(/(\d{2,3})\s*°?C/i)?.[1]||"";const r=makeRecipe({name:lines[0]||"Importowana receptura",category:"Inne",description:"Zaimportowana lokalnie z tekstu.",yield:1,yieldUnit:"porcja",prep:0,cook:0,ferment:0,temp:+temp,tags:["import"],traditional:false,flag:"",servings:1,ingredients:ing,steps:steps.length?steps:["Uzupełnij instrukcję.",],notes:"Zaimportowano z tekstu.",source:"Wklejony tekst",sourceUrl:""});closeModal();state.editTemp=r;state.editId=null;state.route="edit";render();toast("Rozpoznano recepturę — sprawdź i zapisz")}
 function backupInput(){const i=document.createElement("input");i.type="file";i.accept=".json,application/json";i.onchange=()=>importBackup(i.files[0]);i.click()}
@@ -748,6 +846,17 @@ bindV14=function(){
   $$('#main [data-route2]').forEach(b=>b.onclick=()=>nav(b.dataset.route2));
   $$('#main [data-google]').forEach(b=>b.onclick=()=>nav('google'));
   $$('#main [data-google-suggest]').forEach(b=>b.onclick=()=>{state.googleQuery=b.dataset.googleSuggest||'';renderV20();requestAnimationFrame(()=>$('#googleRecipeSearch')?.focus())});
+  $$('#main [data-online-suggest]').forEach(b=>b.onclick=()=>{state.onlineQuery=b.dataset.onlineSuggest||'';renderV20();searchOnlineRecipes()});
+  $('#openUrlImporter')?.addEventListener('click',openUrlImporter);
+  $('#url-import-go')?.addEventListener('click',importRecipeFromUrl);
+  $('#url-import-input')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();importRecipeFromUrl()}});
+  $$('#main [data-online-id]').forEach(b=>b.onclick=()=>openOnlineMeal(b.dataset.onlineId));
+  $('#onlineRecipeGo')?.addEventListener('click',searchOnlineRecipes);
+  const os=$('#onlineRecipeSearch');if(os){os.oninput=()=>state.onlineQuery=os.value;os.onkeydown=e=>{if(e.key==='Enter')searchOnlineRecipes()}}
+  $('#onlineRetry')?.addEventListener('click',searchOnlineRecipes);
+  $('#main [data-online-back]')?.addEventListener('click',()=>{state.onlineMeal=null;renderV20()});
+  $('#main [data-online-source]')?.addEventListener('click',()=>{const m=state.onlineMeal;const url=m?.strSource||m?.strYoutube;if(url)window.open(url,'_blank','noopener,noreferrer')});
+  $('#main [data-online-import]')?.addEventListener('click',async()=>{const m=state.onlineMeal;if(!m)return;const r=onlineMealToRecipe(m);state.editTemp=r;state.editId=null;state.route='edit';renderV20();toast('Przepis zaimportowany — sprawdź składniki i zapisz')});
   $$('#main [data-cat-am]').forEach(b=>b.onclick=()=>{state.route='recipes';state.selectedCat=b.dataset.catAm;renderV14();});
 };
 
@@ -877,7 +986,7 @@ function viewCalculatorsV20(){
 }
 
 function updateTopbar(){
- const titleMap={inventory:(state.settings.profile==="amateur"?"Lodówka":"Magazyn"),start:'Start',recipes:'Przepisy',traditional:'Kuchnie świata',calculators:'Kalkulatory',shopping:'Zakupy',settings:'Ustawienia',cook:'Gotuję',edit:'Edytuj recepturę',google:'Szukaj w Google',recipe:(state.recipes.find(r=>r.id===state.selectedId)?.name||'Receptura')};
+ const titleMap={inventory:(state.settings.profile==="amateur"?"Lodówka":"Magazyn"),start:'Start',recipes:'Przepisy',traditional:'Kuchnie świata',calculators:'Kalkulatory',shopping:'Zakupy',settings:'Ustawienia',cook:'Gotuję',edit:'Edytuj recepturę',google:'Szukaj w Google',online:'Przepisy z sieci',recipe:(state.recipes.find(r=>r.id===state.selectedId)?.name||'Receptura')};
  const el=$("#topbarTitle"); if(el) el.textContent=titleMap[state.route]||'Kucharzyna';
  const gb=$("#globalBack"); if(gb) gb.style.visibility=state.route==='start'?'hidden':'visible';
 }
@@ -961,8 +1070,72 @@ function updatePizzaProResult(){
   const out=$('#p2-live-result');if(out)out.innerHTML=`<div><span>Mąka</span><b>${fmt(f)} g</b></div><div><span>Woda</span><b>${fmt(water)} g</b></div><div><span>Sól</span><b>${fmt(salt)} g</b></div><div><span>Oliwa</span><b>${fmt(oil)} g</b></div><div><span>Drożdże</span><b>${fmt(yeast)} g</b></div><div><span>Ciasto</span><b>${fmt(total)} g</b></div><div><span>Kulki</span><b>${fmt(balls)} × ${fmt(p.ball||0)} g${p.mode==='flour'?' · wyliczone':''}</b></div>`;
 }
 
-function renderV20(){applyTheme();updateTopbar();$$('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));if(state.route==='recipe')$('#main').innerHTML=recipeViewV20(state.selectedId);else if(state.route==='google')$('#main').innerHTML=viewGoogleSearch();else if(state.route==='cook')$('#main').innerHTML=viewCookV20();else if(state.route==='shopping')$('#main').innerHTML=viewShoppingV20();else if(state.route==='calculators')$('#main').innerHTML=viewCalculatorsV20();else if(state.route==='edit')$('#main').innerHTML=editorV14(state.editId);else {const views={start:viewStart,recipes:viewRecipes,traditional:viewTraditionalV14,calculators:viewCalculators,shopping:viewShoppingV20,inventory:viewInventoryK312,settings:viewSettings};$('#main').innerHTML=(views[state.route]||viewStart)()}bindV20()}
-function backRoute(){const r=state.route;let target='start';if(r==='cook')target='recipe';else if(r==='edit'){target=state.editId?'recipe':'start';if(state.editId)state.selectedId=state.editId;}else if(r==='recipe')target=state.returnRoute||'recipes';else if(r==='google')target='recipes';else if(r==='recipes'||r==='traditional'||r==='calculators'||r==='shopping'||r==='inventory'||r==='settings')target='start';state.route=target;applyTheme();renderV20();requestAnimationFrame(()=>document.querySelector('.main-scroll')?.scrollTo({top:0,left:0,behavior:'auto'}))}
+
+function onlineMealToRecipe(meal){
+  const ingredients=[];
+  for(let i=1;i<=20;i++){
+    const name=String(meal?.[`strIngredient${i}`]||'').trim();
+    const measure=String(meal?.[`strMeasure${i}`]||'').trim();
+    if(!name) continue;
+    const parsed=parseOnlineMeasure(measure);
+    ingredients.push({id:uid(),name,qty:parsed.qty,unit:parsed.unit,originalMeasure:measure});
+  }
+  const steps=String(meal?.strInstructions||'').split(/\r?\n|(?<=[.!?])\s+(?=[A-ZŻŹĆŚÓŁĘĄ])/).map(x=>x.trim()).filter(Boolean).map(text=>({id:uid(),text}));
+  return makeRecipe({
+    name:meal?.strMeal||'Przepis z sieci',category:meal?.strCategory||'Inne',cuisine:meal?.strArea||'',description:`Przepis zaimportowany z internetowej bazy TheMealDB.`,yield:4,yieldUnit:'porcja',servings:4,prep:0,cook:0,ferment:0,temp:0,tags:String(meal?.strTags||'').split(',').map(x=>x.trim()).filter(Boolean),traditional:false,flag:'',ingredients:ingredients.map(i=>[i.name,i.qty,i.unit,'']),steps:steps.length?steps.map(s=>s.text):['Otwórz źródło przepisu i wykonaj przygotowanie zgodnie z instrukcją.'],notes:'Zaimportowano z TheMealDB. Sprawdź składniki i gramatury przed zapisaniem do własnej bazy.',source:'TheMealDB',sourceUrl:meal?.strSource||meal?.strYoutube||'',image:meal?.strMealThumb||'',imageUrl:meal?.strMealThumb||'',imageSource:'TheMealDB',imageCredit:'TheMealDB',onlineSourceId:meal?.idMeal||''
+  });
+}
+function parseOnlineMeasure(raw){
+  const s=String(raw||'').trim();
+  if(!s)return {qty:1,unit:'szt.'};
+  const normalized=s.replace(/,/g,'.');
+  const m=normalized.match(/^(\d+(?:\.\d+)?|\d+\/\d+|½|⅓|⅔|¼|¾)\s*(.*)$/);
+  if(!m)return {qty:1,unit:s};
+  let q=m[1]; const frac={'½':.5,'⅓':1/3,'⅔':2/3,'¼':.25,'¾':.75};
+  q=frac[q]??(q.includes('/')?(+q.split('/')[0]/+q.split('/')[1]):+q);
+  let unit=m[2].trim().toLowerCase();
+  const map=[[/^kg\b/,'kg'],[/^g\b/,'g'],[/^ml\b/,'ml'],[/^l\b/,'l'],[/^oz\b/,'oz'],[/^lb\b/,'lb'],[/^tsp\b|^teaspoon/,'łyżeczka'],[/^tbsp\b|^tablespoon/,'łyżka'],[/^cup\b/,'cup'],[/^clove\b/,'szt.'],[/^can\b|^tin\b/,'szt.'],[/^package\b|^packet\b/,'szt.'],[/^bunch\b/,'pęczek']];
+  for(const [re,u] of map){if(re.test(unit)){unit=u;break}}
+  if(!unit)unit='szt.';
+  return {qty:Number.isFinite(q)&&q>0?q:1,unit};
+}
+function onlineCard(meal){
+  const img=meal?.strMealThumb||'./photo-generic.webp';
+  return `<article class="online-card" data-online-id="${escapeHtml(meal.idMeal)}"><div class="online-card-img"><img src="${escapeHtml(img)}" alt="${escapeHtml(meal.strMeal||'Przepis')}" loading="lazy" decoding="async" onerror="this.src='./photo-generic.webp'"></div><div class="online-card-body"><span class="v3-card-kicker">${escapeHtml(meal.strArea||'Kuchnia świata')} · ${escapeHtml(meal.strCategory||'Przepis')}</span><h3>${escapeHtml(meal.strMeal||'Przepis')}</h3><span class="online-card-cta">Podejrzyj przepis →</span></div></article>`;
+}
+async function searchOnlineRecipes(){
+  const q=String(state.onlineQuery||'').trim();
+  if(!q){toast('Wpisz nazwę dania lub składnik');return}
+  state.onlineLoading=true;state.onlineError='';renderV20();
+  try{
+    const res=await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(q)}`,{headers:{Accept:'application/json'}});
+    if(!res.ok)throw new Error(`HTTP ${res.status}`);
+    const data=await res.json();state.onlineResults=Array.isArray(data?.meals)?data.meals:[];
+  }catch(e){console.error('Online recipe search failed',e);state.onlineResults=[];state.onlineError='Nie udało się połączyć z bazą przepisów. Sprawdź internet i spróbuj ponownie.'}
+  state.onlineLoading=false;renderV20();
+}
+async function openOnlineMeal(id){
+  state.onlineLoading=true;state.onlineError='';renderV20();
+  try{
+    const res=await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${encodeURIComponent(id)}`,{headers:{Accept:'application/json'}});
+    if(!res.ok)throw new Error(`HTTP ${res.status}`);
+    const data=await res.json();state.onlineMeal=data?.meals?.[0]||null;
+    if(!state.onlineMeal)throw new Error('Brak przepisu');
+  }catch(e){state.onlineMeal=null;state.onlineError='Nie udało się pobrać tego przepisu.'}
+  state.onlineLoading=false;renderV20();
+}
+function onlineIngredientLines(meal){
+  const out=[];for(let i=1;i<=20;i++){const n=String(meal?.[`strIngredient${i}`]||'').trim();const m=String(meal?.[`strMeasure${i}`]||'').trim();if(n)out.push(`<div class="online-ingredient"><span>${escapeHtml(n)}</span><b>${escapeHtml(m||'do smaku')}</b></div>`)}return out.join('')||'<div class="empty">Brak listy składników.</div>';
+}
+function onlineSteps(meal){return String(meal?.strInstructions||'').split(/\r?\n|(?<=[.!?])\s+(?=[A-ZŻŹĆŚÓŁĘĄ])/).map(x=>x.trim()).filter(Boolean).map((x,i)=>`<article class="online-step"><span>${i+1}</span><p>${escapeHtml(x)}</p></article>`).join('')||'<div class="empty">Brak instrukcji.</div>'}
+function viewOnlineRecipes(){
+  if(state.onlineMeal){const m=state.onlineMeal;return `<div class="online-screen"><div class="v3-page-head"><div><span class="v3-kicker">THEMEALDB</span><h1>${escapeHtml(m.strMeal||'Przepis')}</h1><p>${escapeHtml(m.strArea||'')} ${m.strCategory?'· '+escapeHtml(m.strCategory):''}</p></div></div>${m.strMealThumb?`<img class="online-cover" src="${escapeHtml(m.strMealThumb)}" alt="${escapeHtml(m.strMeal)}" onerror="this.src='./photo-generic.webp'">`:''}<div class="online-actions"><button class="btn primary" data-online-import="1">＋ Zapisz w Kucharzynie</button>${m.strSource||m.strYoutube?`<button class="btn" data-online-source="1">↗ Oryginalne źródło</button>`:''}<button class="btn" data-online-back="1">‹ Wyniki</button></div><section class="online-section"><div class="section-title-row"><h2>Składniki</h2><span class="kicker">${[...Array(20)].filter((_,i)=>String(m[`strIngredient${i+1}`]||'').trim()).length}</span></div>${onlineIngredientLines(m)}</section><section class="online-section"><div class="section-title-row"><h2>Przygotowanie</h2></div><div>${onlineSteps(m)}</div></section><section class="online-source"><b>Źródło</b><p>TheMealDB udostępnia dane przepisu przez publiczne API.</p></section></div>`}
+  const results=state.onlineResults||[];
+  return `<div class="online-screen"><div class="v3-page-head"><div><span class="v3-kicker">PRZEPISY Z SIECI</span><h1>Znajdź przepis</h1><p>Szukaj w bazie online i podejrzyj recepturę bez opuszczania Kucharzyny.</p></div></div><div class="online-search"><span>⌕</span><input id="onlineRecipeSearch" autocomplete="off" placeholder="np. carbonara, ramen, pizza…" value="${escapeHtml(state.onlineQuery||'')}"><button id="onlineRecipeGo">Szukaj</button></div><div class="url-import-launch"><button class="btn" id="openUrlImporter">↗ Importuj z linku</button><span>Wklej adres dowolnej strony z przepisem</span></div><div class="online-hints"><button data-online-suggest="Carbonara">Carbonara</button><button data-online-suggest="Pizza">Pizza</button><button data-online-suggest="Pasta">Pasta</button><button data-online-suggest="Chicken">Chicken</button></div>${state.onlineLoading?`<div class="online-loading"><span class="spinner"></span><b>Szukam przepisów…</b></div>`:state.onlineError?`<div class="v3-empty"><span>⚠️</span><b>Nie udało się pobrać wyników</b><p>${escapeHtml(state.onlineError)}</p><button class="btn primary" id="onlineRetry">Spróbuj ponownie</button></div>`:results.length?`<div class="online-results-head"><b>${results.length} ${results.length===1?'wynik':'wyników'}</b><span>Źródło: TheMealDB</span></div><div class="online-grid">${results.map(onlineCard).join('')}</div>`:`<div class="online-empty"><span>🌐</span><b>Internetowa książka kucharska</b><p>Wpisz danie, składnik albo nazwę kuchni. Wyniki pojawią się tutaj.</p></div>`}<section class="online-note"><b>Co możesz zrobić z wynikiem?</b><p>Otworzyć pełną recepturę i zapisać ją w Kucharzynie. Zapisany przepis trafia do Twojej bazy, gdzie działa z przelicznikiem, zakupami i magazynem.</p></section></div>`;
+}
+
+function renderV20(){applyTheme();updateTopbar();$$('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.route===state.route));if(state.route==='recipe')$('#main').innerHTML=recipeViewV20(state.selectedId);else if(state.route==='google')$('#main').innerHTML=viewGoogleSearch();else if(state.route==='online')$('#main').innerHTML=viewOnlineRecipes();else if(state.route==='cook')$('#main').innerHTML=viewCookV20();else if(state.route==='shopping')$('#main').innerHTML=viewShoppingV20();else if(state.route==='calculators')$('#main').innerHTML=viewCalculatorsV20();else if(state.route==='edit')$('#main').innerHTML=editorV14(state.editId);else {const views={start:viewStart,recipes:viewRecipes,traditional:viewTraditionalV14,calculators:viewCalculators,shopping:viewShoppingV20,inventory:viewInventoryK312,settings:viewSettings};$('#main').innerHTML=(views[state.route]||viewStart)()}bindV20()}
+function backRoute(){const r=state.route;let target='start';if(r==='cook')target='recipe';else if(r==='edit'){target=state.editId?'recipe':'start';if(state.editId)state.selectedId=state.editId;}else if(r==='recipe')target=state.returnRoute||'recipes';else if(r==='google'||r==='online')target='recipes';else if(r==='recipes'||r==='traditional'||r==='calculators'||r==='shopping'||r==='inventory'||r==='settings')target='start';state.route=target;applyTheme();renderV20();requestAnimationFrame(()=>document.querySelector('.main-scroll')?.scrollTo({top:0,left:0,behavior:'auto'}))}
 function recipeViewV20(id){const r=state.recipes.find(x=>x.id===id);if(!r)return viewRecipes();const ingredients=ingredientGroups(r),desc=recipeDescription(r);return `<div class="recipe20">${photoMarkup(r,'global-photo')}<div class="recipe20-title"><div class="kicker">${escapeHtml(r.category||'Inne')} ${r.flag||''} ${k39RecipeMeta(r)}</div><h1>${escapeHtml(r.name)}</h1><p>${escapeHtml(desc)}</p></div><div class="recipe20-intro"><b>Na co zwrócić uwagę</b><div>${escapeHtml(r.notes||'Zanim zaczniesz, przygotuj wszystkie składniki, sprawdź temperaturę i zaplanuj kolejność pracy. Własne uwagi możesz później zapisać przy tej recepturze.')}</div></div><div class="recipe20-actions"><button class="btn primary" data-cook="${r.id}">▶ GOTUJĘ</button><button class="btn" data-edit="${r.id}">✎ EDYTUJ</button><button class="btn" data-shop-recipe="${r.id}">＋ ZAKUPY</button></div><section><div class="section-title-row"><h2>Składniki</h2><span class="kicker">${ingredients.length}</span></div>${(r.sections||[]).map(s=>`<div class="ingredient-section"><h3>${escapeHtml(s.name)}</h3>${(s.ingredients||[]).map(i=>`<button class="ingredient20" data-recipe-ing="${i.id}"><span>${escapeHtml(i.name)}</span><strong>${fmt(i.qty)} ${escapeHtml(i.unit)}</strong></button>`).join('')}</div>`).join('')}</section><section><div class="section-title-row"><h2>Wykonanie</h2><span class="kicker">${(r.steps||[]).length} kroków</span></div><div class="steps20">${(r.steps||[]).map((s,i)=>`<article class="step20"><div>${i+1}</div><p>${escapeHtml(s.text)}</p></article>`).join('')}</div></section><section class="recipe20-meta"><div><span>Przygotowanie</span><b>${fmt(r.prep||0)} min</b></div><div><span>Gotowanie</span><b>${fmt(r.cook||0)} min</b></div><div><span>Fermentacja</span><b>${fmt(r.ferment||0)} h</b></div>${r.servingType?`<div><span>Sposób podania</span><b>${escapeHtml(r.servingType)}</b></div>`:''}</section>${r.imageCredit?`<p class="photo-credit">${escapeHtml(r.imageCredit)}</p>`:''}</div>`}
 
 function initKucharzyna20(){nav=function(route){if(route===state.route && route==='start'){document.querySelector('.main-scroll')?.scrollTo(0,0);return}state.route=route;applyTheme();renderV20();requestAnimationFrame(()=>document.querySelector('.main-scroll')?.scrollTo({top:0,left:0,behavior:'auto'}))};window.renderV20=renderV20}
@@ -1003,7 +1176,7 @@ function viewStart(){
       <button class="k42-card" data-action="calculators"><span class="k42-icon">${v3SvgIcon('calc')}</span><b>Kalkulatory</b><small>Pizza, ciasto i więcej</small></button>
       <button class="k42-card" data-action="fav"><span class="k42-icon">${v3SvgIcon('heart')}</span><b>Ulubione</b><small>Twoje najlepsze</small></button>
       <button class="k42-card" data-action="settings"><span class="k42-icon">${v3SvgIcon('gear')}</span><b>Ustawienia</b><small>Motyw, profil, backup</small></button>
-      <button class="k42-card k42-google" data-google="1"><span class="k42-icon k42-g">G</span><b>Szukaj w Google</b><small>Przepisy z internetu</small></button>
+      <button class="k42-card k42-online" data-route2="online"><span class="k42-icon">🌐</span><b>Przepisy z sieci</b><small>Szukaj i zapisuj przepisy</small></button>
     </section>
     ${recent.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">WRACAJ DO GOTOWANIA</span><h2>Ostatnio używane</h2></div><button class="v3-link" data-route2="recipes">Wszystkie →</button></div><div class="v3-horizontal">${recent.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
     ${fav.length?`<section class="k42-section"><div class="v3-section-head"><div><span class="v3-kicker">TWOJE PEWNIAKI</span><h2>Ulubione</h2></div></div><div class="v3-horizontal">${fav.map(r=>v3RecipeCard(r)).join('')}</div></section>`:''}
@@ -1016,7 +1189,7 @@ function viewRecipes(){
   if(state.sort==='name')rs.sort((a,b)=>a.name.localeCompare(b.name)); else if(state.sort==='fav')rs.sort((a,b)=>Number(b.favorite)-Number(a.favorite)); else rs.sort((a,b)=>(b.lastUsedAt||b.updatedAt||'').localeCompare(a.lastUsedAt||a.updatedAt||''));
   return `<div class="v3-library"><div class="v3-page-head"><div><span class="v3-kicker">TWOJA BAZA</span><h1>Przepisy</h1><p>Wszystko, co chcesz ugotować, zapisane w jednym miejscu.</p></div><button class="v3-add-btn" data-action="new">＋<span>Nowa</span></button></div>
     <div class="v3-search"><span>⌕</span><input id="recipeSearch" placeholder="Szukaj przepisu, składnika…" value="${escapeHtml(state.query)}"></div>
-    <div class="v3-chips"><button class="v3-chip ${state.selectedCat==='Wszystkie'?'active':''}" data-cat="Wszystkie">Wszystkie</button>${state.categories.map(c=>`<button class="v3-chip ${state.selectedCat===c.name?'active':''}" data-cat="${escapeHtml(c.name)}">${escapeHtml(c.name)}</button>`).join('')}</div><button class="v3-google-entry" data-google="1"><span>G</span><div><b>Znajdź przepis w Google</b><small>Internetowe inspiracje i źródła</small></div><strong>›</strong></button>
+    <div class="v3-chips"><button class="v3-chip ${state.selectedCat==='Wszystkie'?'active':''}" data-cat="Wszystkie">Wszystkie</button>${state.categories.map(c=>`<button class="v3-chip ${state.selectedCat===c.name?'active':''}" data-cat="${escapeHtml(c.name)}">${escapeHtml(c.name)}</button>`).join('')}</div><button class="v3-google-entry v3-online-entry" data-route2="online"><span>🌐</span><div><b>Znajdź przepis w sieci</b><small>Wyszukuj, podejrzyj i zapisz bez wychodzenia z Kucharzyny</small></div><strong>›</strong></button>
     <div class="v3-sort-row"><span>${rs.length} ${rs.length===1?'receptura':'receptur'}</span><select id="sort"><option value="recent" ${state.sort==='recent'?'selected':''}>Ostatnio używane</option><option value="name" ${state.sort==='name'?'selected':''}>Nazwa A–Z</option><option value="fav" ${state.sort==='fav'?'selected':''}>Ulubione</option></select></div>
     <div class="v3-recipe-list">${rs.length?rs.map(r=>v3RecipeCard(r,true)).join(''):`<div class="v3-empty"><span>🍽️</span><b>Nic tu jeszcze nie ma</b><p>Zmień filtr albo dodaj pierwszą recepturę.</p><button class="btn primary" data-action="new">＋ Nowa receptura</button></div>`}</div>
   </div>`;
