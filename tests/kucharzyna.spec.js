@@ -50,11 +50,13 @@ test('main navigation works on iPhone-sized viewport', async ({ page }) => {
 
 test('recipe creation workflow saves a local recipe', async ({ page }) => {
   await page.locator('[data-route="recipes"]').click();
-  await page.locator('[data-action="new"]').click();
+  await expect(page.locator('#main')).toContainText('Przepisy');
+  await page.locator('[data-action="new"]').first().click();
 
-  await page.locator('#f-name').fill('E2E Kucharzyna');
-  await page.locator('#f-cat').selectOption({ label: 'Inne' }).catch(() => {});
-  await page.locator('#saveRecipe, #saveRecipe2').first().click();
+  await expect(page.locator('#v14-name')).toBeVisible();
+  await page.locator('#v14-name').fill('E2E Kucharzyna');
+  await page.locator('#v14-cat').fill('Inne');
+  await page.locator('[data-v14-save]').click();
 
   await expect(page.locator('#main')).toContainText('E2E Kucharzyna');
   const count = await page.evaluate(async () => (await getAll('recipes')).filter(r => r.name === 'E2E Kucharzyna').length);
@@ -63,18 +65,21 @@ test('recipe creation workflow saves a local recipe', async ({ page }) => {
 
 test('shopping list can add and complete an item', async ({ page }) => {
   await page.locator('[data-route="shopping"]').click();
+  await expect(page.locator('#main')).toContainText('Co kupić?');
   await page.locator('#add-shopping').click();
 
+  await expect(page.locator('#shop-name')).toBeVisible();
   await page.locator('#shop-name').fill('E2E Pomidor');
   await page.locator('#shop-qty').fill('3');
   await page.locator('#shop-unit').fill('szt.');
   await page.locator('#shop-ok').click();
 
   await expect(page.locator('#main')).toContainText('E2E Pomidor');
-  const row = page.locator('.k33-shopping-row').filter({ hasText: 'E2E Pomidor' }).first();
-  const toggle = row.locator('[data-shop-check]').first();
-  await toggle.click();
-  await expect(toggle).toHaveAttribute('aria-label', /kupione/i);
+  const row = page.locator('.v3-shop-row, .shopping-item, .k32-shop-row').filter({ hasText: 'E2E Pomidor' }).first();
+  await expect(row).toBeVisible();
+  const toggle = row.locator('[data-shop-check-v20]').first();
+  await toggle.check();
+  await expect(toggle).toBeChecked();
 });
 
 test('online recipe browser stays inside Kucharzyna', async ({ page }) => {
