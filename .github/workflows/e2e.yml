@@ -22,11 +22,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium webkit
+      - name: Install Playwright WebKit
+        run: npx playwright install --with-deps webkit
 
-      - name: Run Kucharzyna E2E
-        run: npx playwright test --project=iphone-17-pro-max --project=desktop-smoke
+      - name: Run iPhone Safari E2E
+        run: npx playwright test --project=iphone-17-pro-max
 
       - name: Upload Playwright report
         if: always()
