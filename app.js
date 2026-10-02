@@ -2753,12 +2753,14 @@ document.head.appendChild(s)})();
   const emojiFor=(name='')=>{
     const raw=String(name).toLowerCase().trim();
     const rules=[
+      [/parmigiano|parmezan|pecorino|grana padano|padano|mozzarella|gorgonzola|provolone|halloumi|camembert|brie|cheddar|emmental|gruyere|gouda|feta|ricotta|mascarpone|twarog|twaróg|ser/,'🧀'],
+      [/seler naciowy|seler|celery/,'🌿'],[/fenkuł|koper wloski|koper włoski|fennel/,'🌱'],[/szparag|asparagus/,'🌱'],[/fasolka szparagowa|fasolka|green bean/,'🫛'],[/groszek|peas/,'🫛'],[/kukurydz|corn/,'🌽'],[/awokado|avocado/,'🥑'],[/bakłaż|eggplant/,'🍆'],[/burak|beet/,'🫜'],[/rzodkiew|radish/,'🌱'],[/brokuł|broccoli/,'🥦'],[/kalafior|cauliflower/,'🥦'],[/dynia|pumpkin/,'🎃'],[/sałata|lettuce/,'🥬'],
       [/mąk|skrobi|płatk|kasz/,'🌾'],[/wod|bulion/,'💧'],[/sól|salt/,'🧂'],[/cukier|cukru/,'🍚'],
       [/drożd/,'🫧'],[/pomidor|passata|pelati|ketchup/,'🍅'],[/czosnk/,'🧄'],[/cebul|por|dymka/,'🧅'],
       [/marchew/,'🥕'],[/ziemniak/,'🥔'],[/papryk|chili|jalape|pieprz/,'🌶️'],[/cukinia|ogórek/,'🥒'],
       [/bakłaż/,'🍆'],[/grzyb|pieczark/,'🍄'],[/sałat|rukol|szpinak|jarmuż|kapust/,'🥬'],
-      [/bazyl|oregano|tymian|rozmaryn|koperek|pietrusz|kolendr|zioł/,'🌿'],[/ser|twaróg|feta|ricott|mozz|mascarpone/,'🧀'],
-      [/mleko|śmietan|jogurt/,'🥛'],[/jaj/,'🥚'],[/oliw|olej/,'🫒'],[/masł|ghee/,'🧈'],
+      [/bazyl|oregano|tymian|rozmaryn|koperek|pietrusz|kolendr|zioł/,'🌿'],[/mleko|śmietan|jogurt/,'🥛'],
+      [/jaj/,'🥚'],[/oliw|olej/,'🫒'],[/masł|ghee/,'🧈'],
       [/woł|wieprz|baran|jagnię|królik|mięso/,'🥩'],[/kurczak|drób/,'🍗'],[/boczek|pancetta|guanciale|szynka|salami|kiełbasa|chorizo/,'🥓'],
       [/krewet|małż|mule|ośmior/,'🦐'],[/ryb|dorsz|łosoś|tuńczyk|anchois/,'🐟'],[/makaron|spaghetti|ramen|pasta|lasagne|gnocchi/,'🍝'],
       [/ryż|risotto/,'🍚'],[/fasol|ciecierzyc|soczew|groch|bób/,'🫘'],[/orzech|migdał|pistacj|sezam/,'🥜'],
